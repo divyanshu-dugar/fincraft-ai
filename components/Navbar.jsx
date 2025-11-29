@@ -49,14 +49,14 @@ export default function Navbar() {
     {
       name: 'Ledgerify',
       items: [
-        // {
-        //   title: 'Income Tracker',
-        //   items: [
-        //     { name: 'Income List', href: '/income-list' },
-        //     { name: 'Add Income', href: '/add-income' },
-        //     { name: 'Add Category', href: '/add-income-category' },
-        //   ],
-        // },
+        {
+          title: 'Income Tracker',
+          items: [
+            { name: 'Income List', href: '/income/list' },
+            { name: 'Add Income', href: '/income/add' },
+            { name: 'Add Category', href: '/income/category' },
+          ],
+        },
         {
           title: 'Expenses Tracker',
           items: [
