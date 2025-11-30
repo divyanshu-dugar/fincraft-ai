@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseSummary from "./ExpenseSummary";
 import LoadingSpinner from "./LoadingSpinner";
+//
+import { Plus, Upload } from "lucide-react";
+import ImportExpensesModal from "./ImportExpensesModel";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
@@ -32,6 +34,8 @@ const ExpenseList = () => {
   // Pagination
   const [currentMonth, setCurrentMonth] = useState(todayUTC.getUTCMonth());
   const [currentYear, setCurrentYear] = useState(todayUTC.getUTCFullYear());
+
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -208,7 +212,8 @@ const ExpenseList = () => {
               Expense Tracker
             </h1>
             <p className="text-xl md:text-2xl text-blue-100/90 max-w-2xl mb-8 leading-relaxed">
-              Take control of your financial journey. Track, analyze, and optimize your spending with intelligent insights.
+              Take control of your financial journey. Track, analyze, and
+              optimize your spending with intelligent insights.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -221,6 +226,18 @@ const ExpenseList = () => {
                 <Plus size={20} />
                 Add New Expense
               </motion.button>
+
+              {/* Add Import Button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setImportModalOpen(true)}
+                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
+              >
+                <Upload size={20} />
+                Import Expenses
+              </motion.button>
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -260,7 +277,7 @@ const ExpenseList = () => {
         />
 
         {/* Enhanced Pagination Controls */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -310,6 +327,15 @@ const ExpenseList = () => {
           <ExpenseSummary expenses={expenses} formatCurrency={formatCurrency} />
         )}
       </div>
+
+      <ImportExpensesModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImportSuccess={() => {
+          fetchExpenses(); // Refresh the expense list
+          fetchStats(); // Refresh stats
+        }}
+      />
     </div>
   );
 };
