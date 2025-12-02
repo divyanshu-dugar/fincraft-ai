@@ -1,6 +1,13 @@
 "use client";
 
-import { Pencil, Trash2, TrendingUp, Plus, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  TrendingUp,
+  Plus,
+  AlertTriangle,
+  CheckCircle,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function BudgetTable({
@@ -13,58 +20,119 @@ export default function BudgetTable({
   // Generate subtle background colors based on index
   const getRowBackgroundColor = (index) => {
     const colors = [
-      'from-white to-gray-50/80',
-      'from-purple-50/30 to-indigo-50/20',
-      'from-blue-50/20 to-cyan-50/10',
-      'from-violet-50/15 to-purple-50/10',
+      "from-white to-gray-50/80",
+      "from-purple-50/30 to-indigo-50/20",
+      "from-blue-50/20 to-cyan-50/10",
+      "from-violet-50/15 to-purple-50/10",
     ];
     return colors[index % colors.length];
+  };
+
+  // Helper function to determine date status
+  const getDateStatus = (budget) => {
+    const today = new Date();
+    const startDate = new Date(budget.startDate);
+    const endDate = new Date(budget.endDate);
+
+    if (today < startDate) {
+      return {
+        label: "Upcoming",
+        color: "blue",
+        textColor: "text-blue-700",
+        bgColor: "bg-blue-100",
+        borderColor: "border-blue-200",
+      };
+    } else if (today > endDate) {
+      return {
+        label: "Expired",
+        color: "gray",
+        textColor: "text-gray-700",
+        bgColor: "bg-gray-100",
+        borderColor: "border-gray-200",
+      };
+    } else {
+      return {
+        label: "Current",
+        color: "green",
+        textColor: "text-green-700",
+        bgColor: "bg-green-100",
+        borderColor: "border-green-200",
+      };
+    }
   };
 
   // Get hover gradient based on index
   const getHoverGradient = (index) => {
     const gradients = [
-      'hover:from-purple-50/40 hover:to-indigo-50/30',
-      'hover:from-blue-50/30 hover:to-cyan-50/20',
-      'hover:from-violet-50/25 hover:to-purple-50/15',
-      'hover:from-indigo-50/20 hover:to-blue-50/10',
+      "hover:from-purple-50/40 hover:to-indigo-50/30",
+      "hover:from-blue-50/30 hover:to-cyan-50/20",
+      "hover:from-violet-50/25 hover:to-purple-50/15",
+      "hover:from-indigo-50/20 hover:to-blue-50/10",
     ];
     return gradients[index % gradients.length];
   };
 
-  // Get status color and icon
-  const getBudgetStatus = (budget) => {
-    const percentage = (budget.currentSpent / budget.amount) * 100;
-    
-    if (percentage >= 100) {
-      return {
-        color: 'red',
-        icon: AlertTriangle,
-        label: 'Exceeded',
-        textColor: 'text-red-700',
-        bgColor: 'bg-red-100',
-        borderColor: 'border-red-200'
-      };
-    } else if (percentage >= 80) {
-      return {
-        color: 'orange',
-        icon: AlertTriangle,
-        label: 'Almost Exceeded',
-        textColor: 'text-orange-700',
-        bgColor: 'bg-orange-100',
-        borderColor: 'border-orange-200'
-      };
-    } else {
-      return {
-        color: 'green',
-        icon: CheckCircle,
-        label: 'On Track',
-        textColor: 'text-green-700',
-        bgColor: 'bg-green-100',
-        borderColor: 'border-green-200'
-      };
-    }
+  // Safe calculation functions
+  const getCurrentSpent = (budget) => {
+    return budget.currentSpent || 0;
   };
+
+  const getBudgetPercentage = (budget) => {
+    const currentSpent = getCurrentSpent(budget);
+    const amount = budget.amount || 0;
+    if (amount === 0) return 0;
+    return Math.min((currentSpent / amount) * 100, 100);
+  };
+
+  const getRemainingAmount = (budget) => {
+    const currentSpent = getCurrentSpent(budget);
+    const amount = budget.amount || 0;
+    return Math.max(amount - currentSpent, 0);
+  };
+
+  // Get status color and icon
+  // Get status color and icon
+const getBudgetStatus = (budget) => {
+  const percentage = getBudgetPercentage(budget);
+  
+  if (percentage > 100) { // Changed from >= 100 to > 100
+    return {
+      color: "red",
+      icon: AlertTriangle,
+      label: "Exceeded",
+      textColor: "text-red-700",
+      bgColor: "bg-red-100",
+      borderColor: "border-red-200",
+    };
+  } else if (percentage === 100) { // New: exactly at 100%
+    return {
+      color: "blue",
+      icon: CheckCircle,
+      label: "Limit Reached",
+      textColor: "text-blue-700",
+      bgColor: "bg-blue-100",
+      borderColor: "border-blue-200",
+    };
+  } else if (percentage >= 80) {
+    return {
+      color: "orange",
+      icon: AlertTriangle,
+      label: "Almost Exceeded",
+      textColor: "text-orange-700",
+      bgColor: "bg-orange-100",
+      borderColor: "border-orange-200",
+    };
+  } else {
+    return {
+      color: "green",
+      icon: CheckCircle,
+      label: "On Track",
+      textColor: "text-green-700",
+      bgColor: "bg-green-100",
+      borderColor: "border-green-200",
+    };
+  }
+};
 
   // Case: No budgets
   if (!budgets || budgets.length === 0) {
@@ -90,7 +158,14 @@ export default function BudgetTable({
 
           <thead>
             <tr className="border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 to-gray-100/50">
-              {["Budget Name", "Category", "Progress", "Amount", "Period", "Actions"].map((header, index) => (
+              {[
+                "Budget Name",
+                "Category",
+                "Progress",
+                "Amount",
+                "Period",
+                "Actions",
+              ].map((header, index) => (
                 <th
                   key={header}
                   className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500 tracking-wider"
@@ -116,8 +191,10 @@ export default function BudgetTable({
                 const hoverGradient = getHoverGradient(index);
                 const status = getBudgetStatus(budget);
                 const StatusIcon = status.icon;
-                const percentage = Math.min((budget.currentSpent / budget.amount) * 100, 100);
-                const remaining = Math.max(budget.amount - budget.currentSpent, 0);
+                const currentSpent = getCurrentSpent(budget);
+                const percentage = getBudgetPercentage(budget);
+                const remaining = getRemainingAmount(budget);
+                const dateStatus = getDateStatus(budget);
 
                 return (
                   <motion.tr
@@ -134,10 +211,19 @@ export default function BudgetTable({
                           {budget.name}
                         </span>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.textColor} ${status.borderColor} border`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.textColor} ${status.borderColor} border`}
+                          >
                             <StatusIcon size={12} />
                             {status.label}
                           </span>
+                          {dateStatus.label !== "Current" && (
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${dateStatus.bgColor} ${dateStatus.textColor} ${dateStatus.borderColor} border`}
+                            >
+                              {dateStatus.label}
+                            </span>
+                          )}
                           {!budget.isActive && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
                               Inactive
@@ -152,9 +238,9 @@ export default function BudgetTable({
                       <motion.span
                         whileHover={{ scale: 1.05 }}
                         className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white shadow-lg transition-all duration-200 group-hover:shadow-xl"
-                        style={{ 
+                        style={{
                           backgroundColor: categoryColor,
-                          background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`
+                          background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`,
                         }}
                       >
                         <div className="w-2 h-2 rounded-full bg-white/30" />
@@ -168,17 +254,18 @@ export default function BudgetTable({
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Spent</span>
                           <span className="font-medium text-gray-900">
-                            {formatCurrency(budget.currentSpent)} / {formatCurrency(budget.amount)}
+                            {formatCurrency(currentSpent)} /{" "}
+                            {formatCurrency(budget.amount)}
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div 
+                          <div
                             className={`h-2.5 rounded-full transition-all duration-500 ${
-                              percentage >= 100 
-                                ? 'bg-red-500' 
-                                : percentage >= 80 
-                                ? 'bg-orange-500' 
-                                : 'bg-green-500'
+                              percentage >= 100
+                                ? "bg-red-500"
+                                : percentage >= 80
+                                ? "bg-orange-500"
+                                : "bg-green-500"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
@@ -205,9 +292,13 @@ export default function BudgetTable({
                     {/* Period */}
                     <td className="px-6 py-5">
                       <div className="flex flex-col text-sm text-gray-600">
-                        <span className="font-medium">{formatDate(budget.startDate)}</span>
+                        <span className="font-medium">
+                          {formatDate(budget.startDate)}
+                        </span>
                         <span className="text-gray-400">to</span>
-                        <span className="font-medium">{formatDate(budget.endDate)}</span>
+                        <span className="font-medium">
+                          {formatDate(budget.endDate)}
+                        </span>
                       </div>
                     </td>
 
@@ -217,7 +308,9 @@ export default function BudgetTable({
                         <motion.button
                           whileHover={{ scale: 1.1, y: -1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => router.push(`/budget/edit/${budget._id}`)}
+                          onClick={() =>
+                            router.push(`/budget/edit/${budget._id}`)
+                          }
                           className="p-2.5 bg-white text-purple-600 rounded-xl border border-purple-200/60 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
                         >
                           <Pencil size={18} />
@@ -248,7 +341,7 @@ export default function BudgetTable({
       </div>
 
       {/* Summary Footer */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
@@ -256,10 +349,11 @@ export default function BudgetTable({
       >
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            Showing <span className="font-semibold">{budgets.length}</span> budgets
-            {budgets.some(b => !b.isActive) && (
+            Showing <span className="font-semibold">{budgets.length}</span>{" "}
+            budgets
+            {budgets.some((b) => !b.isActive) && (
               <span className="ml-2 text-orange-600">
-                ({budgets.filter(b => !b.isActive).length} inactive)
+                ({budgets.filter((b) => !b.isActive).length} inactive)
               </span>
             )}
           </div>
