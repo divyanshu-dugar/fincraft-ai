@@ -67,13 +67,13 @@ export default function Navbar() {
         },
       ],
     },
-    // {
-    //   name: 'Budgetify',
-    //   items: [
-    //     { name: 'Coming Soon!🔒', href: '/' },
-    //     { name: 'Coming Soon!', href: '/' },
-    //   ],
-    // },
+    {
+      name: 'Budgetify',
+      items: [
+        { name: 'Budget List', href: '/budget/list' },
+        { name: 'Add Budget', href: '/budget/add' },
+      ],
+    },
     // {
     //   name: 'Investify',
     //   items: [
