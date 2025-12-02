@@ -4,11 +4,17 @@ import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
+import { Menu, X, ChevronDown, ChevronRight } from 'lucide-react';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState(null);
+  
   const dropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,15 +28,28 @@ export default function Navbar() {
         setActiveDropdown(null);
         setActiveSubmenu(null);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setMobileMenuOpen(false);
+        setMobileActiveDropdown(null);
+        setMobileActiveSubmenu(null);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileActiveDropdown(null);
+    setMobileActiveSubmenu(null);
+  }, [pathname]);
+
   const handleLogout = () => {
     removeToken();
     setActiveDropdown(null);
     setActiveSubmenu(null);
+    setMobileMenuOpen(false);
     router.replace('/');
     router.refresh();
   };
@@ -42,6 +61,15 @@ export default function Navbar() {
 
   const toggleSubmenu = (title) => {
     setActiveSubmenu(activeSubmenu === title ? null : title);
+  };
+
+  const toggleMobileDropdown = (menuName) => {
+    setMobileActiveDropdown(mobileActiveDropdown === menuName ? null : menuName);
+    setMobileActiveSubmenu(null);
+  };
+
+  const toggleMobileSubmenu = (title) => {
+    setMobileActiveSubmenu(mobileActiveSubmenu === title ? null : title);
   };
 
   // Authenticated menu items
@@ -74,26 +102,12 @@ export default function Navbar() {
         { name: 'Add Budget', href: '/budget/add' },
       ],
     },
-    // {
-    //   name: 'Investify',
-    //   items: [
-    //     { name: 'Coming Soon!🔒', href: '/' },
-    //     { name: 'Coming Soon', href: '/' },
-    //   ],
-    // },
     {
       name: 'Goalify',
       items: [
         { name: 'Savings Goal List', href: '/goal/list' },
       ],
     },
-    // {
-    //   name: 'Other Tools',
-    //   items: [
-    //     { name: 'Tax Calculator', href: '/tax-calculator' },
-    //     { name: 'Currency Converter', href: '/currency-converter' },
-    //   ],
-    // },
   ];
 
   const publicMenuItems = [
@@ -114,7 +128,6 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 text-white hover:text-gray-200 transition-colors">
-            <span className="text-2xl"></span>
             <span className="text-xl font-bold bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent">
               Fincraft AI
             </span>
@@ -138,19 +151,14 @@ export default function Navbar() {
                   className="px-4 py-2 text-white hover:bg-white/20 rounded-lg flex items-center space-x-1 transition-all cursor-pointer"
                 >
                   <span>{menu.name}</span>
-                  <svg
+                  <ChevronDown
                     className={`w-4 h-4 transition-transform ${activeDropdown === menu.name ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
                 <div
-                  className={`absolute left-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-gray-200 transition-all duration-200 overflow-hidden ${
+                  className={`absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 transition-all duration-200 overflow-hidden ${
                     activeDropdown === menu.name
                       ? 'max-h-[500px] opacity-100 visible'
                       : 'max-h-0 opacity-0 invisible'
@@ -164,16 +172,11 @@ export default function Navbar() {
                           className="w-full flex justify-between items-center px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-blue-50 transition-all"
                         >
                           <span>{group.title}</span>
-                          <svg
+                          <ChevronDown
                             className={`w-3 h-3 transition-transform ${
                               activeSubmenu === group.title ? 'rotate-180' : ''
                             }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
+                          />
                         </button>
 
                         <div
@@ -270,8 +273,185 @@ export default function Navbar() {
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white hover:text-gray-200 p-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <div
+        ref={mobileMenuRef}
+        className={`md:hidden fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="h-full overflow-y-auto">
+          {/* Mobile Menu Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-700 p-4 flex justify-between items-center">
+            <span className="text-xl font-bold text-white">Fincraft AI</span>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-white p-2"
+              aria-label="Close menu"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Mobile Menu Content */}
+          <div className="p-4">
+            {/* Home Link */}
+            <Link
+              href="/"
+              className={`block w-full px-4 py-3 rounded-lg mb-2 transition-all font-medium ${
+                pathname === '/' ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+
+            {/* Menu Items */}
+            {menuItems.map((menu) => (
+              <div key={menu.name} className="mb-2">
+                <button
+                  onClick={() => toggleMobileDropdown(menu.name)}
+                  className="w-full flex justify-between items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all"
+                >
+                  <span className="font-medium">{menu.name}</span>
+                  <ChevronRight
+                    className={`w-4 h-4 transition-transform ${
+                      mobileActiveDropdown === menu.name ? 'rotate-90' : ''
+                    }`}
+                  />
+                </button>
+
+                {/* Mobile Dropdown Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    mobileActiveDropdown === menu.name ? 'max-h-[1000px]' : 'max-h-0'
+                  }`}
+                >
+                  <div className="pl-6 mt-1 space-y-1">
+                    {menu.items[0]?.items ? (
+                      menu.items.map((group) => (
+                        <div key={group.title} className="mb-2">
+                          <button
+                            onClick={() => toggleMobileSubmenu(group.title)}
+                            className="w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+                          >
+                            <span className="font-medium">{group.title}</span>
+                            <ChevronRight
+                              className={`w-3 h-3 transition-transform ${
+                                mobileActiveSubmenu === group.title ? 'rotate-90' : ''
+                              }`}
+                            />
+                          </button>
+
+                          <div
+                            className={`overflow-hidden transition-all duration-200 ${
+                              mobileActiveSubmenu === group.title ? 'max-h-[300px]' : 'max-h-0'
+                            }`}
+                          >
+                            <div className="pl-4 mt-1 space-y-1">
+                              {group.items.map((sub) => (
+                                <Link
+                                  key={sub.name}
+                                  href={sub.href}
+                                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  {sub.name}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      menu.items.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Auth Section */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              {authenticated ? (
+                <>
+                  <div className="px-4 py-3 mb-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Signed in as</p>
+                    <p className="font-medium text-gray-900">{user?.userName}</p>
+                  </div>
+                  
+                  <Link
+                    href="/dashboard"
+                    className="block w-full px-4 py-3 mb-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg font-medium text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg font-medium text-center"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className={`block w-full px-4 py-3 mb-2 rounded-lg font-medium text-center ${
+                      pathname === '/login'
+                        ? 'bg-blue-100 text-blue-600'
+                        : 'text-blue-600 hover:bg-blue-50'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 rounded-lg font-medium text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </nav>
   );
 }
