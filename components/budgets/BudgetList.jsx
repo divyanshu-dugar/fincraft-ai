@@ -16,7 +16,7 @@ const BudgetList = () => {
   const [alerts, setAlerts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all"); // all, active, exceeded, almost_exceeded
+  const [filter, setFilter] = useState("active"); // all, active, exceeded, almost_exceeded
 
   const router = useRouter();
 
@@ -53,32 +53,63 @@ const BudgetList = () => {
   const fetchBudgets = async () => {
     try {
       const token = getToken();
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/budgets`,
-        {
-          headers: {
-            Authorization: `jwt ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/budgets`, {
+        headers: {
+          Authorization: `jwt ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) throw new Error("Failed to fetch budgets");
 
       const data = await res.json();
-      
+
+      // Add current date for filtering
+      const today = new Date();
+
       // Apply filters
       let filteredData = data;
+
       if (filter === "active") {
-        filteredData = data.filter(budget => budget.isActive);
+        filteredData = data.filter((budget) => {
+          // Budget is active AND current date is within budget period
+          const isActive = budget.isActive;
+          const startDate = new Date(budget.startDate);
+          const endDate = new Date(budget.endDate);
+          const isCurrent = today >= startDate && today <= endDate;
+          return isActive && isCurrent;
+        });
       } else if (filter === "exceeded") {
-        filteredData = data.filter(budget => 
-          budget.currentSpent >= budget.amount
-        );
+        filteredData = data.filter((budget) => {
+          const currentSpent = budget.currentSpent || 0;
+          const percentage = (currentSpent / budget.amount) * 100;
+          const startDate = new Date(budget.startDate);
+          const endDate = new Date(budget.endDate);
+          const isCurrent = today >= startDate && today <= endDate;
+          return percentage > 100 && isCurrent && budget.isActive; // Changed from >= 100 to > 100
+        });
+      } else if (filter === "limit_reached") {
+        filteredData = data.filter((budget) => {
+          const currentSpent = budget.currentSpent || 0;
+          const percentage = (currentSpent / budget.amount) * 100;
+          const startDate = new Date(budget.startDate);
+          const endDate = new Date(budget.endDate);
+          const isCurrent = today >= startDate && today <= endDate;
+          return percentage === 100 && isCurrent && budget.isActive;
+        });
       } else if (filter === "almost_exceeded") {
-        filteredData = data.filter(budget => {
-          const percentage = (budget.currentSpent / budget.amount) * 100;
-          return percentage >= 80 && percentage < 100;
+        filteredData = data.filter((budget) => {
+          const currentSpent = budget.currentSpent || 0;
+          const percentage = (currentSpent / budget.amount) * 100;
+          const startDate = new Date(budget.startDate);
+          const endDate = new Date(budget.endDate);
+          const isCurrent = today >= startDate && today <= endDate;
+          return (
+            percentage >= 80 &&
+            percentage <= 100 &&
+            isCurrent &&
+            budget.isActive
+          ); // Changed from < 100 to <= 100
         });
       }
 
@@ -123,7 +154,7 @@ const BudgetList = () => {
 
       if (res.ok) {
         const data = await res.json();
-        setAlerts(data.filter(alert => !alert.isRead));
+        setAlerts(data.filter((alert) => !alert.isRead));
       }
     } catch (error) {
       console.error("Error fetching alerts:", error);
@@ -166,7 +197,7 @@ const BudgetList = () => {
       );
 
       if (res.ok) {
-        setAlerts(alerts.filter(alert => alert._id !== alertId));
+        setAlerts(alerts.filter((alert) => alert._id !== alertId));
       }
     } catch (error) {
       console.error("Error marking alert as read:", error);
@@ -206,7 +237,8 @@ const BudgetList = () => {
               Budget Tracker
             </h1>
             <p className="text-xl md:text-2xl text-purple-100/90 max-w-2xl mb-8 leading-relaxed">
-              Take control of your spending. Set budgets, track progress, and get smart alerts to stay on track financially.
+              Take control of your spending. Set budgets, track progress, and
+              get smart alerts to stay on track financially.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -265,9 +297,13 @@ const BudgetList = () => {
                     className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-100"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        alert.type === 'budget_exceeded' ? 'bg-red-500' : 'bg-orange-500'
-                      }`} />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          alert.type === "budget_exceeded"
+                            ? "bg-red-500"
+                            : "bg-orange-500"
+                        }`}
+                      />
                       <p className="text-sm text-gray-700">{alert.message}</p>
                     </div>
                     <button
