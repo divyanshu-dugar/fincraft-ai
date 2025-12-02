@@ -5,7 +5,7 @@ export default function FinancialTools() {
   const tools = [
     { name: 'Ledgerify', description: 'Track your income and expenses seamlessly with Income & Expense Trackers.', icon: '📊', color: 'from-blue-500 to-cyan-500', href: '/expense/list' },
     { name: 'Goalify', description: 'Set, track, and achieve your savings goals - one step at a time.', icon: '💰', color: 'from-green-500 to-emerald-500', href: '/goal/list'},
-    { name: 'Budgetify', description: 'Manage your budget and plan better every month.', icon: '📈', color: 'from-purple-500 to-pink-500', comingSoon: true },
+    { name: 'Budgetify', description: 'Manage your budget and plan better every month.', icon: '📈', color: 'from-purple-500 to-pink-500', href: '/budget/list'},
     { name: 'Investify', description: 'Learn to invest smartly and grow your wealth.', icon: '🚀', color: 'from-orange-500 to-red-500', comingSoon: true },
     { name: 'Other Tools', description: 'Tax Calculator, Currency Converter, and more utility tools.', icon: '🛠️', color: 'from-gray-500 to-slate-600', comingSoon: true}
   ];
