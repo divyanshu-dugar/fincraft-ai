@@ -1,13 +1,13 @@
 "use client";
 
-import { Filter } from "lucide-react";
+import { Filter, Calendar, TrendingUp } from "lucide-react";
 
 export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
   const filters = [
-    { value: "all", label: "All Budgets", color: "gray" },
-    { value: "active", label: "Active", color: "green" },
-    { value: "almost_exceeded", label: "Almost Exceeded", color: "orange" },
-    { value: "exceeded", label: "Exceeded", color: "red" },
+    { value: "active", label: "Active", color: "green", icon: Calendar },
+    { value: "almost_exceeded", label: "Almost Exceeded", color: "orange", icon: TrendingUp },
+    { value: "exceeded", label: "Exceeded", color: "red", icon: TrendingUp },
+    { value: "all", label: "All Budgets", color: "gray", icon: null },
   ];
 
   return (
@@ -26,19 +26,43 @@ export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
 
       {/* Filter Buttons */}
       <div className="flex flex-wrap gap-3">
-        {filters.map((filterOption) => (
-          <button
-            key={filterOption.value}
-            onClick={() => setFilter(filterOption.value)}
-            className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border ${
-              filter === filterOption.value
-                ? `bg-${filterOption.color}-100 text-${filterOption.color}-700 border-${filterOption.color}-300 shadow-sm`
-                : "bg-white/80 text-gray-600 border-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            {filterOption.label}
-          </button>
-        ))}
+        {filters.map((filterOption) => {
+          const Icon = filterOption.icon;
+          return (
+            <button
+              key={filterOption.value}
+              onClick={() => setFilter(filterOption.value)}
+              className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 border flex items-center gap-2 ${
+                filter === filterOption.value
+                  ? `bg-${filterOption.color}-100 text-${filterOption.color}-700 border-${filterOption.color}-300 shadow-sm`
+                  : "bg-white/80 text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {Icon && <Icon size={16} />}
+              {filterOption.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filter Descriptions */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-gray-600">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+          <span>All: All budgets created</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-300"></div>
+          <span>Active: Current month/year budgets</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-orange-300"></div>
+          <span>Almost: 80-99% used</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-red-300"></div>
+          <span>Exceeded: 100% or more used</span>
+        </div>
       </div>
 
       {/* Subtle background gradient accent */}
