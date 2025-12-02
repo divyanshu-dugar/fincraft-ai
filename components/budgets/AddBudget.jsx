@@ -14,33 +14,197 @@ const AddBudget = () => {
     amount: '',
     period: 'monthly',
     category: '',
-    startDate: new Date().toLocaleDateString('en-CA'),
+    startDate: '',
     endDate: '',
     notifications: true,
     alertThreshold: 80
   });
   const [errors, setErrors] = useState({});
 
-  // Calculate default end date (1 month from start)
+  // Helper function to create a UTC date at midnight
+  const createUTCDate = (year, month, day) => {
+    return new Date(Date.UTC(year, month, day));
+  };
+
+  // Helper function to get Monday of the current week (in user's local time, then convert to UTC)
+  const getMondayOfWeek = (dateString) => {
+    // Parse the input date in user's local timezone
+    const localDate = new Date(dateString + 'T00:00:00');
+    const day = localDate.getDay();
+    const diff = localDate.getDate() - day + (day === 0 ? -6 : 1);
+    
+    // Create new date with adjusted day
+    const mondayLocal = new Date(localDate);
+    mondayLocal.setDate(diff);
+    
+    // Convert to UTC date string (YYYY-MM-DD)
+    return createUTCDate(
+      mondayLocal.getFullYear(),
+      mondayLocal.getMonth(),
+      mondayLocal.getDate()
+    );
+  };
+
+  // Helper function to get Sunday of the current week
+  const getSundayOfWeek = (dateString) => {
+    const localDate = new Date(dateString + 'T00:00:00');
+    const day = localDate.getDay();
+    const diff = localDate.getDate() - day + (day === 0 ? 0 : 7);
+    
+    const sundayLocal = new Date(localDate);
+    sundayLocal.setDate(diff);
+    
+    return createUTCDate(
+      sundayLocal.getFullYear(),
+      sundayLocal.getMonth(),
+      sundayLocal.getDate()
+    );
+  };
+
+  // Helper function to get first day of the month
+  const getFirstDayOfMonth = (dateString) => {
+    const localDate = new Date(dateString + 'T00:00:00');
+    return createUTCDate(
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      1
+    );
+  };
+
+  // Helper function to get last day of the month
+  const getLastDayOfMonth = (dateString) => {
+    const localDate = new Date(dateString + 'T00:00:00');
+    // Get first day of next month, then subtract 1 day
+    const nextMonth = new Date(Date.UTC(
+      localDate.getFullYear(),
+      localDate.getMonth() + 1,
+      1
+    ));
+    const lastDay = new Date(nextMonth);
+    lastDay.setUTCDate(nextMonth.getUTCDate() - 1);
+    return lastDay;
+  };
+
+  // Helper function to get first day of the year
+  const getFirstDayOfYear = (dateString) => {
+    const localDate = new Date(dateString + 'T00:00:00');
+    return createUTCDate(
+      localDate.getFullYear(),
+      0, // January
+      1
+    );
+  };
+
+  // Helper function to get last day of the year
+  const getLastDayOfYear = (dateString) => {
+    const localDate = new Date(dateString + 'T00:00:00');
+    return createUTCDate(
+      localDate.getFullYear(),
+      11, // December
+      31
+    );
+  };
+
+  // Format date to YYYY-MM-DD string (local time for display)
+  const formatDateForInput = (date) => {
+    if (!date) return '';
+    return date.toISOString().split('T')[0];
+  };
+
+  // Format date for display in user's locale
+  const formatDateForDisplay = (date) => {
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC' // Show UTC date in display
+    });
+  };
+
+  // Get today's date in user's local timezone for the date input
+  const getTodayLocalDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Calculate date ranges based on period
+  const calculateDateRange = (selectedDate, period) => {
+    if (!selectedDate) return { startDate: null, endDate: null };
+    
+    let startDateUTC, endDateUTC;
+
+    switch (period) {
+      case 'weekly':
+        startDateUTC = getMondayOfWeek(selectedDate);
+        endDateUTC = getSundayOfWeek(selectedDate);
+        break;
+      case 'monthly':
+        startDateUTC = getFirstDayOfMonth(selectedDate);
+        endDateUTC = getLastDayOfMonth(selectedDate);
+        break;
+      case 'yearly':
+        startDateUTC = getFirstDayOfYear(selectedDate);
+        endDateUTC = getLastDayOfYear(selectedDate);
+        break;
+      default:
+        startDateUTC = getFirstDayOfMonth(selectedDate);
+        endDateUTC = getLastDayOfMonth(selectedDate);
+    }
+
+    return {
+      startDate: startDateUTC,
+      endDate: endDateUTC
+    };
+  };
+
+  // Initialize with default dates when component mounts
   useEffect(() => {
-    if (formData.startDate && !formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(start);
-      
-      if (formData.period === 'weekly') {
-        end.setDate(start.getDate() + 7);
-      } else if (formData.period === 'monthly') {
-        end.setMonth(start.getMonth() + 1);
-      } else if (formData.period === 'yearly') {
-        end.setFullYear(start.getFullYear() + 1);
-      }
-      
+    const todayLocal = getTodayLocalDate();
+    const { startDate, endDate } = calculateDateRange(todayLocal, 'monthly');
+    
+    setFormData(prev => ({
+      ...prev,
+      startDate: formatDateForInput(startDate),
+      endDate: formatDateForInput(endDate),
+      // Set the reference date input to today's local date
+      referenceDate: todayLocal
+    }));
+  }, []);
+
+  // Update date range when period changes
+  useEffect(() => {
+    if (formData.referenceDate) {
+      const { startDate, endDate } = calculateDateRange(formData.referenceDate, formData.period);
       setFormData(prev => ({
         ...prev,
-        endDate: end.toLocaleDateString('en-CA')
+        startDate: formatDateForInput(startDate),
+        endDate: formatDateForInput(endDate)
       }));
     }
-  }, [formData.startDate, formData.period]);
+  }, [formData.period]);
+
+  // Handle reference date change
+  const handleReferenceDateChange = (date) => {
+    const { startDate, endDate } = calculateDateRange(date, formData.period);
+    
+    setFormData(prev => ({
+      ...prev,
+      referenceDate: date,
+      startDate: formatDateForInput(startDate),
+      endDate: formatDateForInput(endDate)
+    }));
+    
+    if (errors.referenceDate) {
+      setErrors(prev => ({
+        ...prev,
+        referenceDate: ''
+      }));
+    }
+  };
 
   // Fetch categories from backend
   useEffect(() => {
@@ -73,10 +237,15 @@ const AddBudget = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    if (name === 'referenceDate') {
+      handleReferenceDateChange(value);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -102,14 +271,12 @@ const AddBudget = () => {
       newErrors.category = 'Category is required';
     }
 
-    if (!formData.startDate) {
-      newErrors.startDate = 'Start date is required';
+    if (!formData.referenceDate) {
+      newErrors.referenceDate = 'Reference date is required';
     }
 
-    if (!formData.endDate) {
-      newErrors.endDate = 'End date is required';
-    } else if (new Date(formData.endDate) <= new Date(formData.startDate)) {
-      newErrors.endDate = 'End date must be after start date';
+    if (!formData.startDate || !formData.endDate) {
+      newErrors.dateRange = 'Date range calculation failed';
     }
 
     if (formData.alertThreshold < 0 || formData.alertThreshold > 100) {
@@ -130,13 +297,22 @@ const AddBudget = () => {
     setLoading(true);
     try {
       const token = getToken();
+      
+      // Send UTC dates to backend
+      const budgetData = {
+        ...formData,
+        // Ensure dates are sent as UTC strings
+        startDate: new Date(formData.startDate + 'T00:00:00Z').toISOString(),
+        endDate: new Date(formData.endDate + 'T23:59:59.999Z').toISOString()
+      };
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/budgets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `jwt ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(budgetData)
       });
 
       if (res.ok) {
@@ -170,6 +346,16 @@ const AddBudget = () => {
       default:
         return [100, 200, 500, 1000];
     }
+  };
+
+  // Get date range description for display
+  const getDateRangeDescription = () => {
+    const startDate = formData.startDate ? new Date(formData.startDate + 'T00:00:00Z') : null;
+    const endDate = formData.endDate ? new Date(formData.endDate + 'T00:00:00Z') : null;
+    
+    if (!startDate || !endDate) return '';
+    
+    return `${formatDateForDisplay(startDate)} to ${formatDateForDisplay(endDate)}`;
   };
 
   return (
@@ -275,10 +461,15 @@ const AddBudget = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                 >
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
+                  <option value="weekly">Weekly (Mon-Sun)</option>
+                  <option value="monthly">Monthly (1st-last)</option>
+                  <option value="yearly">Yearly (Jan 1-Dec 31)</option>
                 </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.period === 'weekly' && 'Monday to Sunday of selected week'}
+                  {formData.period === 'monthly' && '1st to last day of selected month'}
+                  {formData.period === 'yearly' && 'January 1 to December 31 of selected year'}
+                </p>
               </div>
 
               {/* Amount Field */}
@@ -310,46 +501,59 @@ const AddBudget = () => {
               </div>
             </div>
 
-            {/* Date Range in Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Start Date */}
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Date <span className="text-red-500">*</span>
+            {/* Date Range */}
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <h3 className="text-sm font-medium text-blue-900 mb-3">
+                {formData.period.charAt(0).toUpperCase() + formData.period.slice(1)} Period
+              </h3>
+              
+              <div className="mb-4">
+                <label htmlFor="referenceDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Reference Date <span className="text-red-500">*</span>
+                  <span className="text-xs text-gray-500 ml-2">(Your local timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone})</span>
                 </label>
                 <input
                   type="date"
-                  id="startDate"
-                  name="startDate"
-                  value={formData.startDate}
+                  id="referenceDate"
+                  name="referenceDate"
+                  value={formData.referenceDate || getTodayLocalDate()}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
-                    errors.startDate ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                    errors.referenceDate ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
-                {errors.startDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>
+                {errors.referenceDate && (
+                  <p className="mt-1 text-sm text-red-600">{errors.referenceDate}</p>
                 )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Select any date within the {formData.period}. Dates will be converted to UTC for storage.
+                </p>
               </div>
 
-              {/* End Date */}
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
-                  End Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="endDate"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
-                    errors.endDate ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
-                {errors.endDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>
-                )}
+              {/* Auto-calculated Date Range Display */}
+              <div className="bg-white rounded-lg p-4 border border-blue-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Calculated Date Range (UTC):</p>
+                    <p className="text-sm text-gray-600 mt-1">{getDateRangeDescription()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-700">Duration:</p>
+                    <p className="text-sm text-gray-600 mt-1 capitalize">{formData.period}</p>
+                  </div>
+                </div>
+                
+                {/* Read-only date display */}
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <label className="text-gray-500">Start Date (UTC):</label>
+                    <p className="font-medium text-gray-900">{formData.startDate || 'Calculating...'}</p>
+                  </div>
+                  <div>
+                    <label className="text-gray-500">End Date (UTC):</label>
+                    <p className="font-medium text-gray-900">{formData.endDate || 'Calculating...'}</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -468,23 +672,23 @@ const AddBudget = () => {
           transition={{ delay: 0.2 }}
           className="mt-8 bg-purple-50 rounded-2xl p-6 border border-purple-200"
         >
-          <h3 className="text-lg font-medium text-purple-900 mb-3">💡 Budgeting Tips</h3>
+          <h3 className="text-lg font-medium text-purple-900 mb-3">💡 Timezone Handling</h3>
           <ul className="space-y-2 text-purple-800 text-sm">
             <li className="flex items-start">
               <span className="mr-2">•</span>
-              Set realistic amounts based on your past spending patterns
+              All dates are stored in UTC to ensure consistency across timezones
             </li>
             <li className="flex items-start">
               <span className="mr-2">•</span>
-              Use specific categories for better tracking and insights
+              The reference date uses your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone})
             </li>
             <li className="flex items-start">
               <span className="mr-2">•</span>
-              Enable notifications to stay informed about your budget progress
+              Budget periods are calculated based on the selected reference date
             </li>
             <li className="flex items-start">
               <span className="mr-2">•</span>
-              Review and adjust budgets regularly based on your actual spending
+              When viewing budgets, dates will be displayed in your local timezone
             </li>
           </ul>
         </motion.div>
