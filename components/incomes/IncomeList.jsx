@@ -67,24 +67,34 @@ const IncomeList = () => {
   const fetchIncomes = async () => {
     try {
       const token = getToken();
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/income`;
+      let url = "";
 
-      // Handle category + date filters
-      if (selectedCategory !== "all") {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}`;
-      }
+      // Build query parameters for date range
+      const dateParams = new URLSearchParams();
       if (dateRange.startDate && dateRange.endDate) {
-        const params = new URLSearchParams({
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-        }).toString();
+        dateParams.append("startDate", dateRange.startDate);
+        dateParams.append("endDate", dateRange.endDate);
+      }
+      const dateQueryString = dateParams.toString();
 
-        if (selectedCategory === "all") {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/income/date-range?${params}`;
+      // Determine which endpoint to use
+      if (selectedCategory === "all") {
+        // Use main income endpoint with date filter
+        url = `${process.env.NEXT_PUBLIC_API_URL}/income`;
+        if (dateQueryString) {
+          url = `${url}?${dateQueryString}`;
+        }
+      } else {
+        // Use category-specific date range endpoint
+        if (dateQueryString) {
+          url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}/date-range?${dateQueryString}`;
         } else {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}/date-range?${params}`;
+          // If no date range, use just category endpoint
+          url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}`;
         }
       }
+
+      console.log("Fetching incomes from URL:", url); // Debug log
 
       const res = await fetch(url, {
         headers: {
@@ -93,12 +103,17 @@ const IncomeList = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch incomes");
+      if (!res.ok) {
+        console.error("Income response not OK:", res.status, res.statusText);
+        throw new Error(`Failed to fetch incomes: ${res.status}`);
+      }
 
       const data = await res.json();
       setIncomes(data);
     } catch (error) {
       console.error("Error fetching incomes:", error);
+      // Fallback to empty array
+      setIncomes([]);
     } finally {
       setLoading(false);
     }
@@ -208,7 +223,8 @@ const IncomeList = () => {
               Income Tracker
             </h1>
             <p className="text-xl md:text-2xl text-green-100/90 max-w-2xl mb-8 leading-relaxed">
-              Monitor your earnings and financial growth. Track, analyze, and optimize your income streams with intelligent insights.
+              Monitor your earnings and financial growth. Track, analyze, and
+              optimize your income streams with intelligent insights.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -260,7 +276,7 @@ const IncomeList = () => {
         />
 
         {/* Enhanced Pagination Controls */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
