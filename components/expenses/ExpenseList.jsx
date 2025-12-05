@@ -67,46 +67,52 @@ const ExpenseList = () => {
     }
   };
 
-  // 🟣 Fetch expenses
-  const fetchExpenses = async () => {
-    try {
-      const token = getToken();
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/expenses`;
-
-      // Handle category + date filters
-      if (selectedCategory !== "all") {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/expenses/category/${selectedCategory}`;
-      }
-      if (dateRange.startDate && dateRange.endDate) {
-        const params = new URLSearchParams({
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-        }).toString();
-
-        if (selectedCategory === "all") {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/expenses/date-range?${params}`;
-        } else {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/expenses/category/${selectedCategory}/date-range?${params}`;
-        }
-      }
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `jwt ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch expenses");
-
-      const data = await res.json();
-      setExpenses(data);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-    } finally {
-      setLoading(false);
+// 🟣 Fetch expenses
+const fetchExpenses = async () => {
+  try {
+    const token = getToken();
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/expenses`;
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    
+    if (dateRange.startDate && dateRange.endDate) {
+      params.append('startDate', dateRange.startDate);
+      params.append('endDate', dateRange.endDate);
     }
-  };
+    
+    // If specific category is selected, we need to use the category-specific endpoint
+    // OR filter on frontend. Let's filter on frontend for simplicity
+    const queryString = params.toString();
+    const finalUrl = queryString ? `${url}?${queryString}` : url;
+    
+    const res = await fetch(finalUrl, {
+      headers: {
+        Authorization: `jwt ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch expenses");
+
+    const allExpenses = await res.json();
+    
+    // Filter by category on frontend if needed
+    let filteredExpenses = allExpenses;
+    if (selectedCategory !== "all") {
+      filteredExpenses = allExpenses.filter(expense => 
+        expense.category?._id === selectedCategory || 
+        expense.category?.name === selectedCategory
+      );
+    }
+    
+    setExpenses(filteredExpenses);
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // 🟣 Fetch aggregated stats
   const fetchStats = async () => {
