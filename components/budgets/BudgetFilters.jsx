@@ -1,11 +1,12 @@
 "use client";
 
-import { Filter, Calendar, TrendingUp } from "lucide-react";
+import { Filter, Calendar, TrendingUp, ChartLine } from "lucide-react";
 
 export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
   const filters = [
     { value: "active", label: "Active", color: "green", icon: Calendar },
     { value: "almost_exceeded", label: "Almost Exceeded", color: "orange", icon: TrendingUp },
+    { value: "limit_reached", label: "Limit Reached", color: "orange", icon: ChartLine },
     { value: "exceeded", label: "Exceeded", color: "red", icon: TrendingUp },
     { value: "all", label: "All Budgets", color: "gray", icon: null },
   ];
