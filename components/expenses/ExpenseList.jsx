@@ -1,154 +1,227 @@
 "use client";
 
-import { useState, useEffect } from "react";
+/**
+ * @file ExpenseList.jsx
+ * @description
+ * Client-side container component responsible for displaying,
+ * filtering, paginating, and managing user expenses.
+ *
+ * This component orchestrates data fetching and UI state while
+ * delegating rendering responsibilities to child components.
+ *
+ * @author Divyanshu Dugar
+ * @project FinCraft AI
+ */
+
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Plus, Upload } from "lucide-react";
+
 import { getToken } from "@/lib/authenticate";
+
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseSummary from "./ExpenseSummary";
 import LoadingSpinner from "./LoadingSpinner";
-//
-import { Plus, Upload } from "lucide-react";
 import ImportExpensesModal from "./ImportExpensesModel";
 
+/**
+ * Constants used throughout the component to avoid magic strings.
+ */
+const DEFAULT_CATEGORY = "all";
+const CURRENCY_CODE = "USD";
+const AUTH_SCHEME = "jwt";
+
 const ExpenseList = () => {
+  /**
+   * ================================
+   * Component State
+   * ================================
+   */
   const [expenses, setExpenses] = useState([]);
-  const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const today = new Date();
-  const firstDayUTC = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)
-  );
+
+  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+
+  /**
+   * ================================
+   * Date & Pagination State (UTC-based)
+   * ================================
+   * UTC is enforced to avoid timezone-related date shifting issues
+   * between frontend and backend.
+   */
   const todayUTC = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+    Date.UTC(
+      new Date().getUTCFullYear(),
+      new Date().getUTCMonth(),
+      new Date().getUTCDate()
+    )
   );
 
-  const [dateRange, setDateRange] = useState({
-    startDate: firstDayUTC.toISOString().split("T")[0],
-    endDate: todayUTC.toISOString().split("T")[0],
-  });
-
-  // Pagination
   const [currentMonth, setCurrentMonth] = useState(todayUTC.getUTCMonth());
   const [currentYear, setCurrentYear] = useState(todayUTC.getUTCFullYear());
 
-  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(Date.UTC(currentYear, currentMonth, 1))
+      .toISOString()
+      .split("T")[0],
+    endDate: todayUTC.toISOString().split("T")[0],
+  });
 
   const router = useRouter();
 
-  // 🟢 Load all data when filters change
+  /**
+   * ================================
+   * Data Fetching Effects
+   * ================================
+   * Refetch expenses and stats whenever filters change.
+   */
   useEffect(() => {
     fetchCategories();
     fetchExpenses();
     fetchStats();
   }, [selectedCategory, dateRange]);
 
-  // 🟣 Fetch user-specific categories
-  const fetchCategories = async () => {
+  /**
+   * ================================
+   * API Calls
+   * ================================
+   */
+
+  /**
+   * Fetch all expense categories for the authenticated user.
+   */
+  const fetchCategories = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/expense-categories`,
         {
           headers: {
-            Authorization: `jwt ${token}`,
+            Authorization: `${AUTH_SCHEME} ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
-      if (!res.ok) throw new Error("Failed to load categories");
-      const data = await res.json();
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch expense categories");
+      }
+
+      const data = await response.json();
       setCategories(data);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
-  };
+  }, []);
 
-// 🟣 Fetch expenses
-const fetchExpenses = async () => {
-  try {
-    const token = getToken();
-    let url = `${process.env.NEXT_PUBLIC_API_URL}/expenses`;
-    
-    // Build query parameters
-    const params = new URLSearchParams();
-    
-    if (dateRange.startDate && dateRange.endDate) {
-      params.append('startDate', dateRange.startDate);
-      params.append('endDate', dateRange.endDate);
-    }
-    
-    // If specific category is selected, we need to use the category-specific endpoint
-    // OR filter on frontend. Let's filter on frontend for simplicity
-    const queryString = params.toString();
-    const finalUrl = queryString ? `${url}?${queryString}` : url;
-    
-    const res = await fetch(finalUrl, {
-      headers: {
-        Authorization: `jwt ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+  /**
+   * Fetch expenses within the selected date range.
+   * Category filtering is applied on the frontend for simplicity.
+   */
+  const fetchExpenses = useCallback(async () => {
+    setLoading(true);
 
-    if (!res.ok) throw new Error("Failed to fetch expenses");
-
-    const allExpenses = await res.json();
-    
-    // Filter by category on frontend if needed
-    let filteredExpenses = allExpenses;
-    if (selectedCategory !== "all") {
-      filteredExpenses = allExpenses.filter(expense => 
-        expense.category?._id === selectedCategory || 
-        expense.category?.name === selectedCategory
-      );
-    }
-    
-    setExpenses(filteredExpenses);
-  } catch (error) {
-    console.error("Error fetching expenses:", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // 🟣 Fetch aggregated stats
-  const fetchStats = async () => {
     try {
       const token = getToken();
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/stats`,
+      const params = new URLSearchParams();
+
+      if (dateRange.startDate && dateRange.endDate) {
+        params.append("startDate", dateRange.startDate);
+        params.append("endDate", dateRange.endDate);
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses?${params.toString()}`,
         {
-          headers: { Authorization: `jwt ${token}` },
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      if (res.ok) {
-        const data = await res.json();
+      if (!response.ok) {
+        throw new Error("Failed to fetch expenses");
+      }
+
+      const allExpenses = await response.json();
+
+      // Apply category filter on frontend if a specific category is selected
+      const filteredExpenses =
+        selectedCategory === DEFAULT_CATEGORY
+          ? allExpenses
+          : allExpenses.filter(
+              (expense) =>
+                expense.category?._id === selectedCategory ||
+                expense.category?.name === selectedCategory
+            );
+
+      setExpenses(filteredExpenses);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [dateRange, selectedCategory]);
+
+  /**
+   * Fetch aggregated expense statistics for analytics display.
+   */
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/stats`,
+        {
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
         setStats(data);
       }
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error fetching expense stats:", error);
     }
-  };
+  }, []);
 
-  // 🟣 Delete expense
+  /**
+   * ================================
+   * Mutations
+   * ================================
+   */
+
+  /**
+   * Delete an expense after user confirmation.
+   */
   const deleteExpense = async (id) => {
-    if (!confirm("Are you sure you want to delete this expense?")) return;
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this expense?"
+    );
+    if (!confirmed) return;
+
     try {
       const token = getToken();
-      const res = await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/expenses/${id}`,
         {
           method: "DELETE",
-          headers: { Authorization: `jwt ${token}` },
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+          },
         }
       );
 
-      if (res.ok) {
-        setExpenses(expenses.filter((e) => e._id !== id));
+      if (response.ok) {
+        setExpenses((prev) => prev.filter((e) => e._id !== id));
         fetchStats();
       }
     } catch (error) {
@@ -156,58 +229,64 @@ const fetchExpenses = async () => {
     }
   };
 
-  // 🟣 Utility formatters
+  /**
+   * ================================
+   * Utility Functions
+   * ================================
+   */
+
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: CURRENCY_CODE,
     }).format(amount);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-      timeZone: "UTC", // 👈 Force UTC so it doesn't shift with user timezone
+      timeZone: "UTC",
     });
-  };
 
-  // Pagination
+  /**
+   * Handle month-based pagination.
+   */
   const changeMonth = (direction) => {
     let newMonth = currentMonth + direction;
     let newYear = currentYear;
 
-    // Handle year rollover
     if (newMonth < 0) {
       newMonth = 11;
-      newYear -= 1;
+      newYear--;
     } else if (newMonth > 11) {
       newMonth = 0;
-      newYear += 1;
+      newYear++;
     }
 
-    // Update current month/year
     setCurrentMonth(newMonth);
     setCurrentYear(newYear);
 
-    // Calculate first and last day of the new month in UTC
-    const firstDayUTC = new Date(Date.UTC(newYear, newMonth, 1));
-    const lastDayUTC = new Date(Date.UTC(newYear, newMonth + 1, 0));
+    const firstDay = new Date(Date.UTC(newYear, newMonth, 1));
+    const lastDay = new Date(Date.UTC(newYear, newMonth + 1, 0));
 
-    // Update date range state
     setDateRange({
-      startDate: firstDayUTC.toISOString().split("T")[0],
-      endDate: lastDayUTC.toISOString().split("T")[0],
+      startDate: firstDay.toISOString().split("T")[0],
+      endDate: lastDay.toISOString().split("T")[0],
     });
   };
+
+  /**
+   * ================================
+   * Render
+   * ================================
+   */
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 🌟 Enhanced Hero Section */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -254,16 +333,8 @@ const fetchExpenses = async () => {
               </motion.button>
             </div>
           </div>
-
-          {/* Enhanced decorative elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-400/15 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2"></div>
-          </div>
         </motion.header>
 
-        {/* Filters */}
         <ExpenseFilters
           categories={categories}
           selectedCategory={selectedCategory}
@@ -273,7 +344,6 @@ const fetchExpenses = async () => {
           router={router}
         />
 
-        {/* Enhanced Table with proper props */}
         <ExpenseTable
           expenses={expenses}
           router={router}
@@ -282,7 +352,6 @@ const fetchExpenses = async () => {
           formatDate={formatDate}
         />
 
-        {/* Enhanced Pagination Controls */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
