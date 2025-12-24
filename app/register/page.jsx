@@ -11,7 +11,7 @@ export default function Register(props) {
   const [password2, setPassword2] = useState("");
   const [warning, setWarning] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Now from next/navigation
+  const router = useRouter(); 
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function Register(props) {
               Create Account
             </h2>
             <p className="text-gray-600">
-              Join Fin-Craft Studios and take control of your finances
+              Join Fincraft AI and take control of your finances
             </p>
           </div>
 
