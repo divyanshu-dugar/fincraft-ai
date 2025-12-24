@@ -1,6 +1,7 @@
 
 <details>
-<summary> Project Directory Structure </summary>
+<summary>👉🏻 Project Directory Structure </summary>
+ 
 ```
 📁 fincraft-ai/
 ├── 📁 app/
