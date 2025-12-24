@@ -110,17 +110,17 @@ export default function Navbar() {
     },
   ];
 
-  const publicMenuItems = [
-    {
-      name: 'Tools',
-      items: [
-        { name: 'Tax Calculator', href: '/tax-calculator' },
-        { name: 'Currency Converter', href: '/currency-converter' },
-      ],
-    },
-  ];
+  // const publicMenuItems = [
+  //   {
+  //     name: 'Tools',
+  //     items: [
+  //       { name: 'Tax Calculator', href: '/tax-calculator' },
+  //       { name: 'Currency Converter', href: '/currency-converter' },
+  //     ],
+  //   },
+  // ];
 
-  const menuItems = authenticated ? authenticatedMenuItems : publicMenuItems;
+  const menuItems = authenticated ? authenticatedMenuItems : [];
 
   return (
     <nav className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg sticky top-0 z-50" ref={dropdownRef}>
