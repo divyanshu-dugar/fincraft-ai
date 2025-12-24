@@ -40,7 +40,7 @@ export default function Login(props) {
               Welcome Back
             </h2>
             <p className="text-gray-600">
-              Sign in to your Fin-Craft Studios account
+              Sign in to your Fincraft AI account
             </p>
           </div>
 
