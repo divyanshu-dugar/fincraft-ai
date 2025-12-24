@@ -326,7 +326,7 @@ const ExpenseList = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/reports")}
+                onClick={() => router.push("/expense/analytics")}
                 className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200"
               >
                 📊 View Analytics
