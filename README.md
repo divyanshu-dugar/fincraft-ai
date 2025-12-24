@@ -1,5 +1,6 @@
 
-## Project Directory Structure
+<details>
+<summary> Project Directory Structure </summary>
 ```
 📁 fincraft-ai/
 ├── 📁 app/
@@ -113,6 +114,7 @@
 ├── 🟨 tailwind.config.js
 └── 🔢 tsconfig.json
 ```
+</details>
 
 <details>
 <summary>👉🏻 Expense List Directory Structure</summary>
