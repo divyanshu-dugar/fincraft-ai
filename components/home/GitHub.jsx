@@ -16,7 +16,7 @@ export default function GitHub() {
             Check out our project on GitHub and feel free to fork, star, or contribute to make financial management better for everyone.
           </p>
           <a 
-            href="https://github.com/divyanshu-dugar/fincraft-studios" 
+            href="https://github.com/divyanshu-dugar/fincraft-ai" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gray-800 hover:bg-gray-700 rounded-xl hover:scale-105 transform transition-all duration-200 border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl"
