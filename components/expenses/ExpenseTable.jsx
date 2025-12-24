@@ -1,8 +1,35 @@
 "use client";
 
+/**
+ * @file ExpenseTable.jsx
+ * @description
+ * Presentational component responsible for rendering expenses in a
+ * grouped, animated, and interactive table format.
+ *
+ * Expenses are grouped by date, with each day displaying:
+ * - A sticky header containing the date and daily total
+ * - A detailed table of individual expenses
+ *
+ * This component is UI-focused and receives all data, navigation,
+ * formatting utilities, and actions via props.
+ *
+ * @author Divyanshu Dugar
+ * @project FinCraft AI
+ */
+
 import { Pencil, Trash2, TrendingUp, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+/**
+ * ExpenseTable Component
+ *
+ * @param {Object} props
+ * @param {Array} props.expenses - List of expense objects to display
+ * @param {Object} props.router - Next.js router instance for navigation
+ * @param {Function} props.deleteExpense - Callback to delete an expense
+ * @param {Function} props.formatCurrency - Utility to format currency values
+ * @param {Function} props.formatDate - Utility to format dates (used for grouping)
+ */
 export default function ExpenseTable({
   expenses = [],
   router,
@@ -10,34 +37,52 @@ export default function ExpenseTable({
   formatCurrency = (v) => `$${v.toFixed(2)}`,
   formatDate,
 }) {
-  // Calculate daily totals
+  /* ============================================================
+     Utility Helpers
+     ============================================================ */
+
+  /**
+   * Calculates total expense amount for a single day
+   * @param {Array} expenses - List of expenses for a given date
+   * @returns {number} Daily total amount
+   */
   const calculateDailyTotal = (expenses) => {
     return expenses.reduce((sum, expense) => sum + expense.amount, 0);
   };
 
-  // Generate subtle background colors based on index
+  /**
+   * Returns a subtle background gradient based on row index
+   * Used to visually differentiate rows
+   */
   const getRowBackgroundColor = (index) => {
     const colors = [
-      'from-white to-gray-50/80', // Pure white with subtle gray
-      'from-blue-50/30 to-indigo-50/20', // Very subtle blue
-      'from-emerald-50/20 to-cyan-50/10', // Very subtle green
-      'from-violet-50/15 to-purple-50/10', // Very subtle purple
+      "from-white to-gray-50/80",
+      "from-blue-50/30 to-indigo-50/20",
+      "from-emerald-50/20 to-cyan-50/10",
+      "from-violet-50/15 to-purple-50/10",
     ];
     return colors[index % colors.length];
   };
 
-  // Get hover gradient based on index
+  /**
+   * Returns a hover gradient based on row index
+   * Enhances interaction feedback
+   */
   const getHoverGradient = (index) => {
     const gradients = [
-      'hover:from-blue-50/40 hover:to-indigo-50/30', // Blue hover
-      'hover:from-emerald-50/30 hover:to-teal-50/20', // Green hover
-      'hover:from-violet-50/25 hover:to-purple-50/15', // Purple hover
-      'hover:from-amber-50/20 hover:to-orange-50/10', // Amber hover
+      "hover:from-blue-50/40 hover:to-indigo-50/30",
+      "hover:from-emerald-50/30 hover:to-teal-50/20",
+      "hover:from-violet-50/25 hover:to-purple-50/15",
+      "hover:from-amber-50/20 hover:to-orange-50/10",
     ];
     return gradients[index % gradients.length];
   };
 
-  // Case: No expenses
+  /* ============================================================
+     Empty State
+     ============================================================ */
+
+  // Render a friendly empty state if no expenses exist
   if (!expenses || expenses.length === 0) {
     return (
       <motion.div
@@ -49,9 +94,11 @@ export default function ExpenseTable({
           <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center">
             <TrendingUp className="w-8 h-8 text-blue-600" />
           </div>
+
           <h3 className="text-3xl font-bold text-gray-900 mb-3">
             No expenses yet
           </h3>
+
           <p className="text-gray-500 text-lg mb-8">
             Start tracking your spending journey by adding your first expense.
           </p>
@@ -70,7 +117,18 @@ export default function ExpenseTable({
     );
   }
 
-  // Group expenses by date
+  /* ============================================================
+     Data Grouping
+     ============================================================ */
+
+  /**
+   * Group expenses by formatted date
+   * Structure:
+   * {
+   *   "Jan 01, 2025": [expense, expense],
+   *   "Jan 02, 2025": [expense]
+   * }
+   */
   const groupedExpenses = expenses.reduce((acc, expense) => {
     const dateKey = formatDate(expense.date);
     if (!acc[dateKey]) acc[dateKey] = [];
@@ -78,9 +136,14 @@ export default function ExpenseTable({
     return acc;
   }, {});
 
+  // Sort dates in descending order (latest first)
   const sortedDates = Object.keys(groupedExpenses).sort(
     (a, b) => new Date(b) - new Date(a)
   );
+
+  /* ============================================================
+     Main Table Rendering
+     ============================================================ */
 
   return (
     <motion.div
@@ -93,7 +156,7 @@ export default function ExpenseTable({
           {sortedDates.map((date, dateIndex) => {
             const dailyExpenses = groupedExpenses[date];
             const dailyTotal = calculateDailyTotal(dailyExpenses);
-            
+
             return (
               <motion.div
                 key={date}
@@ -102,15 +165,13 @@ export default function ExpenseTable({
                 transition={{ delay: dateIndex * 0.1 }}
                 className="border-b border-gray-100/80 last:border-b-0"
               >
-                {/* Enhanced Sticky Header */}
+                {/* ====================================================
+                    Sticky Daily Header
+                   ==================================================== */}
                 <div className="backdrop-blur-lg bg-gradient-to-r from-gray-50 to-blue-50/30 px-8 py-6 sticky top-0 z-20 border-b border-gray-200/60 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg" />
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {date}
-                      </h2>
-                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">{date}</h2>
+
                     <div className="text-right">
                       <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">
                         Daily Total
@@ -122,7 +183,9 @@ export default function ExpenseTable({
                   </div>
                 </div>
 
-                {/* Enhanced Table */}
+                {/* ====================================================
+                    Expenses Table
+                   ==================================================== */}
                 <div className="px-2 py-4">
                   <table className="w-full">
                     <colgroup>
@@ -134,19 +197,24 @@ export default function ExpenseTable({
 
                     <thead>
                       <tr className="border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 to-gray-100/50">
-                        {["Category", "Amount", "Note", "Actions"].map((header, index) => (
-                          <th
-                            key={header}
-                            className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500 tracking-wider"
-                          >
-                            <div className="flex items-center gap-2">
-                              {header}
-                              {header === "Amount" && (
-                                <TrendingUp size={14} className="text-gray-400" />
-                              )}
-                            </div>
-                          </th>
-                        ))}
+                        {["Category", "Amount", "Note", "Actions"].map(
+                          (header, index) => (
+                            <th
+                              key={header}
+                              className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500 tracking-wider"
+                            >
+                              <div className="flex items-center gap-2">
+                                {header}
+                                {header === "Amount" && (
+                                  <TrendingUp
+                                    size={14}
+                                    className="text-gray-400"
+                                  />
+                                )}
+                              </div>
+                            </th>
+                          )
+                        )}
                       </tr>
                     </thead>
 
@@ -156,7 +224,8 @@ export default function ExpenseTable({
                           const category = expense.category || {};
                           const categoryName = category.name || "Uncategorized";
                           const categoryColor = category.color || "#9ca3af";
-                          const rowBgColor = getRowBackgroundColor(expenseIndex);
+                          const rowBgColor =
+                            getRowBackgroundColor(expenseIndex);
                           const hoverGradient = getHoverGradient(expenseIndex);
 
                           return (
@@ -164,7 +233,9 @@ export default function ExpenseTable({
                               key={expense._id}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: (dateIndex * 0.1) + (expenseIndex * 0.05) }}
+                              transition={{
+                                delay: dateIndex * 0.1 + expenseIndex * 0.05,
+                              }}
                               className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-gray-100/30 last:border-b-0`}
                             >
                               {/* Category */}
@@ -172,14 +243,12 @@ export default function ExpenseTable({
                                 <motion.span
                                   whileHover={{ scale: 1.05 }}
                                   className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white shadow-lg transition-all duration-200 group-hover:shadow-xl"
-                                  style={{ 
+                                  style={{
                                     backgroundColor: categoryColor,
-                                    background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`
+                                    background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`,
                                   }}
                                 >
-                                  <div 
-                                    className="w-2 h-2 rounded-full bg-white/30"
-                                  />
+                                  <div className="w-2 h-2 rounded-full bg-white/30" />
                                   {categoryName}
                                 </motion.span>
                               </td>
@@ -192,9 +261,11 @@ export default function ExpenseTable({
                                   </span>
                                   {expense.note && (
                                     <span className="text-xs text-gray-400 mt-1 group-hover:text-gray-500 transition-colors">
-                                      {new Date(expense.date).toLocaleTimeString([], { 
-                                        hour: '2-digit', 
-                                        minute: '2-digit' 
+                                      {new Date(
+                                        expense.date
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
                                       })}
                                     </span>
                                   )}
@@ -205,7 +276,7 @@ export default function ExpenseTable({
                               <td className="px-6 py-5">
                                 <div className="max-w-xs">
                                   {expense.note ? (
-                                    <motion.p 
+                                    <motion.p
                                       className="text-gray-700 text-sm leading-relaxed line-clamp-2 group-hover:text-gray-900 transition-colors"
                                       whileHover={{ scale: 1.02 }}
                                     >
@@ -225,7 +296,11 @@ export default function ExpenseTable({
                                   <motion.button
                                     whileHover={{ scale: 1.1, y: -1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => router.push(`/expense/edit/${expense._id}`)}
+                                    onClick={() =>
+                                      router.push(
+                                        `/expense/edit/${expense._id}`
+                                      )
+                                    }
                                     className="p-2.5 bg-white text-blue-600 rounded-xl border border-blue-200/60 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
                                   >
                                     <Pencil size={18} />
@@ -261,7 +336,7 @@ export default function ExpenseTable({
       </div>
 
       {/* Summary Footer */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
@@ -269,7 +344,9 @@ export default function ExpenseTable({
       >
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            Total <span className="font-semibold">{expenses.length}</span> expenses across <span className="font-semibold">{sortedDates.length}</span> days
+            Total <span className="font-semibold">{expenses.length}</span>{" "}
+            expenses across{" "}
+            <span className="font-semibold">{sortedDates.length}</span> days
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
