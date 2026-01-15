@@ -2,7 +2,7 @@
 
 import HeroSection from "@/components/home/HeroSection";
 import FinancialTools from "@/components/home/FinancialTools";
-import TechStackSection from "@/components/home/TechStack";
+// import TechStackSection from "@/components/home/TechStack";
 import Github from "@/components/home/GitHub";
 
 export default function HomePage() {
@@ -15,7 +15,7 @@ export default function HomePage() {
       <FinancialTools />
 
       {/* Tech Stack Section */}
-      <TechStackSection />
+      {/* <TechStackSection /> */}
 
       {/* GitHub Section */}
       <Github/>
