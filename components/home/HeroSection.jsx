@@ -29,7 +29,7 @@ export default function HeroSection() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-lg sm:text-xl md:text-2xl mb-10 text-blue-100 max-w-3xl mx-auto"
         >
-          Your all-in-one financial companion for smarter, stress-free money decisions.
+          Your adaptive personal finance mentor.
         </motion.p>
 
         {/* CTA Button */}
@@ -42,7 +42,7 @@ export default function HeroSection() {
             href="/expense/list"
             className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-blue-700 bg-white rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transform transition-all duration-300"
           >
-            Get Started
+            Explore Here
             <svg
               className="w-6 h-6 text-blue-700"
               fill="none"
