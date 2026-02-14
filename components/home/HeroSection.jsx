@@ -22,6 +22,20 @@ export default function HeroSection() {
     },
   };
 
+  const orbVariants = {
+    initial: { scale: 0, opacity: 0 },
+    animate: (index) => ({
+      scale: 1,
+      opacity: [0.3, 0.6, 0.3],
+      y: [-20, 20, -20],
+      transition: {
+        scale: { duration: 0.6, delay: index * 0.1 },
+        opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+        y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+      },
+    }),
+  };
+
   const floatingVariants = {
     initial: { y: 0 },
     animate: {
@@ -31,12 +45,30 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen flex items-center">
-      {/* Premium gradient background elements */}
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen flex items-center">
+      {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl" />
+        <motion.div
+          custom={0}
+          variants={orbVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full blur-3xl opacity-20"
+        />
+        <motion.div
+          custom={1}
+          variants={orbVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full blur-3xl opacity-15"
+        />
+        <motion.div
+          custom={2}
+          variants={orbVariants}
+          initial="initial"
+          animate="animate"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-full blur-3xl opacity-10"
+        />
       </div>
 
       {/* Grid pattern overlay */}
@@ -53,9 +85,9 @@ export default function HeroSection() {
           >
             {/* Badge */}
             <motion.div variants={itemVariants} className="mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 backdrop-blur-sm">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-sm font-semibold text-blue-200">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 backdrop-blur-sm">
+                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-sm font-semibold text-cyan-200">
                   AI-Powered Finance Platform
                 </span>
               </div>
@@ -67,7 +99,7 @@ export default function HeroSection() {
               className="text-6xl sm:text-7xl md:text-7xl font-bold text-white mb-8 leading-tight"
             >
               Fincraft{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
                 AI
               </span>
             </motion.h1>
@@ -77,7 +109,7 @@ export default function HeroSection() {
               variants={itemVariants}
               className="text-lg sm:text-xl text-slate-300 mb-10 max-w-xl leading-relaxed"
             >
-              Your personal finance coach. A complete financial ecosystem in one platform.
+              Your personal finance coach. A complete financial ecosystem designed for modern wealth management.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -87,14 +119,18 @@ export default function HeroSection() {
             >
               <Link
                 href="/expense/list"
-                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:-translate-y-1"
+                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-white font-bold rounded-xl overflow-hidden"
               >
-                Start Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative flex items-center gap-2">
+                  Start Free
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
               </Link>
               <Link
                 href="#tools"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-slate-400 text-white font-bold rounded-xl hover:bg-white/10 hover:border-slate-300 transition-all duration-300 backdrop-blur-sm"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               >
                 Explore Features
               </Link>
@@ -102,15 +138,15 @@ export default function HeroSection() {
 
             {/* Stats */}
             <motion.div variants={itemVariants} className="flex gap-8 text-sm">
-              <div className="border-l border-slate-400 pl-4">
+              <div className="border-l border-cyan-400/50 pl-4">
                 <div className="text-2xl font-bold text-white">100%</div>
                 <div className="text-slate-400">Secure & Private</div>
               </div>
-              <div className="border-l border-slate-400 pl-4">
+              <div className="border-l border-cyan-400/50 pl-4">
                 <div className="text-2xl font-bold text-white">Real-time</div>
                 <div className="text-slate-400">Tracking</div>
               </div>
-              <div className="border-l border-slate-400 pl-4">
+              <div className="border-l border-cyan-400/50 pl-4">
                 <div className="text-2xl font-bold text-white">AI</div>
                 <div className="text-slate-400">Insights</div>
               </div>
@@ -129,10 +165,10 @@ export default function HeroSection() {
               variants={floatingVariants}
               initial="initial"
               animate="animate"
-              className="absolute top-0 right-0 w-64 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 border border-slate-600 shadow-2xl shadow-blue-500/10"
+              className="absolute top-0 right-0 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-cyan-400/20 shadow-2xl shadow-cyan-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-sm font-semibold text-slate-300">Expenses</span>
@@ -141,8 +177,8 @@ export default function HeroSection() {
                 <div className="text-3xl font-bold text-white">$2,450</div>
                 <div className="text-sm text-slate-400">This month</div>
               </div>
-              <div className="h-1 bg-slate-600 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-gradient-to-r from-blue-500 to-blue-600" />
+              <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full w-2/3 bg-gradient-to-r from-cyan-500 to-blue-600" />
               </div>
             </motion.div>
 
@@ -152,10 +188,10 @@ export default function HeroSection() {
               initial="initial"
               animate="animate"
               style={{ animationDelay: "0.5s" }}
-              className="absolute bottom-10 left-0 w-64 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 border border-slate-600 shadow-2xl shadow-emerald-500/10"
+              className="absolute bottom-10 left-0 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-emerald-400/20 shadow-2xl shadow-emerald-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-sm font-semibold text-slate-300">Income</span>
@@ -173,10 +209,10 @@ export default function HeroSection() {
               initial="initial"
               animate="animate"
               style={{ animationDelay: "1s" }}
-              className="absolute top-1/2 right-1/4 w-64 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 border border-slate-600 shadow-2xl shadow-purple-500/10"
+              className="absolute top-1/2 right-1/4 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/20 shadow-2xl shadow-purple-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
                   <PieChart className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-sm font-semibold text-slate-300">Goals Progress</span>
@@ -185,8 +221,8 @@ export default function HeroSection() {
                 <div className="text-2xl font-bold text-white">$8,500</div>
                 <div className="text-sm text-slate-400">of $15,000 saved</div>
               </div>
-              <div className="h-2 bg-slate-600 rounded-full overflow-hidden">
-                <div className="h-full w-1/2 bg-gradient-to-r from-purple-500 to-purple-600" />
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full w-1/2 bg-gradient-to-r from-purple-500 to-pink-600" />
               </div>
             </motion.div>
           </motion.div>
