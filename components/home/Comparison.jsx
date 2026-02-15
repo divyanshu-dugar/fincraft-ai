@@ -21,7 +21,7 @@ export default function Comparison() {
 
   const competitors = [
     {
-      name: "Fincraft",
+      name: "Fincraft AI",
       tagline: "Your Complete Finance OS",
       color: "from-cyan-400 to-blue-400",
       highlighted: true,
@@ -47,7 +47,7 @@ export default function Comparison() {
   ];
 
   const comparisonData = {
-    Fincraft: [true, true, true, true, true, true, true, true, true, true, true, true],
+    "Fincraft AI": [true, true, true, true, true, true, true, true, true, true, true, true],
     Mint: [true, true, false, false, true, false, false, false, false, false, false, false],
     YNAB: [true, true, false, true, false, false, false, false, true, false, false, false],
     "Traditional Bank": [true, false, false, false, false, false, false, false, false, false, false, false],
