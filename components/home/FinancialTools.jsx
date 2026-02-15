@@ -1,28 +1,31 @@
 'use client';
 import ToolCard from "./ToolCard";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function FinancialTools() {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   const tools = [
     {
       name: 'Ledgerify',
       description: 'Intelligent expense and income tracking with smart categorization, CSV imports, and real-time analytics dashboard.',
       icon: '📊',
-      color: 'from-cyan-500 to-blue-600',
+      color: 'from-blue-500 to-cyan-500',
       href: '/expense/list'
     },
     {
       name: 'Goalify',
       description: 'Set ambitious savings goals, track progress with visual indicators, and achieve milestones with smart reminders.',
       icon: '💰',
-      color: 'from-emerald-500 to-teal-600',
+      color: 'from-emerald-500 to-teal-500',
       href: '/goal/list'
     },
     {
       name: 'Budgetify',
       description: 'Create smart budgets by category, monitor spending in real-time, and get alerts when approaching limits.',
       icon: '📈',
-      color: 'from-violet-500 to-purple-600',
+      color: 'from-violet-500 to-purple-500',
       href: '/budget/list'
     },
     {
@@ -38,13 +41,6 @@ export default function FinancialTools() {
       icon: '🛠️',
       color: 'from-slate-500 to-gray-600',
       comingSoon: true
-    },
-    {
-      name: 'AI Insights',
-      description: 'Personalized financial recommendations powered by advanced machine learning and behavioral analytics.',
-      icon: '🤖',
-      color: 'from-pink-500 to-rose-600',
-      comingSoon: true
     }
   ];
 
@@ -53,48 +49,50 @@ export default function FinancialTools() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.2,
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: "easeOut" },
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 
   return (
     <section id="tools" className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-32 sm:py-40 overflow-hidden">
-      {/* Animated background elements */}
+      {/* Animated mesh gradient background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           animate={{ 
             x: [0, 150, 0],
             y: [0, 80, 0],
+            scale: [1, 1.1, 1],
           }}
           transition={{
             duration: 20,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-1/2 -left-1/4 w-full h-full bg-gradient-to-br from-cyan-600/15 to-blue-600/10 rounded-full blur-3xl"
+          className="absolute -top-1/2 -left-1/4 w-full h-full bg-gradient-to-br from-blue-600/15 via-purple-600/10 to-transparent rounded-full blur-3xl"
         />
         <motion.div
           animate={{ 
             x: [0, -100, 0],
-            y: [0, -60, 0],
+            y: [0, -80, 0],
+            scale: [1, 0.9, 1],
           }}
           transition={{
-            duration: 25,
+            duration: 24,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-1/4 -right-1/4 w-full h-full bg-gradient-to-tl from-purple-600/15 to-pink-600/10 rounded-full blur-3xl"
+          className="absolute -bottom-1/2 -right-1/4 w-full h-full bg-gradient-to-tl from-cyan-600/15 via-blue-600/10 to-transparent rounded-full blur-3xl"
         />
       </div>
 
@@ -112,10 +110,14 @@ export default function FinancialTools() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 backdrop-blur-sm mb-8"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 backdrop-blur-xl shadow-lg shadow-cyan-500/20 mb-8"
           >
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-sm font-semibold text-cyan-300">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="w-2 h-2 rounded-full bg-cyan-400"
+            />
+            <span className="text-sm font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
               Complete Financial Suite
             </span>
           </motion.div>
@@ -125,9 +127,9 @@ export default function FinancialTools() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl sm:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight"
+            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight"
           >
-            Everything You Need to{" "}
+            Everything to{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               Thrive Financially
             </span>
@@ -138,46 +140,70 @@ export default function FinancialTools() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light"
           >
-            Powerful, intuitive tools designed to transform your financial life. From tracking to planning and intelligent insights.
+            Powerful financial tools designed for the modern individual. From tracking to planning, we've got every aspect of your financial life covered.
           </motion.p>
         </motion.div>
 
         {/* Tools Grid */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10"
         >
-          {tools.map((tool) => (
-            <motion.div key={tool.name} variants={itemVariants}>
-              <ToolCard tool={tool} />
+          {tools.map((tool, index) => (
+            <motion.div 
+              key={tool.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.12, duration: 0.7 }}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              <ToolCard tool={tool} isHovered={hoveredIndex === index} index={index} />
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA with enhanced styling */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-center"
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="mt-28 text-center"
         >
-          <p className="text-slate-300 text-lg mb-8">Ready to transform your finances?</p>
-          <button className="group relative inline-flex items-center gap-2 px-10 py-4 text-white font-bold rounded-xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="relative flex items-center gap-2">
-              Get Started Now
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </span>
-          </button>
+          <p className="text-slate-300 text-lg font-light mb-8">Ready to transform your financial journey?</p>
+          <motion.div
+            whileHover={{ scale: 1.05, y: -3 }}
+            whileTap={{ scale: 0.98 }}
+            className="relative inline-block group"
+          >
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+            <button className="relative group/btn inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-cyan-500 via-blue-600 to-blue-700 text-white font-bold text-lg rounded-xl shadow-2xl shadow-cyan-500/40 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+              
+              <motion.div
+                animate={{ x: ["-200%", "200%"] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+              />
+              
+              <span className="relative flex items-center gap-3">
+                Get Started Now
+                <motion.svg 
+                  className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </motion.svg>
+              </span>
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     </section>

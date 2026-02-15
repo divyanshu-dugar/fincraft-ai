@@ -116,7 +116,7 @@ export default function Comparison() {
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
             Why Choose{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Fincraft
+              Fincraft AI
             </span>
           </h2>
           <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-light">
