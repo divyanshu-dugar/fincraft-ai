@@ -182,7 +182,7 @@ export default function CombinedFeatures() {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight"
           >
-            Your Personal Finance{" "}
+            Your Personal Finance{" "} <br/>
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               Command Center
             </span>

@@ -214,7 +214,7 @@ export default function Footer() {
               className="mt-12 text-center text-slate-500 font-light text-sm space-y-2"
             >
               <p>
-                © 2024 Fincraft. All rights reserved. | Built with ❤️ for your financial freedom
+                © 2026 Fincraft. All rights reserved. | Built with ❤️ for your financial freedom
               </p>
             </motion.div>
           </motion.div>
