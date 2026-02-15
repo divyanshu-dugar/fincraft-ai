@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Fin-Craft Studios - Financial Management",
+  title: "Fincraft AI - Personal Finance Mentor",
   description: "Manage your expenses, income, and savings efficiently",
 };
 
