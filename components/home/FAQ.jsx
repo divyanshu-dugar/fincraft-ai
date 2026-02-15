@@ -10,7 +10,7 @@ export default function FAQ() {
   const faqs = [
     {
       question: "How does Fincraft AI provide personalized guidance?",
-      answer: "Fincraft AI analyzes your unique income, expenses, goals, and budgets to understand your financial situation. It then uses advanced AI to deliver context-aware recommendations tailored specifically to you—not generic advice. Think of it as having a personal financial coach who knows your complete picture.",
+      answer: "Fincraft AI analyzes your unique income, expenses, goals, and budgets to understand your financial situation. It then uses advanced AI to deliver context-aware recommendations tailored specifically to you, not generic advice. Think of it as having a personal financial coach who knows your complete picture.",
     },
     {
       question: "What kind of financial advice can I get?",
