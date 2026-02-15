@@ -151,7 +151,7 @@ export default function SavingsGoals() {
   if (loading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 py-8 px-4 sm:px-6 lg:px-8 py-18">
       <div className="max-w-7xl mx-auto">
         <GoalsHeader onNewGoal={() => setShowForm(true)} />
 

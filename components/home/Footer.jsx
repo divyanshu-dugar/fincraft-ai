@@ -178,7 +178,7 @@ export default function Footer() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div>
                 <h1 className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                  Fincraft
+                  Fincraft AI
                 </h1>
                 <p className="text-slate-400 font-light">
                   Your personal finance operating system.
@@ -215,15 +215,6 @@ export default function Footer() {
             >
               <p>
                 © 2024 Fincraft. All rights reserved. | Built with ❤️ for your financial freedom
-              </p>
-              <p>
-                Made by developers, for developers. Open source at{" "}
-                <a
-                  href="https://github.com/fincraft"
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                >
-                  github.com/fincraft
-                </a>
               </p>
             </motion.div>
           </motion.div>
