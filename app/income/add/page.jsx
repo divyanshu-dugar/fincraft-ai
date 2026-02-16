@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
+import { QuickCategoryModal } from '@/components/categories/QuickCategoryModal';
 
 const AddIncome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toLocaleDateString('en-CA'),
     category: '',
@@ -123,6 +125,16 @@ const AddIncome = () => {
     router.back();
   };
 
+  const handleCategoryCreated = (newCategory) => {
+    // Add the new category to the list
+    setCategories(prev => [...prev, newCategory]);
+    // Auto-select the newly created category
+    setFormData(prev => ({
+      ...prev,
+      category: newCategory.name
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -180,22 +192,34 @@ const AddIncome = () => {
                 Category <span className="text-red-500">*</span>
               </label>
               
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
-                  errors.category ? 'border-red-300' : 'border-gray-300'
-                }`}
-              >
-                <option value="">Select a category</option>
-                {categories.map(category => (
-                  <option key={category._id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
+                    errors.category ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option key={category._id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(true)}
+                  className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium whitespace-nowrap"
+                  title="Create a new category"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
 
               {errors.category && (
                 <p className="mt-1 text-sm text-red-600">{errors.category}</p>
@@ -331,6 +355,16 @@ const AddIncome = () => {
           </ul>
         </div>
       </div>
+
+      {/* Quick Category Modal */}
+      <QuickCategoryModal
+        isOpen={showCategoryModal}
+        onClose={() => setShowCategoryModal(false)}
+        endpoint="/income-categories"
+        onCategoryCreated={handleCategoryCreated}
+        existingCategories={categories}
+        defaultColor="#10B981"
+      />
     </div>
   );
 };
