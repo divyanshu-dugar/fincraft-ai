@@ -25,7 +25,7 @@ export default function GoalsHeader({ onNewGoal }) {
           </motion.div>
 
           <div>
-            <h1 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-tight">
+            <h1 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-tight leading-snug">
               Your Savings Goals
             </h1>
             <p className="text-gray-600 text-lg mt-2 max-w-xl">
