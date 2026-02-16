@@ -345,9 +345,9 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 top-16"
+              className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             />
 
             {/* Menu Panel */}
@@ -356,10 +356,10 @@ export default function Navbar() {
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed top-16 right-0 bottom-0 w-80 sm:w-2/3 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="md:hidden fixed top-0 right-0 bottom-0 w-full bg-slate-950 shadow-2xl z-50 overflow-y-auto pt-20"
             >
-              <div className="p-4 space-y-3 pb-24">
+              <div className="p-4 space-y-3 pb-8">
                 {/* Home Link */}
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
                   <motion.button
