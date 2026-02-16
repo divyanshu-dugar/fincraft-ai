@@ -345,26 +345,27 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 top-16"
             />
 
             {/* Menu Panel */}
             <motion.div
               ref={mobileMenuRef}
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed inset-y-16 right-0 w-full max-w-sm bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
+              className="md:hidden fixed top-16 right-0 bottom-0 w-80 sm:w-2/3 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
             >
-              <div className="p-4 space-y-3">
+              <div className="p-4 space-y-3 pb-24">
                 {/* Home Link */}
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-base ${
                       pathname === '/'
                         ? 'text-cyan-300 bg-cyan-400/10 border border-cyan-400/50'
                         : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20'
@@ -384,7 +385,7 @@ export default function Navbar() {
                   >
                     <button
                       onClick={() => toggleMobileDropdown(menu.name)}
-                      className="w-full flex justify-between items-center px-4 py-3 rounded-xl text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20 transition-all font-medium"
+                      className="w-full flex justify-between items-center px-4 py-3 rounded-xl text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20 transition-all font-medium text-base active:scale-95"
                     >
                       <span>{menu.name}</span>
                       <motion.div
@@ -410,7 +411,7 @@ export default function Navbar() {
                                 <div key={group.title}>
                                   <button
                                     onClick={() => toggleMobileSubmenu(group.title)}
-                                    className="w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border border-transparent hover:border-cyan-400/30"
+                                    className="w-full flex justify-between items-center px-3 py-3 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border border-transparent hover:border-cyan-400/30 active:scale-95 font-medium text-sm"
                                   >
                                     <span className="font-medium">{group.title}</span>
                                     <motion.div
@@ -435,7 +436,7 @@ export default function Navbar() {
                                             <Link
                                               key={sub.name}
                                               href={sub.href}
-                                              className="block px-3 py-2 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all"
+                                              className="block px-3 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all active:scale-95"
                                               onClick={() => setMobileMenuOpen(false)}
                                             >
                                               {sub.name}
@@ -452,7 +453,7 @@ export default function Navbar() {
                                 <Link
                                   key={item.name}
                                   href={item.href}
-                                  className="block px-3 py-2 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all"
+                                  className="block px-3 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all active:scale-95"
                                   onClick={() => setMobileMenuOpen(false)}
                                 >
                                   {item.name}
@@ -477,14 +478,14 @@ export default function Navbar() {
                     <>
                       <div className="px-4 py-3 bg-cyan-400/10 border border-cyan-400/30 rounded-xl">
                         <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Signed in as</p>
-                        <p className="font-bold text-cyan-300">{user?.userName}</p>
+                        <p className="font-bold text-cyan-300 text-sm">{user?.userName}</p>
                       </div>
 
                       <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full px-4 py-3 bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/50 rounded-xl font-medium transition-all"
+                          className="w-full px-4 py-3 bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/50 rounded-xl font-medium transition-all text-base active:scale-95"
                         >
                           Dashboard
                         </motion.button>
@@ -494,7 +495,7 @@ export default function Navbar() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleLogout}
-                        className="w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-400/30 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                        className="w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-400/30 rounded-xl font-medium transition-all flex items-center justify-center gap-2 text-base active:scale-95"
                       >
                         <LogOut className="w-4 h-4" />
                         Logout
@@ -506,7 +507,7 @@ export default function Navbar() {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`w-full px-4 py-3 rounded-xl font-medium transition-all border ${
+                          className={`w-full px-4 py-3 rounded-xl font-medium transition-all border text-base active:scale-95 ${
                             pathname === '/login'
                               ? 'text-cyan-300 bg-cyan-400/10 border-cyan-400/50'
                               : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-cyan-400/20'
@@ -520,7 +521,7 @@ export default function Navbar() {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/30 rounded-xl font-medium transition-all"
+                          className="w-full px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/30 rounded-xl font-medium transition-all text-base active:scale-95"
                         >
                           Register
                         </motion.button>
