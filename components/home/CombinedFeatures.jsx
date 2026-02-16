@@ -96,7 +96,7 @@ export default function CombinedFeatures() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-32 sm:py-40 lg:py-48">
+    <section id="features" className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-32 sm:py-40 lg:py-48">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div

@@ -129,7 +129,7 @@ export default function HeroSection() {
                 </span>
               </Link>
               <Link
-                href="#tools"
+                href="#features"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               >
                 Explore Features
