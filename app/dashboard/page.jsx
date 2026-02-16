@@ -230,7 +230,7 @@ export default function Dashboard() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/10 to-indigo-50/5 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/10 to-indigo-50/5 pb-20 py-20">
       {/* Header */}
       <DashboardHeader
         timeRange={timeRange}
