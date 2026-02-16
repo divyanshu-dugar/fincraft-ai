@@ -118,7 +118,7 @@ export default function HeroSection() {
               className="flex flex-col sm:flex-row gap-4 mb-12"
             >
               <Link
-                href="/expense/list"
+                href="/dashboard"
                 className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-white font-bold rounded-xl overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl" />
