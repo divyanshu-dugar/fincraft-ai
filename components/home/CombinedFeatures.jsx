@@ -1,5 +1,6 @@
 'use client';
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   BarChart3,
   Goal,
@@ -246,30 +247,34 @@ export default function CombinedFeatures() {
                     className="mt-5 h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent origin-left rounded-full"
                   />
 
-                  <motion.button
-                    whileHover={{ scale: 1.05, x: 4 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={item.comingSoon}
-                    className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 ${
-                      item.comingSoon
-                        ? 'bg-slate-700/30 text-slate-400 border border-slate-600/50 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 hover:from-cyan-500/40 hover:to-blue-500/40 border border-cyan-400/30 hover:border-cyan-400/60'
-                    }`}
-                  >
-                    {item.comingSoon ? 'Coming Soon' : 'Explore'}
-                    {!item.comingSoon && (
-                      <motion.svg
-                        animate={{ x: [0, 2, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                  {item.comingSoon ? (
+                    <motion.button
+                      disabled
+                      className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 bg-slate-700/30 text-slate-400 border border-slate-600/50 cursor-not-allowed"
+                    >
+                      Coming Soon
+                    </motion.button>
+                  ) : (
+                    <Link href={item.href}>
+                      <motion.button
+                        whileHover={{ scale: 1.05, x: 4 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 hover:from-cyan-500/40 hover:to-blue-500/40 border border-cyan-400/30 hover:border-cyan-400/60"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </motion.svg>
-                    )}
-                  </motion.button>
+                        Explore
+                        <motion.svg
+                          animate={{ x: [0, 2, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </motion.svg>
+                      </motion.button>
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             );
