@@ -23,7 +23,7 @@ export function QuickActions() {
           <span>Add Income</span>
         </button>
         <button
-          onClick={() => router.push('/goal/add')}
+          onClick={() => router.push('/goal/list')}
           className="flex items-center justify-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-colors font-medium shadow-md hover:shadow-lg"
         >
           <Target size={20} />
