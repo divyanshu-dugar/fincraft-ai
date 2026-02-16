@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { registerUser } from "@/lib/authenticate";
+import { createDefaultCategories } from "@/lib/utils/defaultCategoriesManager";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Lock, ArrowRight, Eye, EyeOff, CheckCircle } from "lucide-react";

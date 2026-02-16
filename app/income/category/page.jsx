@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useCategories } from '@/lib/hooks/useCategories';
+import { restoreDefaultCategories } from '@/lib/utils/defaultCategoriesManager';
 import { CategoryForm } from '@/components/categories/CategoryForm';
 import { CategoryList } from '@/components/categories/CategoryList';
 
@@ -76,6 +77,19 @@ export default function IncomeCategoryPage() {
     setEditingData({ name: '', color: '#10B981' });
   };
 
+  const handleRestoreDefaults = async () => {
+    setSubmitting(true);
+    try {
+      await restoreDefaultCategories('/income-categories');
+      await fetchCategories();
+      toast.success('Default income categories restored!');
+    } catch (error) {
+      toast.error(error.message || 'Failed to restore categories');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50/30 px-4 py-8 sm:py-20">
       <div className="max-w-6xl mx-auto">
@@ -145,6 +159,8 @@ export default function IncomeCategoryPage() {
               onEdit={handleEditClick}
               onDelete={handleDeleteCategory}
               deleting={deleting}
+              onRestore={handleRestoreDefaults}
+              isRestoring={submitting}
             />
 
             {/* Tips */}
