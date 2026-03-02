@@ -2,9 +2,12 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, TrendingUp, BarChart3, PieChart } from "lucide-react";
+import { ArrowRight, TrendingUp, BarChart3, PieChart, Sparkles } from "lucide-react";
+import { useState } from "react";
+import AIInsightsModal from "./AIInsightsModal";
 
 export default function HeroSection() {
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -128,12 +131,13 @@ export default function HeroSection() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
-              <Link
-                href="#features"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              <button
+                onClick={() => setIsAIModalOpen(true)}
+                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               >
-                Explore Features
-              </Link>
+                <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
+                View Insights
+              </button>
             </motion.div>
 
             {/* Stats */}
@@ -228,6 +232,11 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </div>
+
+      <AIInsightsModal 
+        isOpen={isAIModalOpen} 
+        onClose={() => setIsAIModalOpen(false)} 
+      />
     </section>
   );
 }
