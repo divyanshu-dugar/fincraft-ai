@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader, Plus, Trash2 } from 'lucide-react';
-import { readToken } from '@/lib/authenticate';
+import { getToken } from '@/lib/authenticate';
 
 export default function AIInsightsModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
@@ -12,7 +12,6 @@ export default function AIInsightsModal({ isOpen, onClose }) {
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [loadingSessions, setLoadingSessions] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -40,7 +39,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
   const fetchSessions = async () => {
     setLoadingSessions(true);
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getToken();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions`,
         {
@@ -70,7 +69,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
 
   const fetchMessages = async (sessionId) => {
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getToken();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions/${sessionId}/messages`,
         {
@@ -93,7 +92,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
 
   const createNewSession = async () => {
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getToken();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat-session`,
         {
@@ -125,7 +124,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     if (!confirm('Are you sure you want to delete this conversation?')) return;
 
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getToken();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions/${sessionId}`,
         {
@@ -159,13 +158,17 @@ export default function AIInsightsModal({ isOpen, onClose }) {
       timestamp: new Date(),
     };
 
+    // Store the message to send
+    const messageToSend = input;
+    
+    // Add user message optimistically
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
     setError('');
 
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getToken();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat-message`,
         {
@@ -176,7 +179,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
           },
           body: JSON.stringify({
             sessionId: currentSessionId,
-            userQuery: input,
+            userQuery: messageToSend,
           }),
         }
       );
@@ -187,7 +190,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
 
       const data = await response.json();
 
-      // Add the assistant message from the server
+      // Add assistant message
       const aiMessage = {
         role: 'assistant',
         content: data.assistantMessage.content,
@@ -198,10 +201,73 @@ export default function AIInsightsModal({ isOpen, onClose }) {
       await fetchSessions(); // Refresh sessions to update names
     } catch (err) {
       console.error('Error:', err);
+      
+      // Add error message instead of discarding
+      const errorMessage = {
+        role: 'error',
+        content: 'Failed to get response. Please try again.',
+        timestamp: new Date(),
+        retryMessage: messageToSend,
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
       setError(err.message || 'An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // Remove the user message on error
-      setMessages((prev) => prev.slice(0, -1));
+  const retryMessage = async (retryMessage) => {
+    if (!currentSessionId) return;
+
+    // Remove the error message
+    setMessages((prev) => prev.filter((msg) => msg.role !== 'error'));
+    setLoading(true);
+    setError('');
+
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-message`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `jwt ${token}`,
+          },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            userQuery: retryMessage,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const data = await response.json();
+
+      const aiMessage = {
+        role: 'assistant',
+        content: data.assistantMessage.content,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+      await fetchSessions();
+    } catch (err) {
+      console.error('Error:', err);
+      
+      const errorMessage = {
+        role: 'error',
+        content: 'Failed to get response. Please try again.',
+        timestamp: new Date(),
+        retryMessage: retryMessage,
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+      setError(err.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -307,19 +373,34 @@ export default function AIInsightsModal({ isOpen, onClose }) {
                     msg.role === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  <div
-                    className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg ${
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                        : msg.role === 'assistant'
-                        ? 'bg-slate-800 text-slate-100 border border-cyan-400/20'
-                        : 'bg-red-900/20 text-red-300 border border-red-500/30'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed break-words">
-                      {msg.content}
-                    </p>
-                  </div>
+                  {msg.role === 'error' ? (
+                    <div className="max-w-xs lg:max-w-md xl:max-w-lg">
+                      <div className="bg-red-900/20 text-red-300 border border-red-500/30 px-4 py-3 rounded-lg">
+                        <p className="text-sm leading-relaxed break-words mb-2">
+                          {msg.content}
+                        </p>
+                        <button
+                          onClick={() => retryMessage(msg.retryMessage)}
+                          disabled={loading}
+                          className="text-xs bg-red-600/40 hover:bg-red-600/60 disabled:opacity-50 disabled:cursor-not-allowed px-2 py-1 rounded transition-colors"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg ${
+                        msg.role === 'user'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
+                          : 'bg-slate-800 text-slate-100 border border-cyan-400/20'
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed break-words">
+                        {msg.content}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))
             )}
