@@ -36,10 +36,10 @@ export default function FAQ() {
       question: "Can I set multiple goals and budgets?",
       answer: "Yes! You can create unlimited financial goals, budgets by category, and track multiple income and expense sources. Fincraft adapts its guidance based on all your goals and priorities working together.",
     },
-    {
-      question: "What happens if I cancel my subscription?",
-      answer: "You can cancel anytime with no penalties. We'll help you export all your data in standard formats. Your financial information belongs to you—we're here to be your trusted advisor, not lock you in.",
-    },
+    // {
+    //   question: "What happens if I cancel my subscription?",
+    //   answer: "You can cancel anytime with no penalties. We'll help you export all your data in standard formats. Your financial information belongs to you—we're here to be your trusted advisor, not lock you in.",
+    // },
   ];
 
   const containerVariants = {
