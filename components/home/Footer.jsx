@@ -86,7 +86,7 @@ export default function Footer() {
       </div>
 
       {/* Newsletter Section */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -130,7 +130,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Main Footer */}
       <div className="relative border-t border-cyan-400/10">

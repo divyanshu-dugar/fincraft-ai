@@ -252,7 +252,7 @@ export default function Comparison() {
         </motion.div>
 
         {/* CTA */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -269,7 +269,7 @@ export default function Comparison() {
           >
             Start Free Trial
           </motion.button>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );
