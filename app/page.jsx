@@ -19,7 +19,7 @@ export default function HomePage() {
       <CombinedFeatures />
 
       {/* Pricing Section */}
-      <Pricing />
+      {/* <Pricing /> */}
 
       {/* Use Cases Section */}
       <UseCases />
@@ -31,7 +31,7 @@ export default function HomePage() {
       <Comparison />
       
       {/* Demo Section */}
-      <Demo />
+      {/* <Demo /> */}
 
       {/* Footer */}
       <Footer />
