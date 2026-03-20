@@ -17,10 +17,20 @@ export default function GoalGrid({
 }) {
   const [viewMode, setViewMode] = useState("year"); // 'priority' or 'year'
 
+  const normalizeDateOnlyToUtc = (value) => {
+    if (!value) return null;
+    const dateOnly = String(value).split("T")[0];
+    const [year, month, day] = dateOnly.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(Date.UTC(year, month - 1, day));
+  };
+
   // Helper to get year from deadline
   const getGoalYear = (deadline) => {
     if (!deadline) return "No Deadline";
-    const year = new Date(deadline).getFullYear();
+    const normalizedDate = normalizeDateOnlyToUtc(deadline);
+    if (!normalizedDate) return "No Deadline";
+    const year = normalizedDate.getUTCFullYear();
     return year.toString();
   };
 
@@ -59,7 +69,7 @@ export default function GoalGrid({
       if (!a.deadline) return 1;
       if (!b.deadline) return -1;
 
-      return new Date(a.deadline) - new Date(b.deadline);
+      return normalizeDateOnlyToUtc(a.deadline) - normalizeDateOnlyToUtc(b.deadline);
     });
   });
 
@@ -75,7 +85,7 @@ export default function GoalGrid({
     if (!a.deadline) return 1;
     if (!b.deadline) return -1;
 
-    return new Date(a.deadline) - new Date(b.deadline);
+    return normalizeDateOnlyToUtc(a.deadline) - normalizeDateOnlyToUtc(b.deadline);
   });
 
   // Group goals by priority for priority view

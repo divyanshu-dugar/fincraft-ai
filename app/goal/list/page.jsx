@@ -138,21 +138,43 @@ export default function SavingsGoals() {
   };
 
   // helpers
+  const normalizeDateOnlyToUtc = (value) => {
+    if (!value) return null;
+    const dateOnly = String(value).split("T")[0];
+    const [year, month, day] = dateOnly.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(Date.UTC(year, month - 1, day));
+  };
+
   const formatCurrency = (a) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(a);
 
-  const formatDate = (d) =>
-    new Date(d).toLocaleDateString("en-US", {
+  const formatDate = (d) => {
+    const normalizedDate = normalizeDateOnlyToUtc(d);
+    if (!normalizedDate) return "Invalid date";
+
+    return normalizedDate.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
+      timeZone: "UTC",
     });
+  };
 
-  const getDaysRemaining = (d) =>
-    Math.ceil((new Date(d) - new Date()) / (1000 * 60 * 60 * 24));
+  const getDaysRemaining = (d) => {
+    const deadlineUtc = normalizeDateOnlyToUtc(d);
+    if (!deadlineUtc) return 0;
+
+    const now = new Date();
+    const todayUtc = new Date(
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+    );
+
+    return Math.ceil((deadlineUtc - todayUtc) / (1000 * 60 * 60 * 24));
+  };
 
   const getPriorityColor = (p) =>
     p === "high"
