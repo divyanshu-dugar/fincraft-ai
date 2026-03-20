@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { getToken } from "@/lib/authenticate";
+import {
+  calculateMonthlySavings,
+  calculateYearlySavings,
+  calculateDailySavings,
+} from "@/lib/goalsUtils";
 
 import GoalsHeader from "@/components/goals/GoalsHeader";
 import GoalGrid from "@/components/goals/GoalGrid";
@@ -59,6 +64,13 @@ export default function SavingsGoals() {
   const handleUpdateSavedAmount = async (id, savedAmount) => {
     try {
       const token = getToken();
+      const numAmount = parseFloat(savedAmount);
+      
+      if (isNaN(numAmount) || numAmount < 0) {
+        console.error("Invalid amount:", savedAmount);
+        return;
+      }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${id}/save`,
         {
@@ -67,11 +79,15 @@ export default function SavingsGoals() {
             "Content-Type": "application/json",
             Authorization: `jwt ${token}`,
           },
-          body: JSON.stringify({ savedAmount: parseFloat(savedAmount) }),
+          body: JSON.stringify({ savedAmount: numAmount }),
         }
       );
+      
       if (res.ok) {
         await fetchGoals(); // refresh data
+      } else {
+        const error = await res.json();
+        console.error("Failed to update saved amount:", error);
       }
     } catch (err) {
       console.error("Error updating saved amount:", err);
