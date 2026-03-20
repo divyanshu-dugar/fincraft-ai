@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { authenticateUser } from "@/lib/authenticate";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -131,7 +131,11 @@ export default function Login() {
                       value={user}
                       onChange={(e) => setUser(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border-2 text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                        warning
+                          ? "border-red-400/60 focus:border-red-400/80 focus:ring-red-400/40"
+                          : "border-cyan-400/30 focus:border-cyan-400/60 focus:ring-cyan-400/40"
+                      }`}
                       placeholder="Enter your username"
                     />
                   </div>
@@ -150,7 +154,11 @@ export default function Login() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
+                      className={`w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border-2 text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                        warning
+                          ? "border-red-400/60 focus:border-red-400/80 focus:ring-red-400/40"
+                          : "border-cyan-400/30 focus:border-cyan-400/60 focus:ring-cyan-400/40"
+                      }`}
                       placeholder="Enter your password"
                     />
                     <motion.button
@@ -182,11 +190,24 @@ export default function Login() {
                 {/* Error Message */}
                 {warning && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-500/20 border border-red-400/50 rounded-xl p-4"
+                    initial={{ opacity: 0, y: -10, x: 0 }}
+                    animate={{ opacity: 1, y: 0, x: [-5, 5, -5, 0] }}
+                    transition={{ 
+                      opacity: { duration: 0.3 },
+                      y: { duration: 0.3 },
+                      x: { duration: 0.4, times: [0, 0.33, 0.66, 1] }
+                    }}
+                    className="bg-red-500/30 border-2 border-red-400/60 rounded-xl p-4 backdrop-blur-sm shadow-lg shadow-red-500/20"
                   >
-                    <p className="text-red-300 text-sm font-medium">{warning}</p>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="text-red-300 text-sm font-bold">Login Failed</p>
+                        <p className="text-red-200/80 text-sm">
+                          Incorrect username or password. Please try again.
+                        </p>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
 
