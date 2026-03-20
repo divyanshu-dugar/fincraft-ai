@@ -6,8 +6,9 @@ import { X, Upload, FileText, AlertCircle, CheckCircle, Download } from "lucide-
 import { getToken } from "@/lib/authenticate";
 
 export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }) {
-  const [step, setStep] = useState(1); // 1: Upload, 2: Map, 3: Review, 4: Complete
+  const [step, setStep] = useState(1); // 1: Upload, 2: Map/Review, 3: Confirm, 4: Complete
   const [file, setFile] = useState(null);
+  const [uploadType, setUploadType] = useState(null); // 'csv' or 'image'
   const [previewData, setPreviewData] = useState([]);
   const [mapping, setMapping] = useState({
     date: '',
@@ -23,17 +24,61 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
   const supportedFormats = ['.csv', '.xlsx', '.xls'];
 
   // Handle file selection
-  const handleFileSelect = (selectedFile) => {
+  const handleFileSelect = (selectedFile, type) => {
     if (!selectedFile) return;
 
-    const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
-    if (!['csv', 'xlsx', 'xls'].includes(fileExtension)) {
-      alert('Please select a CSV or Excel file');
-      return;
+    const fileName = selectedFile.name.toLowerCase();
+    
+    if (type === 'image') {
+      if (!/\.(jpg|jpeg|png|gif|webp)$/.test(fileName)) {
+        alert('Please select a valid image file (JPG, PNG, GIF, WebP)');
+        return;
+      }
+      setFile(selectedFile);
+      setUploadType('image');
+      handleImageUpload(selectedFile);
+    } else {
+      const fileExtension = fileName.split('.').pop();
+      if (!['csv', 'xlsx', 'xls'].includes(fileExtension)) {
+        alert('Please select a CSV or Excel file');
+        return;
+      }
+      setFile(selectedFile);
+      setUploadType('csv');
+      parseFile(selectedFile);
     }
+  };
 
-    setFile(selectedFile);
-    parseFile(selectedFile);
+  // Handle image upload with AI extraction
+  const handleImageUpload = async (imageFile) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', imageFile);
+
+      const token = getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/extract-from-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `jwt ${token}`
+        },
+        body: formData
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.expenses && result.expenses.length > 0) {
+        setPreviewData(result.expenses);
+        setStep(2);
+      } else {
+        alert('No expenses found in image. Please try another screenshot.');
+      }
+    } catch (error) {
+      console.error('Image extraction error:', error);
+      alert('Error processing image: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Parse CSV/Excel file
@@ -119,16 +164,23 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
   // Process and import data
   const handleImport = async () => {
-    if (!file) return;
+    if (!file && previewData.length === 0) return;
 
     setLoading(true);
     try {
-      const expensesToImport = previewData.map(row => ({
-        date: row[mapping.date] || '',
-        category: row[mapping.category] || '',
-        amount: row[mapping.amount] || '',
-        note: row[mapping.note] || ''
-      })).filter(expense => expense.date && expense.amount); // Filter out empty rows
+      let expensesToImport = [];
+
+      if (uploadType === 'csv') {
+        expensesToImport = previewData.map(row => ({
+          date: row[mapping.date] || '',
+          category: row[mapping.category] || '',
+          amount: row[mapping.amount] || '',
+          note: row[mapping.note] || ''
+        })).filter(expense => expense.date && expense.amount);
+      } else {
+        // For images, data is already extracted and formatted
+        expensesToImport = previewData;
+      }
 
       const token = getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/import`, {
@@ -148,6 +200,14 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
         if (onImportSuccess) {
           onImportSuccess();
         }
+
+        // Auto-close modal after successful import
+        // If there were no errors or some imports succeeded, close after 2 seconds
+        if (result.importedCount > 0) {
+          setTimeout(() => {
+            handleClose();
+          }, 2000);
+        }
       } else {
         throw new Error(result.message || 'Import failed');
       }
@@ -162,6 +222,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
   // Reset modal
   const resetModal = () => {
     setFile(null);
+    setUploadType(null);
     setPreviewData([]);
     setMapping({
       date: '',
@@ -185,25 +246,6 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
   // Get headers from preview data
   const headers = previewData.length > 0 ? Object.keys(previewData[0]) : [];
 
-  // Download template
-  const downloadTemplate = () => {
-    const template = `date,category,amount,note
-2024-01-15,Grocery,45.50,Weekly groceries
-2024-01-16,Restaurant,32.75,Dinner with friends
-2024-01-17,Transport,15.00,UBER ride
-2024-01-18,Shopping,89.99,New clothes`;
-
-    const blob = new Blob([template], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'expense_template.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -217,8 +259,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
             {step === 1 && "Import Expenses"}
-            {step === 2 && "Map Columns"}
-            {step === 3 && "Review Import"}
+            {step === 2 && (uploadType === 'csv' ? "Map Columns" : "Review Extracted")}
+            {step === 3 && "Confirm Import"}
             {step === 4 && "Import Complete"}
           </h2>
           <button
@@ -235,152 +277,183 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center"
             >
-              <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-2xl flex items-center justify-center">
-                <Upload className="w-8 h-8 text-blue-600" />
-              </div>
-              
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Upload Your Expenses File
+                How would you like to import expenses?
               </h3>
-              <p className="text-gray-600 mb-6">
-                Upload a CSV or Excel file containing your expenses. We'll help you map the columns.
+              <p className="text-gray-600 mb-8">
+                Choose between uploading a file or scanning a screenshot from your wallet app.
               </p>
 
-              {/* File Drop Zone */}
-              <div
-                className="border-2 border-dashed border-gray-300 rounded-2xl p-8 mb-6 hover:border-blue-400 transition-colors cursor-pointer"
-                onClick={() => fileInputRef.current?.click()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const droppedFile = e.dataTransfer.files[0];
-                  handleFileSelect(droppedFile);
-                }}
-                onDragOver={(e) => e.preventDefault()}
-              >
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">
-                  <span className="text-blue-600 font-semibold">Click to upload</span> or drag and drop
-                </p>
-                <p className="text-sm text-gray-500">
-                  CSV, Excel files (Max 10MB)
-                </p>
-              </div>
-
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={(e) => handleFileSelect(e.target.files[0])}
-                accept=".csv,.xlsx,.xls"
-                className="hidden"
-              />
-
-              {/* Template Download */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-3">
-                  Don't have a template? Download our CSV template:
-                </p>
-                <button
-                  onClick={downloadTemplate}
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium mx-auto"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* CSV/Excel Option */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="border-2 border-gray-200 rounded-2xl p-6 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  <Download className="w-4 h-4" />
-                  Download CSV Template
-                </button>
+                  <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <FileText className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Upload CSV/Excel</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Import expenses from a spreadsheet file
+                  </p>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => handleFileSelect(e.target.files[0], 'csv')}
+                    accept=".csv,.xlsx,.xls"
+                    className="hidden"
+                  />
+                  <button className="text-sm text-blue-600 font-medium hover:text-blue-700">
+                    Choose File
+                  </button>
+                </motion.div>
+
+                {/* Screenshot Option */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="border-2 border-gray-200 rounded-2xl p-6 cursor-pointer hover:border-green-400 hover:bg-green-50 transition-all"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => handleFileSelect(e.target.files[0], 'image');
+                    input.click();
+                  }}
+                >
+                  <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                    <Upload className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Scan Screenshot</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Use AI to extract expenses from wallet screenshots
+                  </p>
+                  <button className="text-sm text-green-600 font-medium hover:text-green-700">
+                    Upload Screenshot
+                  </button>
+                </motion.div>
               </div>
+
+              {/* Loading state for image processing */}
+              {loading && (
+                <div className="mt-6 text-center">
+                  <div className="inline-flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-gray-600">Processing image...</span>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
-          {/* Step 2: Mapping */}
+          {/* Step 2: Mapping/Review */}
           {step === 2 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Map Your Columns
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Match your file columns to the required expense fields.
-              </p>
+              {uploadType === 'csv' ? (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Map Your Columns
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Match your file columns to the required expense fields.
+                  </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {[
-                  { key: 'date', label: 'Date', required: true, placeholder: 'e.g., 2024-01-15' },
-                  { key: 'category', label: 'Category', required: true, placeholder: 'e.g., Grocery, Restaurant' },
-                  { key: 'amount', label: 'Amount', required: true, placeholder: 'e.g., 45.50' },
-                  { key: 'note', label: 'Note', required: false, placeholder: 'e.g., Weekly groceries' }
-                ].map((field) => (
-                  <div key={field.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <select
-                      value={mapping[field.key]}
-                      onChange={(e) => handleMappingChange(field.key, e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select column...</option>
-                      {headers.map(header => (
-                        <option key={header} value={header}>{header}</option>
-                      ))}
-                    </select>
-                    {mapping[field.key] && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Sample: {previewData[0]?.[mapping[field.key]] || 'No data'}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Data Preview */}
-              <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Data Preview</h4>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          {headers.slice(0, 6).map(header => (
-                            <th key={header} className="px-3 py-2 text-left font-medium text-gray-700 border-b">
-                              {header}
-                            </th>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {[
+                      { key: 'date', label: 'Date', required: true },
+                      { key: 'category', label: 'Category', required: true },
+                      { key: 'amount', label: 'Amount', required: true },
+                      { key: 'note', label: 'Note', required: false }
+                    ].map((field) => (
+                      <div key={field.key}>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {field.label} {field.required && <span className="text-red-500">*</span>}
+                        </label>
+                        <select
+                          value={mapping[field.key]}
+                          onChange={(e) => handleMappingChange(field.key, e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">Select column...</option>
+                          {headers.map(header => (
+                            <option key={header} value={header}>{header}</option>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {previewData.slice(0, 5).map((row, index) => (
-                          <tr key={index} className="border-b border-gray-100 last:border-b-0">
-                            {headers.slice(0, 6).map(header => (
-                              <td key={header} className="px-3 py-2 text-gray-600">
-                                {row[header]}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </select>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
 
-              <div className="flex justify-between">
-                <button
-                  onClick={() => setStep(1)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => setStep(3)}
-                  disabled={!mapping.date || !mapping.amount || !mapping.category}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Continue
-                </button>
-              </div>
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => setStep(1)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={() => setStep(3)}
+                      disabled={!mapping.date || !mapping.amount || !mapping.category}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Review Extracted Expenses
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    AI found {previewData.length} transaction{previewData.length !== 1 ? 's' : ''} in your screenshot.
+                  </p>
+
+                  <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Date</th>
+                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Category</th>
+                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Amount</th>
+                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Note</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {previewData.map((expense, index) => (
+                            <tr key={index} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                              <td className="px-4 py-3 text-gray-600">{expense.date}</td>
+                              <td className="px-4 py-3 text-gray-600">{expense.category}</td>
+                              <td className="px-4 py-3 text-gray-600 font-medium">${expense.amount}</td>
+                              <td className="px-4 py-3 text-gray-600 text-sm">{expense.note}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => setStep(1)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={() => setStep(3)}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
 
@@ -391,29 +464,45 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
               animate={{ opacity: 1 }}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Review Import
+                {uploadType === 'csv' ? 'Confirm CSV Import' : 'Confirm Import'}
               </h3>
               <p className="text-gray-600 mb-6">
-                Ready to import {previewData.length} expenses?
+                Ready to import {previewData.length} expense{previewData.length !== 1 ? 's' : ''}?
               </p>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-yellow-800 font-medium">
-                      Import Summary
-                    </p>
-                    <ul className="text-sm text-yellow-700 mt-1 space-y-1">
-                      <li>• Total rows found: {previewData.length}</li>
-                      <li>• Date column: {mapping.date}</li>
-                      <li>• Category column: {mapping.category}</li>
-                      <li>• Amount column: {mapping.amount}</li>
-                      {mapping.note && <li>• Note column: {mapping.note}</li>}
-                    </ul>
+              {uploadType === 'csv' ? (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-yellow-800 font-medium">
+                        Column Mapping Summary
+                      </p>
+                      <ul className="text-sm text-yellow-700 mt-2 space-y-1">
+                        <li>• Total rows: {previewData.length}</li>
+                        <li>• Date column: <span className="font-semibold">{mapping.date}</span></li>
+                        <li>• Category column: <span className="font-semibold">{mapping.category}</span></li>
+                        <li>• Amount column: <span className="font-semibold">{mapping.amount}</span></li>
+                        {mapping.note && <li>• Note column: <span className="font-semibold">{mapping.note}</span></li>}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-blue-800 font-medium">
+                        AI Extraction Summary
+                      </p>
+                      <p className="text-sm text-blue-700 mt-2">
+                        Successfully extracted <span className="font-semibold">{previewData.length} transaction{previewData.length !== 1 ? 's' : ''}</span> from your screenshot.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-between">
                 <button
@@ -447,38 +536,83 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
               animate={{ opacity: 1 }}
               className="text-center"
             >
-              <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-2xl flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Import Complete!
-              </h3>
-              
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-                <p className="text-green-800 font-medium">
-                  Successfully imported {importResults.importedCount} expenses
-                </p>
-                {importResults.errors.length > 0 && (
-                  <div className="mt-3 text-left">
-                    <p className="text-sm font-medium text-yellow-800 mb-2">
-                      Some rows had errors:
+              {importResults.importedCount > 0 ? (
+                <>
+                  <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-2xl flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Import Complete!
+                  </h3>
+                  
+                  <p className="text-sm text-gray-600 mb-4">
+                    Redirecting to expense list...
+                  </p>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                    <p className="text-green-800 font-medium">
+                      Successfully imported {importResults.importedCount} expense{importResults.importedCount !== 1 ? 's' : ''}
                     </p>
-                    <ul className="text-sm text-yellow-700 space-y-1 max-h-32 overflow-y-auto">
-                      {importResults.errors.map((error, index) => (
-                        <li key={index}>• {error}</li>
-                      ))}
+                    {importResults.errors.length > 0 && (
+                      <div className="mt-3 text-left">
+                        <p className="text-sm font-medium text-yellow-800 mb-2">
+                          ⚠️ Some rows had errors:
+                        </p>
+                        <ul className="text-sm text-yellow-700 space-y-1 max-h-32 overflow-y-auto">
+                          {importResults.errors.map((error, index) => (
+                            <li key={index}>• {error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-2xl flex items-center justify-center">
+                    <AlertCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Import Failed
+                  </h3>
+                  
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                    <p className="text-red-800 font-medium mb-3">
+                      No expenses could be imported. Please check the following:
+                    </p>
+                    <ul className="text-sm text-red-700 space-y-2 text-left max-h-40 overflow-y-auto">
+                      {importResults.errors.length > 0 ? (
+                        importResults.errors.map((error, index) => (
+                          <li key={index}>• {error}</li>
+                        ))
+                      ) : (
+                        <>
+                          <li>• Amount contains currency symbols or invalid format</li>
+                          <li>• Date format is not recognized (use YYYY-MM-DD)</li>
+                          <li>• Category is not properly formatted</li>
+                        </>
+                      )}
                     </ul>
                   </div>
-                )}
-              </div>
+                </>
+              )}
 
-              <button
-                onClick={handleClose}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Done
-              </button>
+              {importResults.importedCount === 0 && (
+                <button
+                  onClick={handleClose}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Done
+                </button>
+              )}
             </motion.div>
           )}
         </div>
