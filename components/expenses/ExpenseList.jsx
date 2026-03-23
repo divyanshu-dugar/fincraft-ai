@@ -33,6 +33,9 @@ const DEFAULT_CATEGORY = "all";
 const CURRENCY_CODE = "USD";
 const AUTH_SCHEME = "jwt";
 
+const toApiLocalDateTime = (dateString) =>
+  dateString ? `${dateString}T00:00:00` : "";
+
 const ExpenseList = () => {
   /**
    * ================================
@@ -131,8 +134,8 @@ const ExpenseList = () => {
       const params = new URLSearchParams();
 
       if (dateRange.startDate && dateRange.endDate) {
-        params.append("startDate", dateRange.startDate);
-        params.append("endDate", dateRange.endDate);
+        params.append("startDate", toApiLocalDateTime(dateRange.startDate));
+        params.append("endDate", toApiLocalDateTime(dateRange.endDate));
       }
 
       const response = await fetch(

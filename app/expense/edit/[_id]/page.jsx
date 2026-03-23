@@ -19,6 +19,9 @@ const EditExpense = () => {
   const router = useRouter();
   const params = useParams();
 
+  const toApiLocalDateTime = (dateString) =>
+    dateString ? `${dateString}T00:00:00` : "";
+
   useEffect(() => {
     fetchCategories();
     fetchExpense();
@@ -85,6 +88,7 @@ const EditExpense = () => {
         },
         body: JSON.stringify({
           ...expense,
+          date: toApiLocalDateTime(expense.date),
           category: expense.category, // sending category ID
         }),
       });

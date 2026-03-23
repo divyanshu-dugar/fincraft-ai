@@ -18,6 +18,9 @@ const AddExpense = () => {
   });
   const [errors, setErrors] = useState({});
 
+  const toApiLocalDateTime = (dateString) =>
+    dateString ? `${dateString}T00:00:00` : "";
+
   // Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
@@ -101,7 +104,10 @@ const AddExpense = () => {
           'Content-Type': 'application/json',
           'Authorization': `jwt ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          date: toApiLocalDateTime(formData.date),
+        })
       });
 
       if (res.ok) {

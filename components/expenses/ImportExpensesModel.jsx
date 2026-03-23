@@ -10,6 +10,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
   const [file, setFile] = useState(null);
   const [uploadType, setUploadType] = useState(null); // 'csv' or 'image'
   const [previewData, setPreviewData] = useState([]);
+  const [importData, setImportData] = useState([]);
   const [mapping, setMapping] = useState({
     date: '',
     category: '',
@@ -20,8 +21,20 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
+  const toApiLocalDateTime = (dateValue) => {
+    if (!dateValue) return '';
+
+    const normalized = String(dateValue).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+      return `${normalized}T00:00:00`;
+    }
+
+    return normalized;
+  };
+
   // Supported file types
   const supportedFormats = ['.csv', '.xlsx', '.xls'];
+  const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
   // Handle file selection
   const handleFileSelect = (selectedFile, type) => {
@@ -43,6 +56,12 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
         alert('Please select a CSV or Excel file');
         return;
       }
+
+      if (selectedFile.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+        alert(`File is too large. Please upload a file smaller than ${Math.round(MAX_IMPORT_FILE_SIZE_BYTES / (1024 * 1024))} MB.`);
+        return;
+      }
+
       setFile(selectedFile);
       setUploadType('csv');
       parseFile(selectedFile);
@@ -68,6 +87,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       const result = await res.json();
 
       if (res.ok && result.expenses && result.expenses.length > 0) {
+        setImportData(result.expenses);
         setPreviewData(result.expenses);
         setStep(2);
       } else {
@@ -120,7 +140,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       return row;
     }).filter(row => Object.values(row).some(val => val));
 
-    setPreviewData(data.slice(0, 10)); // Show first 10 rows
+    setImportData(data);
+    setPreviewData(data.slice(0, 10)); // Only preview first 10 rows in UI
     autoDetectMapping(headers);
     setStep(2);
   };
@@ -164,22 +185,25 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
   // Process and import data
   const handleImport = async () => {
-    if (!file && previewData.length === 0) return;
+    if (!file && importData.length === 0) return;
 
     setLoading(true);
     try {
       let expensesToImport = [];
 
       if (uploadType === 'csv') {
-        expensesToImport = previewData.map(row => ({
-          date: row[mapping.date] || '',
+        expensesToImport = importData.map(row => ({
+          date: toApiLocalDateTime(row[mapping.date] || ''),
           category: row[mapping.category] || '',
           amount: row[mapping.amount] || '',
           note: row[mapping.note] || ''
         })).filter(expense => expense.date && expense.amount);
       } else {
         // For images, data is already extracted and formatted
-        expensesToImport = previewData;
+        expensesToImport = importData.map(expense => ({
+          ...expense,
+          date: toApiLocalDateTime(expense.date),
+        }));
       }
 
       const token = getToken();
@@ -224,6 +248,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     setFile(null);
     setUploadType(null);
     setPreviewData([]);
+    setImportData([]);
     setMapping({
       date: '',
       category: '',
@@ -363,6 +388,12 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                     Match your file columns to the required expense fields.
                   </p>
 
+                  {importData.length > previewData.length && (
+                    <p className="text-sm text-gray-500 mb-4">
+                      Showing first {previewData.length} of {importData.length} rows for preview.
+                    </p>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     {[
                       { key: 'date', label: 'Date', required: true },
@@ -467,7 +498,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                 {uploadType === 'csv' ? 'Confirm CSV Import' : 'Confirm Import'}
               </h3>
               <p className="text-gray-600 mb-6">
-                Ready to import {previewData.length} expense{previewData.length !== 1 ? 's' : ''}?
+                Ready to import {importData.length} expense{importData.length !== 1 ? 's' : ''}?
               </p>
 
               {uploadType === 'csv' ? (
@@ -479,7 +510,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                         Column Mapping Summary
                       </p>
                       <ul className="text-sm text-yellow-700 mt-2 space-y-1">
-                        <li>• Total rows: {previewData.length}</li>
+                        <li>• Total rows: {importData.length}</li>
                         <li>• Date column: <span className="font-semibold">{mapping.date}</span></li>
                         <li>• Category column: <span className="font-semibold">{mapping.category}</span></li>
                         <li>• Amount column: <span className="font-semibold">{mapping.amount}</span></li>
