@@ -15,26 +15,11 @@ export default function IncomeTable({
     return incomes.reduce((sum, income) => sum + income.amount, 0);
   };
 
-  // Generate subtle background colors based on index
-  const getRowBackgroundColor = (index) => {
-    const colors = [
-      'from-white to-gray-50/80', // Pure white with subtle gray
-      'from-green-50/30 to-emerald-50/20', // Very subtle green
-      'from-teal-50/20 to-cyan-50/10', // Very subtle teal
-      'from-lime-50/15 to-green-50/10', // Very subtle lime
-    ];
-    return colors[index % colors.length];
-  };
-
-  // Get hover gradient based on index
-  const getHoverGradient = (index) => {
-    const gradients = [
-      'hover:from-green-50/40 hover:to-emerald-50/30', // Green hover
-      'hover:from-teal-50/30 hover:to-cyan-50/20', // Teal hover
-      'hover:from-lime-50/25 hover:to-green-50/15', // Lime hover
-      'hover:from-emerald-50/20 hover:to-teal-50/10', // Emerald hover
-    ];
-    return gradients[index % gradients.length];
+  const formatIncomeTime = (date) => {
+    return new Date(date).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Case: No incomes
@@ -72,13 +57,18 @@ export default function IncomeTable({
 
   // Group incomes by date
   const groupedIncomes = incomes.reduce((acc, income) => {
-    const dateKey = formatDate(income.date);
-    if (!acc[dateKey]) acc[dateKey] = [];
-    acc[dateKey].push(income);
+    const dateKey = new Date(income.date).toISOString().split("T")[0];
+    if (!acc[dateKey]) {
+      acc[dateKey] = {
+        label: formatDate(income.date),
+        items: [],
+      };
+    }
+    acc[dateKey].items.push(income);
     return acc;
   }, {});
 
-  const sortedDates = Object.keys(groupedIncomes).sort(
+  const sortedDateKeys = Object.keys(groupedIncomes).sort(
     (a, b) => new Date(b) - new Date(a)
   );
 
@@ -86,63 +76,66 @@ export default function IncomeTable({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white rounded-3xl shadow-2xl border border-gray-200/60 overflow-hidden"
+      className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200/70 overflow-hidden"
     >
-      <div className="overflow-x-auto">
+      <div>
         <AnimatePresence>
-          {sortedDates.map((date, dateIndex) => {
-            const dailyIncomes = groupedIncomes[date];
+          {sortedDateKeys.map((dateKey, dateIndex) => {
+            const group = groupedIncomes[dateKey];
+            const dailyIncomes = group.items;
             const dailyTotal = calculateDailyTotal(dailyIncomes);
-            
+
             return (
               <motion.div
-                key={date}
+                key={dateKey}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: dateIndex * 0.1 }}
                 className="border-b border-gray-100/80 last:border-b-0"
               >
-                {/* Enhanced Sticky Header */}
-                <div className="backdrop-blur-lg bg-gradient-to-r from-gray-50 to-green-50/30 px-8 py-6 sticky top-0 z-20 border-b border-gray-200/60 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg" />
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {date}
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-900 via-green-900 to-teal-900 px-5 md:px-8 py-5 border-b border-emerald-700/70">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(16,185,129,0.2),transparent_40%)]" />
+                  <div className="relative flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
+                        {group.label}
                       </h2>
+                      <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-xs font-semibold px-2.5 py-1 border border-white/25 backdrop-blur-sm">
+                        {dailyIncomes.length} item{dailyIncomes.length > 1 ? "s" : ""}
+                      </span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+
+                    <div className="text-right px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 backdrop-blur-sm">
+                      <div className="text-[11px] font-semibold text-emerald-100 uppercase tracking-[0.18em]">
                         Daily Total
                       </div>
-                      <div className="text-xl font-bold text-gray-900">
+                      <div className="text-xl md:text-2xl font-bold text-white mt-0.5">
                         {formatCurrency(dailyTotal)}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Enhanced Table */}
-                <div className="px-2 py-4">
-                  <table className="w-full">
+                <div className="hidden md:block px-4 md:px-6 py-4 overflow-x-auto">
+                  <table className="w-full min-w-[720px] table-fixed border-separate border-spacing-0">
                     <colgroup>
-                      <col style={{ width: "28%" }} />
-                      <col style={{ width: "22%" }} />
-                      <col style={{ width: "35%" }} />
-                      <col style={{ width: "15%" }} />
+                      <col className="w-[30%]" />
+                      <col className="w-[20%]" />
+                      <col className="w-[35%]" />
+                      <col className="w-[15%]" />
                     </colgroup>
 
                     <thead>
-                      <tr className="border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 to-gray-100/50">
-                        {["Category", "Amount", "Note", "Actions"].map((header, index) => (
+                      <tr className="bg-gradient-to-r from-emerald-100 via-green-50 to-teal-50 text-left">
+                        {["Category", "Amount", "Note", "Actions"].map((header) => (
                           <th
                             key={header}
-                            className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500 tracking-wider"
+                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-emerald-900 tracking-[0.14em] border-b-2 border-emerald-200"
                           >
                             <div className="flex items-center gap-2">
                               {header}
                               {header === "Amount" && (
-                                <TrendingUp size={14} className="text-gray-400" />
+                                <TrendingUp size={15} className="text-emerald-700" />
                               )}
                             </div>
                           </th>
@@ -156,92 +149,77 @@ export default function IncomeTable({
                           const category = income.category || {};
                           const categoryName = category.name || "Uncategorized";
                           const categoryColor = category.color || "#10B981";
-                          const rowBgColor = getRowBackgroundColor(incomeIndex);
-                          const hoverGradient = getHoverGradient(incomeIndex);
 
                           return (
                             <motion.tr
                               key={income._id}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: (dateIndex * 0.1) + (incomeIndex * 0.05) }}
-                              className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-gray-100/30 last:border-b-0`}
+                              transition={{
+                                delay: dateIndex * 0.1 + incomeIndex * 0.05,
+                              }}
+                              className="group border-b border-gray-100 last:border-b-0 odd:bg-white even:bg-emerald-50/35 hover:bg-emerald-50/55 transition-colors"
                             >
-                              {/* Category */}
-                              <td className="px-6 py-5">
-                                <motion.span
-                                  whileHover={{ scale: 1.05 }}
-                                  className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white shadow-lg transition-all duration-200 group-hover:shadow-xl"
-                                  style={{ 
-                                    backgroundColor: categoryColor,
-                                    background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`
-                                  }}
-                                >
-                                  <div 
-                                    className="w-2 h-2 rounded-full bg-white/30"
+                              <td className="px-4 lg:px-6 py-4">
+                                <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-900 bg-white border border-emerald-200">
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full"
+                                    style={{ backgroundColor: categoryColor }}
                                   />
-                                  {categoryName}
-                                </motion.span>
+                                  <span className="truncate">{categoryName}</span>
+                                </span>
                               </td>
 
-                              {/* Amount */}
-                              <td className="px-6 py-5">
+                              <td className="px-4 lg:px-6 py-4">
                                 <div className="flex flex-col">
-                                  <span className="text-lg font-bold text-gray-900 group-hover:text-gray-800 transition-colors">
+                                  <span className="text-base font-semibold text-gray-900">
                                     {formatCurrency(income.amount)}
                                   </span>
-                                  {income.note && (
-                                    <span className="text-xs text-gray-400 mt-1 group-hover:text-gray-500 transition-colors">
-                                      {new Date(income.date).toLocaleTimeString([], { 
-                                        hour: '2-digit', 
-                                        minute: '2-digit' 
-                                      })}
-                                    </span>
-                                  )}
+                                  <span className="text-xs text-gray-500 mt-0.5">
+                                    {formatIncomeTime(income.date)}
+                                  </span>
                                 </div>
                               </td>
 
-                              {/* Note */}
-                              <td className="px-6 py-5">
-                                <div className="max-w-xs">
-                                  {income.note ? (
-                                    <motion.p 
-                                      className="text-gray-700 text-sm leading-relaxed line-clamp-2 group-hover:text-gray-900 transition-colors"
-                                      whileHover={{ scale: 1.02 }}
-                                    >
-                                      {income.note}
-                                    </motion.p>
-                                  ) : (
-                                    <span className="text-gray-400 text-sm italic group-hover:text-gray-500 transition-colors">
-                                      — No note —
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-
-                              {/* Enhanced Actions */}
-                              <td className="px-6 py-5">
-                                <div className="flex items-center gap-3">
-                                  <motion.button
-                                    whileHover={{ scale: 1.1, y: -1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => router.push(`/income/edit/${income._id}`)}
-                                    className="p-2.5 bg-white text-green-600 rounded-xl border border-green-200/60 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
+                              <td className="px-4 lg:px-6 py-4">
+                                {income.note ? (
+                                  <p
+                                    className="text-sm text-gray-700 leading-relaxed line-clamp-2 break-words"
+                                    title={income.note}
                                   >
-                                    <Pencil size={18} />
-                                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                                    {income.note}
+                                  </p>
+                                ) : (
+                                  <span className="text-sm italic text-gray-400">
+                                    No note added
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="px-4 lg:px-6 py-4">
+                                <div className="flex items-center gap-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.06, y: -1 }}
+                                    whileTap={{ scale: 0.94 }}
+                                    onClick={() => router.push(`/income/edit/${income._id}`)}
+                                    className="relative p-2 bg-white text-green-600 rounded-lg border border-green-200 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-all duration-200 shadow-sm group/btn"
+                                    aria-label="Edit income"
+                                  >
+                                    <Pencil size={16} />
+                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                                       Edit
                                     </span>
                                   </motion.button>
 
                                   <motion.button
-                                    whileHover={{ scale: 1.1, y: -1 }}
-                                    whileTap={{ scale: 0.9 }}
+                                    whileHover={{ scale: 1.06, y: -1 }}
+                                    whileTap={{ scale: 0.94 }}
                                     onClick={() => deleteIncome(income._id)}
-                                    className="p-2.5 bg-white text-red-600 rounded-xl border border-red-200/60 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
+                                    className="relative p-2 bg-white text-red-600 rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 shadow-sm group/btn"
+                                    aria-label="Delete income"
                                   >
-                                    <Trash2 size={18} />
-                                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                                    <Trash2 size={16} />
+                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                                       Delete
                                     </span>
                                   </motion.button>
@@ -254,6 +232,71 @@ export default function IncomeTable({
                     </tbody>
                   </table>
                 </div>
+
+                <div className="md:hidden px-4 pb-4 space-y-3">
+                  <AnimatePresence>
+                    {dailyIncomes.map((income, incomeIndex) => {
+                      const category = income.category || {};
+                      const categoryName = category.name || "Uncategorized";
+                      const categoryColor = category.color || "#10B981";
+
+                      return (
+                        <motion.div
+                          key={income._id}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            delay: dateIndex * 0.1 + incomeIndex * 0.05,
+                          }}
+                          className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full"
+                                style={{ backgroundColor: categoryColor }}
+                              />
+                              {categoryName}
+                            </span>
+                            <div className="text-right">
+                              <div className="text-base font-semibold text-gray-900">
+                                {formatCurrency(income.amount)}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {formatIncomeTime(income.date)}
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+                            {income.note || "No note added"}
+                          </p>
+
+                          <div className="mt-4 flex items-center justify-end gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.04 }}
+                              whileTap={{ scale: 0.94 }}
+                              onClick={() =>
+                                router.push(`/income/edit/${income._id}`)
+                              }
+                              className="px-3 py-2 text-sm font-medium bg-green-50 text-green-700 rounded-lg border border-green-200"
+                            >
+                              Edit
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.04 }}
+                              whileTap={{ scale: 0.94 }}
+                              onClick={() => deleteIncome(income._id)}
+                              className="px-3 py-2 text-sm font-medium bg-red-50 text-red-700 rounded-lg border border-red-200"
+                            >
+                              Delete
+                            </motion.button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
               </motion.div>
             );
           })}
@@ -261,21 +304,23 @@ export default function IncomeTable({
       </div>
 
       {/* Summary Footer */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-gradient-to-r from-gray-50 to-green-50/30 px-8 py-6 border-t border-gray-200/60"
+        className="bg-gradient-to-r from-gray-50 to-green-50/30 px-5 md:px-8 py-5 border-t border-gray-200/60"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-sm text-gray-600">
-            Total <span className="font-semibold">{incomes.length}</span> income records across <span className="font-semibold">{sortedDates.length}</span> days
+            Total <span className="font-semibold">{incomes.length}</span>{" "}
+            income records across{" "}
+            <span className="font-semibold">{sortedDateKeys.length}</span> days
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => router.push("/income/add")}
-            className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+            className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
           >
             <Plus size={18} />
             Add Income
