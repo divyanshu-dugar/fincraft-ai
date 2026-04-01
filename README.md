@@ -1,4 +1,15 @@
+Problem - Current Personal Finance applications work as passive trackers
 
+What are we doing?
+1. Making logging of financial data easier
+   - PDFs/CSV
+   - SS
+  
+ 2. Giving you personalized financial advice
+    - Month on Month Categorical Spending Comparison
+    - 
+
+<h2>Developers Here!</h2>
 <details>
  
 <summary>👉🏻 Project Directory Structure </summary>
@@ -120,7 +131,7 @@
 </details>
 
 <details>
-<summary>👉🏻 Expense List Directory Structure</summary>
+<summary>👉🏻 Expense Module Directory Structure</summary>
 
 ```
 📦 app
