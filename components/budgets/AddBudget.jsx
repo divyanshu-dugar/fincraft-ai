@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getToken } from '@/lib/authenticate';
-import { QuickCategoryModal } from '@/components/categories/QuickCategoryModal';
+import { CategoryPicker } from '@/components/categories/CategoryPicker';
 
 const AddBudget = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categoryTree, setCategoryTree] = useState([]);
+  const [categoryValue, setCategoryValue] = useState(null); // CategoryPicker value
   const [formData, setFormData] = useState({
     name: '',
     amount: '',
@@ -208,34 +208,54 @@ const AddBudget = () => {
     }
   };
 
-  // Fetch categories from backend
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = getToken();
-        if (!token) {
-          console.error("No token found");
-          return;
-        }
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `jwt ${token}`
-          }
-        });
-
-        if (!res.ok) throw new Error("Failed to load categories");
-
-        const data = await res.json();
-        setCategories(data);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-      }
-    };
-
-    fetchCategories();
+  // ── fetch category tree ──────────────────────────────────────────────────
+  const fetchCategoryTree = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+        headers: { Authorization: `jwt ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.tree) setCategoryTree(data.tree);
+    } catch { /* silent */ }
   }, []);
+
+  const seedIfEmpty = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+        method: 'POST',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      await fetchCategoryTree();
+    } catch { /* silent */ }
+  }, [fetchCategoryTree]);
+
+  useEffect(() => { fetchCategoryTree(); }, [fetchCategoryTree]);
+
+  useEffect(() => {
+    if (categoryTree.length === 0) seedIfEmpty();
+  }, [categoryTree.length]);
+
+  const handleAddCategory = async (parentId, name, color) => {
+    const token = getToken();
+    if (!token) throw new Error('Not authenticated');
+    const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
+    if (color) body.color = color;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || 'Failed to create category');
+    }
+    await fetchCategoryTree();
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -258,14 +278,13 @@ const AddBudget = () => {
     }
   };
 
-  const handleCategoryCreated = (newCategory) => {
-    // Add the new category to the list
-    setCategories(prev => [...prev, newCategory]);
-    // Auto-select the newly created category
-    setFormData(prev => ({
-      ...prev,
-      category: newCategory._id
-    }));
+  const handleCategoryChange = (val) => {
+    setCategoryValue(val);
+    const catId = val ? (val.subcategoryId || val.parentId) : '';
+    setFormData(prev => ({ ...prev, category: catId }));
+    if (errors.category) {
+      setErrors(prev => ({ ...prev, category: '' }));
+    }
   };
 
   const validateForm = () => {
@@ -433,38 +452,18 @@ const AddBudget = () => {
 
             {/* Category Field */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Expense Category <span className="text-red-500">*</span>
               </label>
               
-              <div className="flex gap-2">
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
-                    errors.category ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(category => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={() => setShowCategoryModal(true)}
-                  className="px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-gray-700 font-medium whitespace-nowrap"
-                  title="Create a new category"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-              </div>
+              <CategoryPicker
+                tree={categoryTree}
+                value={categoryValue}
+                onChange={handleCategoryChange}
+                onAddCategory={handleAddCategory}
+                placeholder="Select a category"
+                error={errors.category || undefined}
+              />
 
               {errors.category && (
                 <p className="mt-1 text-sm text-red-600">{errors.category}</p>
@@ -718,15 +717,6 @@ const AddBudget = () => {
         </motion.div>
       </div>
 
-      {/* Quick Category Modal */}
-      <QuickCategoryModal
-        isOpen={showCategoryModal}
-        onClose={() => setShowCategoryModal(false)}
-        endpoint="/expense-categories"
-        onCategoryCreated={handleCategoryCreated}
-        existingCategories={categories}
-        defaultColor="#3b82f6"
-      />
     </div>
   );
 };
