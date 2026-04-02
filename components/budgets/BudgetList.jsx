@@ -33,7 +33,7 @@ const BudgetList = () => {
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories`,
+        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories?flat=true`,
         {
           headers: {
             Authorization: `jwt ${token}`,
@@ -43,7 +43,7 @@ const BudgetList = () => {
       );
       if (!res.ok) throw new Error("Failed to load categories");
       const data = await res.json();
-      setCategories(data);
+      setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
