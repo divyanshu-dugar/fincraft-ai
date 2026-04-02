@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["*"]
