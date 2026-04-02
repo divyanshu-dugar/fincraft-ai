@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getToken } from '@/lib/authenticate';
+import { CategoryPicker } from '@/components/categories/CategoryPicker';
 
 const EditBudget = () => {
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [categoryTree, setCategoryTree] = useState([]);
+  const [categoryValue, setCategoryValue] = useState(null); // CategoryPicker value
   const [formData, setFormData] = useState({
     name: '',
     amount: '',
@@ -48,25 +50,63 @@ const EditBudget = () => {
 
   // Fetch budget data and categories
   useEffect(() => {
-    fetchCategories();
+    fetchCategoryTree();
     fetchBudget();
   }, []);
 
-  const fetchCategories = async () => {
+  // ── fetch category tree ──────────────────────────────────────────────────
+  const fetchCategoryTree = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
     try {
-      const token = getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `jwt ${token}`
-        }
+        headers: { Authorization: `jwt ${token}` },
       });
-
-      if (!res.ok) throw new Error("Failed to load categories");
+      if (!res.ok) return;
       const data = await res.json();
-      setCategories(data);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
+      if (data.tree) setCategoryTree(data.tree);
+    } catch { /* silent */ }
+  }, []);
+
+  const seedIfEmpty = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+        method: 'POST',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      await fetchCategoryTree();
+    } catch { /* silent */ }
+  }, [fetchCategoryTree]);
+
+  useEffect(() => {
+    if (categoryTree.length === 0 && !loading) seedIfEmpty();
+  }, [categoryTree.length, loading]);
+
+  const handleAddCategory = async (parentId, name, color) => {
+    const token = getToken();
+    if (!token) throw new Error('Not authenticated');
+    const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
+    if (color) body.color = color;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || 'Failed to create category');
+    }
+    await fetchCategoryTree();
+  };
+
+  const handleCategoryChange = (val) => {
+    setCategoryValue(val);
+    const catId = val ? (val.subcategoryId || val.parentId) : '';
+    setFormData(prev => ({ ...prev, category: catId }));
+    if (errors.category) {
+      setErrors(prev => ({ ...prev, category: '' }));
     }
   };
 
@@ -99,6 +139,28 @@ const EditBudget = () => {
           alertThreshold: data.alertThreshold || 80,
           isActive: data.isActive !== undefined ? data.isActive : true
         });
+        // Resolve loaded category into a CategoryPicker value
+        if (data.category) {
+          const cat = data.category;
+          if (cat.parentCategory) {
+            setCategoryValue({
+              parentId: cat.parentCategory._id || cat.parentCategory,
+              parentName: cat.parentCategory.name || '',
+              parentIcon: cat.parentCategory.icon || '',
+              subcategoryId: cat._id,
+              subcategoryName: cat.name,
+              subcategoryIcon: cat.icon || '',
+            });
+          } else {
+            setCategoryValue({
+              parentId: cat._id,
+              parentName: cat.name,
+              parentIcon: cat.icon || '',
+              subcategoryId: null,
+              subcategoryName: null,
+            });
+          }
+        }
       } else {
         throw new Error('Failed to load budget');
       }
@@ -330,26 +392,18 @@ const EditBudget = () => {
 
             {/* Category Field */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Expense Category <span className="text-red-500">*</span>
               </label>
               
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
-                  errors.category ? 'border-red-300' : 'border-gray-300'
-                }`}
-              >
-                <option value="">Select a category</option>
-                {categories.map(category => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <CategoryPicker
+                tree={categoryTree}
+                value={categoryValue}
+                onChange={handleCategoryChange}
+                onAddCategory={handleAddCategory}
+                placeholder="Select a category"
+                error={errors.category || undefined}
+              />
 
               {errors.category && (
                 <p className="mt-1 text-sm text-red-600">{errors.category}</p>
