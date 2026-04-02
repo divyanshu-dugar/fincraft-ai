@@ -25,6 +25,7 @@ import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
 import { BudgetHealth } from "@/components/dashboard/BudgetHealth";
 import { AIInsights } from "@/components/dashboard/AIInsights";
 import { RecentTransactionsTable } from "@/components/dashboard/RecentTransactionsTable";
+import { MonthlyBreakdown } from "@/components/dashboard/MonthlyBreakdown";
 import {
   formatCurrency,
   formatCurrencyDetailed,
@@ -93,9 +94,6 @@ export default function Dashboard() {
 
       // Calculate date range based on timeRange
       const getDateRange = () => {
-        const now = new Date();
-        const start = new Date();
-
         // If custom dates are set, use them
         if (timeRange === "custom" && customStartDate && customEndDate) {
           return {
@@ -104,23 +102,51 @@ export default function Dashboard() {
           };
         }
 
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth();
+        const d = now.getDate();
+
+        // Helper: format a local date as YYYY-MM-DD
+        const fmt = (dt) => {
+          const yy = dt.getFullYear();
+          const mm = String(dt.getMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getDate()).padStart(2, '0');
+          return `${yy}-${mm}-${dd}`;
+        };
+
+        let start, end;
+
         switch (timeRange) {
-          case "weekly":
-            start.setDate(now.getDate() - 7);
+          case "weekly": {
+            // Current week: Monday → today
+            const day = now.getDay(); // 0=Sun
+            const diff = day === 0 ? 6 : day - 1; // days since Monday
+            start = new Date(y, m, d - diff);
+            end = now;
             break;
-          case "monthly":
-            start.setMonth(now.getMonth() - 1);
+          }
+          case "monthly": {
+            // Current calendar month: 1st → today
+            start = new Date(y, m, 1);
+            end = now;
             break;
-          case "yearly":
-            start.setFullYear(now.getFullYear() - 1);
+          }
+          case "yearly": {
+            // Current calendar year: Jan 1 → today
+            start = new Date(y, 0, 1);
+            end = now;
             break;
-          default:
-            start.setMonth(now.getMonth() - 1);
+          }
+          default: {
+            start = new Date(y, m, 1);
+            end = now;
+          }
         }
 
         return {
-          startDate: start.toISOString().split("T")[0],
-          endDate: now.toISOString().split("T")[0],
+          startDate: fmt(start),
+          endDate: fmt(end),
         };
       };
       const dateRange = getDateRange();
@@ -163,10 +189,32 @@ export default function Dashboard() {
       const savingsRate =
         totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0;
 
-      // Calculate trends (simplified - would be based on time range)
-      const expenseTrend = 12.5; // Example trend percentage
-      const incomeTrend = 8.2; // Example trend percentage
-      const savingsTrend = 15.3; // Example trend percentage
+      // Calculate real period-over-period trends
+      // Split the date range in half: first half vs second half
+      const rangeStart = new Date(dateRange.startDate);
+      const rangeEnd = new Date(dateRange.endDate);
+      const midpoint = new Date((rangeStart.getTime() + rangeEnd.getTime()) / 2);
+
+      const firstHalfExpenses = expensesData
+        .filter(e => new Date(e.date) < midpoint)
+        .reduce((s, e) => s + e.amount, 0);
+      const secondHalfExpenses = expensesData
+        .filter(e => new Date(e.date) >= midpoint)
+        .reduce((s, e) => s + e.amount, 0);
+      const firstHalfIncome = incomeData
+        .filter(i => new Date(i.date) < midpoint)
+        .reduce((s, i) => s + i.amount, 0);
+      const secondHalfIncome = incomeData
+        .filter(i => new Date(i.date) >= midpoint)
+        .reduce((s, i) => s + i.amount, 0);
+
+      const calcTrend = (prev, curr) => prev === 0 ? (curr > 0 ? 100 : 0) : ((curr - prev) / prev) * 100;
+
+      const expenseTrend = calcTrend(firstHalfExpenses, secondHalfExpenses);
+      const incomeTrend = calcTrend(firstHalfIncome, secondHalfIncome);
+      const firstHalfSavings = firstHalfIncome - firstHalfExpenses;
+      const secondHalfSavings = secondHalfIncome - secondHalfExpenses;
+      const savingsTrend = calcTrend(Math.abs(firstHalfSavings) || 1, secondHalfSavings);
 
       // Generate insights
       const generatedInsights = generateInsights(
@@ -185,6 +233,29 @@ export default function Dashboard() {
       // Budget health
       const budgetHealth = calculateBudgetHealth(budgetData);
 
+      // Monthly breakdown: group income & expenses by month
+      const monthlyMap = {};
+      incomeData.forEach((inc) => {
+        const d = new Date(inc.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
+        monthlyMap[key].income += inc.amount;
+      });
+      expensesData.forEach((exp) => {
+        const d = new Date(exp.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
+        monthlyMap[key].expense += exp.amount;
+      });
+      const monthlyBreakdown = Object.entries(monthlyMap)
+        .sort(([a], [b]) => b.localeCompare(a))
+        .map(([month, data]) => ({
+          month,
+          income: data.income,
+          expense: data.expense,
+          variance: data.income - data.expense,
+        }));
+
       setDashboardData({
         overview: {
           totalExpenses,
@@ -202,6 +273,7 @@ export default function Dashboard() {
           income: topIncomeCategories,
         },
         budgets: budgetHealth,
+        monthlyBreakdown,
         recentTransactions: [
           ...expensesData.slice(0, 5),
           ...incomeData.slice(0, 5),
@@ -277,6 +349,12 @@ export default function Dashboard() {
             <AIInsights insights={insights} />
           </div>
         </div>
+
+        {/* Monthly Breakdown */}
+        <MonthlyBreakdown
+          dashboardData={dashboardData}
+          formatCurrency={formatCurrency}
+        />
 
         {/* Recent Transactions */}
         <RecentTransactionsTable

@@ -27,7 +27,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
         <div>
           <h2 className="text-xl font-bold text-gray-900">Monthly Breakdown</h2>
           <p className="text-gray-500 text-sm">
-            Income vs Expenses — month on month
+            Income vs Expenses - month on month
           </p>
         </div>
         <div className="p-3 bg-indigo-100 rounded-xl">
