@@ -1,652 +1,868 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, FileText, AlertCircle, CheckCircle, Download } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Check,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Loader2,
+  Plus,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { getToken } from "@/lib/authenticate";
+import { CategoryPicker } from "@/components/categories/CategoryPicker";
 
-export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }) {
-  const [step, setStep] = useState(1); // 1: Upload, 2: Map/Review, 3: Confirm, 4: Complete
-  const [file, setFile] = useState(null);
-  const [uploadType, setUploadType] = useState(null); // 'csv' or 'image'
-  const [previewData, setPreviewData] = useState([]);
-  const [importData, setImportData] = useState([]);
-  const [mapping, setMapping] = useState({
-    date: '',
-    category: '',
-    amount: '',
-    note: ''
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+let _rid = 0;
+function uid() { return ++_rid; }
+
+function toApiLocalDateTime(v) {
+  if (!v) return "";
+  const s = String(v).trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? `${s}T00:00:00` : s;
+}
+
+// Common AI category name aliases → canonical sub-category names
+const CATEGORY_ALIASES = {
+  food: "restaurant", dining: "restaurant", "eating out": "restaurant",
+  cafe: "drinks/coffee", coffee: "drinks/coffee", tea: "drinks/coffee",
+  grocery: "groceries", "grocery shopping": "groceries", supermarket: "groceries",
+  gas: "transport", fuel: "transport", uber: "transport", taxi: "transport", cab: "transport", transit: "transport", bus: "transport", metro: "transport", train: "transport",
+  movie: "entertainment", movies: "entertainment", netflix: "subscriptions", spotify: "subscriptions",
+  gym: "fitness", workout: "fitness",
+  doctor: "health/medical", hospital: "health/medical", pharmacy: "health/medical", medicine: "health/medical",
+  rent: "rent/mortgage", mortgage: "rent/mortgage",
+  electricity: "utilities", water: "utilities", power: "utilities",
+  mobile: "phone bill", phone: "phone bill", recharge: "phone bill",
+  wifi: "internet", broadband: "internet",
+  clothes: "shopping", clothing: "shopping", amazon: "shopping", online: "shopping",
+  gift: "gifts", donation: "charity",
+  course: "education", tuition: "education", book: "education", books: "education",
+  haircut: "grooming", salon: "grooming", barber: "grooming",
+  sip: "mutual funds", "mutual fund": "mutual funds",
+};
+
+/** Try to resolve an AI-returned category string into a CategoryPicker value. */
+function autoMatch(name, tree) {
+  if (!name || !tree?.length) return null;
+  const q = name.toLowerCase().trim();
+
+  const mkVal = (p, s) => ({
+    parentId: p._id, parentName: p.name, parentIcon: p.icon,
+    subcategoryId: s?._id || null, subcategoryName: s?.name || null, subcategoryIcon: s?.icon || undefined,
   });
-  const [importResults, setImportResults] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null);
 
-  const toApiLocalDateTime = (dateValue) => {
-    if (!dateValue) return '';
+  // 1. exact sub-category name
+  for (const p of tree)
+    for (const s of p.subcategories || [])
+      if (s.name.toLowerCase() === q) return mkVal(p, s);
 
-    const normalized = String(dateValue).trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-      return `${normalized}T00:00:00`;
+  // 2. exact parent name
+  for (const p of tree)
+    if (p.name.toLowerCase() === q) return mkVal(p, null);
+
+  // 3. alias lookup → match resolved alias to sub-category
+  const alias = CATEGORY_ALIASES[q];
+  if (alias) {
+    for (const p of tree)
+      for (const s of p.subcategories || [])
+        if (s.name.toLowerCase() === alias) return mkVal(p, s);
+  }
+
+  // 4. partial / fuzzy: sub name contains query OR query contains sub's first word
+  for (const p of tree)
+    for (const s of p.subcategories || []) {
+      const sn = s.name.toLowerCase();
+      const sw = sn.split(" ")[0];
+      if (sn.includes(q) || q.includes(sw)) return mkVal(p, s);
     }
 
-    return normalized;
+  return null;
+}
+
+// ─── editable row card (image flow) ──────────────────────────────────────────
+
+function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCategory }) {
+  const [open, setOpen] = useState(false);
+  const unmatched = !row.category;
+
+  return (
+    <div className={`rounded-2xl border ${unmatched ? "border-amber-200 bg-amber-50/40" : "border-gray-100 bg-white"} shadow-sm overflow-hidden`}>
+      {/* card header */}
+      <button
+        type="button"
+        onClick={() => setOpen(p => !p)}
+        className="w-full flex items-center gap-3 px-5 py-4 text-left"
+      >
+        <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">
+          {index + 1}
+        </span>
+
+        {/* category badge */}
+        <div className="flex-1 min-w-0">
+          {row.category ? (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-sm font-semibold text-gray-700 truncate">
+                {row.category.parentIcon} {row.category.parentName}
+              </span>
+              {row.category.subcategoryName && (
+                <>
+                  <span className="text-gray-300">›</span>
+                  <span className="text-sm font-bold text-gray-900 truncate">
+                    {row.category.subcategoryIcon} {row.category.subcategoryName}
+                  </span>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+              <span className="text-sm font-semibold text-amber-700">
+                {row.aiCategory ? `"${row.aiCategory}" — needs category` : "No category set"}
+              </span>
+            </div>
+          )}
+          <p className="text-xs text-gray-400 mt-0.5">
+            {row.date || "No date"} · ₹{row.amount || "0"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {row.category && <Check className="w-4 h-4 text-emerald-500" />}
+          {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+        </div>
+      </button>
+
+      {/* editable fields */}
+      {open && (
+        <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+          {/* ai suggestion hint */}
+          {row.aiCategory && !row.category && (
+            <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs">
+              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-bold text-amber-800">AI suggested: "{row.aiCategory}"</p>
+                <p className="text-amber-700 mt-0.5">This doesn't match any existing category. Please pick one below, or create a new sub-category.</p>
+              </div>
+            </div>
+          )}
+          {row.aiCategory && row.category && (
+            <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
+              <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+              AI suggested "{row.aiCategory}" — auto-matched above. Change if needed.
+            </div>
+          )}
+
+          {/* category picker */}
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Category <span className="text-rose-400">*</span></p>
+            <CategoryPicker
+              tree={categoryTree}
+              value={row.category}
+              onChange={(v) => onChange(row._id, "category", v)}
+              onAddCategory={onAddCategory}
+              placeholder="Select category"
+              error={!row.category ? "Required" : undefined}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {/* date */}
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Date</p>
+              <input
+                type="date"
+                value={row.date}
+                onChange={(e) => onChange(row._id, "date", e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+            {/* amount */}
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Amount (₹)</p>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={row.amount}
+                min="0"
+                onWheel={(e) => e.currentTarget.blur()}
+                onChange={(e) => onChange(row._id, "amount", e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+          </div>
+
+          {/* note */}
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Note</p>
+            <input
+              type="text"
+              value={row.note}
+              onChange={(e) => onChange(row._id, "note", e.target.value)}
+              placeholder="Optional note…"
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
+
+          {/* delete */}
+          <button
+            type="button"
+            onClick={() => onDelete(row._id)}
+            className="flex items-center gap-2 text-xs font-semibold text-rose-500 hover:text-rose-700 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Remove this expense
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── CSV category name resolver (one row per unique name) ─────────────────────
+
+function CsvCategoryResolver({ names, mappings, onChange, categoryTree, onAddCategory }) {
+  return (
+    <div className="space-y-3">
+      {names.map((name) => {
+        const cat = mappings[name];
+        return (
+          <div key={name} className={`rounded-2xl border p-4 ${cat ? "border-gray-100 bg-white" : "border-amber-200 bg-amber-50/40"}`}>
+            <div className="flex items-center gap-3 mb-3">
+              {cat
+                ? <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                : <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />}
+              <span className="text-sm font-bold text-gray-700">"{name}"</span>
+              {cat ? (
+                <span className="ml-auto text-xs text-emerald-600 font-semibold">
+                  → {cat.parentName}{cat.subcategoryName ? ` › ${cat.subcategoryName}` : ""}
+                </span>
+              ) : (
+                <span className="ml-auto text-xs text-amber-600 font-semibold">needs selection</span>
+              )}
+            </div>
+            <CategoryPicker
+              tree={categoryTree}
+              value={cat || null}
+              onChange={(v) => onChange(name, v)}
+              onAddCategory={onAddCategory}
+              placeholder={`Map "${name}" to a category`}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── main modal ───────────────────────────────────────────────────────────────
+
+/**
+ * Steps:
+ *  1 – Choose file type (Upload)
+ *  2 – CSV column mapping  (CSV only; image skips to 3)
+ *  3 – Review & Edit (image: editable cards; CSV: category-name resolver)
+ *  4 – Confirm
+ *  5 – Complete
+ */
+export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }) {
+  const [step,          setStep]         = useState(1);
+  const [uploadType,    setUploadType]   = useState(null); // 'csv' | 'image'
+  const [importData,    setImportData]   = useState([]); // raw CSV rows
+  const [mapping,       setMapping]      = useState({ date: "", category: "", amount: "", note: "" });
+  const [editableRows,  setEditableRows] = useState([]); // image flow rows
+  const [csvUniqNames,  setCsvUniqNames] = useState([]); // unique category names from CSV
+  const [csvCatMap,     setCsvCatMap]    = useState({}); // name → CategoryValue
+  const [importResults, setImportResults] = useState(null);
+  const [loading,       setLoading]      = useState(false);
+  const [categoryTree,  setCategoryTree] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const MAX_SIZE = 5 * 1024 * 1024;
+
+  // ── fetch category tree ────────────────────────────────────────────────────
+  const fetchCategoryTree = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+        headers: { Authorization: `jwt ${token}` },
+      });
+      if (!res.ok) return;
+      const d = await res.json();
+      if (d.tree) setCategoryTree(d.tree);
+    } catch { /* silent */ }
+  }, []);
+
+  // Seed defaults if tree is empty on first open
+  const seedAndFetch = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+        method: "POST",
+        headers: { Authorization: `jwt ${token}` },
+      });
+      await fetchCategoryTree();
+    } catch { /* silent */ }
+  }, [fetchCategoryTree]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    (async () => {
+      await fetchCategoryTree();
+      // Re-read from the API response directly — categoryTree state may not be committed yet
+      const token = getToken();
+      if (!token) return;
+      try {
+        const checkRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+          headers: { Authorization: `jwt ${token}` },
+        });
+        if (!checkRes.ok) return;
+        const checkData = await checkRes.json();
+        if (!checkData.tree?.length) await seedAndFetch();
+      } catch { /* silent */ }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // ── add category from inside the modal ────────────────────────────────────
+  const handleAddCategory = async (parentId, name, color) => {
+    const token = getToken();
+    if (!token) throw new Error("Not authenticated");
+    const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
+    if (color) body.color = color;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `jwt ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || "Failed to create category");
+    }
+    await fetchCategoryTree();
   };
 
-  // Supported file types
-  const supportedFormats = ['.csv', '.xlsx', '.xls'];
-  const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+  // ── reset ──────────────────────────────────────────────────────────────────
+  const reset = () => {
+    setStep(1);
+    setUploadType(null);
+    setImportData([]);
+    setMapping({ date: "", category: "", amount: "", note: "" });
+    setEditableRows([]);
+    setCsvUniqNames([]);
+    setCsvCatMap({});
+    setImportResults(null);
+    setLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-  // Handle file selection
+  const handleClose = () => { reset(); onClose(); };
+
+  // ── file selection ─────────────────────────────────────────────────────────
   const handleFileSelect = (selectedFile, type) => {
     if (!selectedFile) return;
-
-    const fileName = selectedFile.name.toLowerCase();
-    
-    if (type === 'image') {
-      if (!/\.(jpg|jpeg|png|gif|webp)$/.test(fileName)) {
-        alert('Please select a valid image file (JPG, PNG, GIF, WebP)');
-        return;
-      }
-      setFile(selectedFile);
-      setUploadType('image');
+    const name = selectedFile.name.toLowerCase();
+    if (type === "image") {
+      if (!/\.(jpg|jpeg|png|gif|webp)$/.test(name)) { alert("Please select a valid image (JPG, PNG, GIF, WebP)"); return; }
+      setUploadType("image");
       handleImageUpload(selectedFile);
     } else {
-      const fileExtension = fileName.split('.').pop();
-      if (!['csv', 'xlsx', 'xls'].includes(fileExtension)) {
-        alert('Please select a CSV or Excel file');
-        return;
-      }
-
-      if (selectedFile.size > MAX_IMPORT_FILE_SIZE_BYTES) {
-        alert(`File is too large. Please upload a file smaller than ${Math.round(MAX_IMPORT_FILE_SIZE_BYTES / (1024 * 1024))} MB.`);
-        return;
-      }
-
-      setFile(selectedFile);
-      setUploadType('csv');
+      const ext = name.split(".").pop();
+      if (!["csv", "xlsx", "xls"].includes(ext)) { alert("Please select a CSV or Excel file"); return; }
+      if (selectedFile.size > MAX_SIZE) { alert("File is too large (max 5 MB)"); return; }
+      setUploadType("csv");
       parseFile(selectedFile);
     }
   };
 
-  // Handle image upload with AI extraction
+  // ── image upload → AI extraction ───────────────────────────────────────────
   const handleImageUpload = async (imageFile) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('image', imageFile);
-
+      formData.append("image", imageFile);
       const token = getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/extract-from-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `jwt ${token}`
-        },
-        body: formData
+        method: "POST",
+        headers: { Authorization: `jwt ${token}` },
+        body: formData,
       });
-
       const result = await res.json();
-
-      if (res.ok && result.expenses && result.expenses.length > 0) {
-        setImportData(result.expenses);
-        setPreviewData(result.expenses);
-        setStep(2);
+      if (res.ok && result.expenses?.length > 0) {
+        buildEditableRows(result.expenses);
       } else {
-        alert('No expenses found in image. Please try another screenshot.');
+        alert("No expenses found in image. Please try another screenshot.");
       }
-    } catch (error) {
-      console.error('Image extraction error:', error);
-      alert('Error processing image: ' + error.message);
+    } catch (err) {
+      alert("Error processing image: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Parse CSV/Excel file
-  const parseFile = (selectedFile) => {
+  /** Convert AI-extracted expenses into editable rows and go to step 3. */
+  function buildEditableRows(expenses) {
+    const rows = expenses.map((e) => ({
+      _id: uid(),
+      date: typeof e.date === "string" ? e.date.slice(0, 10) : "",
+      amount: String(e.amount || ""),
+      note: e.note || "",
+      aiCategory: e.category || "",
+      category: autoMatch(e.category, categoryTree),
+    }));
+    setEditableRows(rows);
+    setStep(3);
+  }
+
+  // ── CSV parsing ────────────────────────────────────────────────────────────
+  const parseFile = (f) => {
     const reader = new FileReader();
-    
     reader.onload = (e) => {
       try {
-        const content = e.target.result;
-        
-        if (selectedFile.name.endsWith('.csv')) {
-          parseCSV(content);
-        } else {
-          parseExcel(content, selectedFile);
-        }
-      } catch (error) {
-        console.error('Error parsing file:', error);
-        alert('Error parsing file. Please check the format.');
-      }
+        if (f.name.endsWith(".csv")) parseCSV(e.target.result);
+        else alert("Excel parsing is not supported yet. Please export as CSV.");
+      } catch { alert("Error parsing file. Please check the format."); }
     };
-
-    if (selectedFile.name.endsWith('.csv')) {
-      reader.readAsText(selectedFile);
-    } else {
-      reader.readAsArrayBuffer(selectedFile);
-    }
+    if (f.name.endsWith(".csv")) reader.readAsText(f);
+    else reader.readAsArrayBuffer(f);
   };
 
-  // Parse CSV content
   const parseCSV = (content) => {
-    const lines = content.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-    const data = lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-      const row = {};
-      headers.forEach((header, index) => {
-        row[header] = values[index] || '';
-      });
-      return row;
-    }).filter(row => Object.values(row).some(val => val));
-
-    setImportData(data);
-    setPreviewData(data.slice(0, 10)); // Only preview first 10 rows in UI
+    const lines = content.split("\n").filter((l) => l.trim());
+    const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
+    const rows = lines.slice(1)
+      .map((line) => {
+        const vals = line.split(",").map((v) => v.trim().replace(/"/g, ""));
+        const row = {};
+        headers.forEach((h, i) => { row[h] = vals[i] || ""; });
+        return row;
+      })
+      .filter((r) => Object.values(r).some(Boolean));
+    setImportData(rows);
     autoDetectMapping(headers);
     setStep(2);
   };
 
-  // Parse Excel content (simplified - you might want to use a library like SheetJS)
-  const parseExcel = (content, file) => {
-    // For Excel files, we'll show a simplified approach
-    // In a real app, you'd use SheetJS or similar library
-    alert('Excel parsing requires additional libraries. For now, please use CSV format.');
-    return;
-  };
-
-  // Auto-detect column mapping
   const autoDetectMapping = (headers) => {
-    const mapping = {
-      date: '',
-      category: '',
-      amount: '',
-      note: ''
-    };
-
-    headers.forEach(header => {
-      const lowerHeader = header.toLowerCase();
-      
-      if (lowerHeader.includes('date')) mapping.date = header;
-      else if (lowerHeader.includes('categor')) mapping.category = header;
-      else if (lowerHeader.includes('amount') || lowerHeader.includes('price') || lowerHeader.includes('cost')) mapping.amount = header;
-      else if (lowerHeader.includes('note') || lowerHeader.includes('description') || lowerHeader.includes('memo')) mapping.note = header;
+    const m = { date: "", category: "", amount: "", note: "" };
+    headers.forEach((h) => {
+      const l = h.toLowerCase();
+      if (l.includes("date"))                                                  m.date = h;
+      else if (l.includes("categor"))                                          m.category = h;
+      else if (l.includes("amount") || l.includes("price") || l.includes("cost")) m.amount = h;
+      else if (l.includes("note") || l.includes("description") || l.includes("memo")) m.note = h;
     });
-
-    setMapping(mapping);
+    setMapping(m);
   };
 
-  // Handle mapping change
-  const handleMappingChange = (field, value) => {
-    setMapping(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  /** After CSV column mapping → resolve unique category names. */
+  const buildCsvCategoryResolution = () => {
+    const uniqueNames = [...new Set(
+      importData.map((r) => (r[mapping.category] || "").trim()).filter(Boolean)
+    )];
+    const initialMap = {};
+    uniqueNames.forEach((n) => { initialMap[n] = autoMatch(n, categoryTree); });
+    setCsvUniqNames(uniqueNames);
+    setCsvCatMap(initialMap);
+    setStep(3);
   };
 
-  // Process and import data
+  // ── editable row helpers ───────────────────────────────────────────────────
+  const updateRow = (id, field, value) => {
+    setEditableRows((prev) => prev.map((r) => r._id === id ? { ...r, [field]: value } : r));
+  };
+  const deleteRow = (id) => setEditableRows((prev) => prev.filter((r) => r._id !== id));
+
+  // ── import ─────────────────────────────────────────────────────────────────
   const handleImport = async () => {
-    if (!file && importData.length === 0) return;
-
     setLoading(true);
     try {
-      let expensesToImport = [];
+      let expenses = [];
 
-      if (uploadType === 'csv') {
-        expensesToImport = importData.map(row => ({
-          date: toApiLocalDateTime(row[mapping.date] || ''),
-          category: row[mapping.category] || '',
-          amount: row[mapping.amount] || '',
-          note: row[mapping.note] || ''
-        })).filter(expense => expense.date && expense.amount);
-      } else {
-        // For images, data is already extracted and formatted
-        expensesToImport = importData.map(expense => ({
-          ...expense,
-          date: toApiLocalDateTime(expense.date),
+
+      if (uploadType === "image") {
+        const noDate = editableRows.filter((r) => !r.date);
+        const noAmount = editableRows.filter((r) => !r.amount);
+        if (noDate.length || noAmount.length) {
+          alert(`${noDate.length + noAmount.length} row(s) are missing date or amount. Please review all expenses.`);
+          setLoading(false);
+          return;
+        }
+        expenses = editableRows.map((r) => ({
+          date: toApiLocalDateTime(r.date),
+          // If user picked a category → send ObjectId; otherwise fall back to AI string (backend auto-resolves)
+          category: r.category
+            ? (r.category.subcategoryId || r.category.parentId)
+            : (r.aiCategory || "Miscellaneous"),
+          amount: Number(r.amount),
+          note: r.note,
         }));
+      } else {
+        // CSV: apply category name → id mapping to all rows
+        expenses = importData
+          .map((r) => {
+            const catName = (r[mapping.category] || "").trim();
+            const catVal  = csvCatMap[catName];
+            const catId   = catVal ? (catVal.subcategoryId || catVal.parentId) : null;
+            return {
+              date:     toApiLocalDateTime(r[mapping.date] || ""),
+              category: catId,
+              amount:   Number(r[mapping.amount] || 0),
+              note:     r[mapping.note] || "",
+            };
+          })
+          .filter((e) => e.date && e.category && e.amount > 0);
       }
 
       const token = getToken();
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/import`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `jwt ${token}`
-        },
-        body: JSON.stringify({ expenses: expensesToImport })
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `jwt ${token}` },
+        body: JSON.stringify({ expenses }),
       });
-
       const result = await res.json();
-
       if (res.ok) {
         setImportResults(result);
-        setStep(4);
-        if (onImportSuccess) {
-          onImportSuccess();
-        }
-
-        // Auto-close modal after successful import
-        // If there were no errors or some imports succeeded, close after 2 seconds
-        if (result.importedCount > 0) {
-          setTimeout(() => {
-            handleClose();
-          }, 2000);
-        }
+        setStep(5);
+        if (onImportSuccess) onImportSuccess();
+        if (result.importedCount > 0) setTimeout(handleClose, 2500);
       } else {
-        throw new Error(result.message || 'Import failed');
+        throw new Error(result.message || "Import failed");
       }
-    } catch (error) {
-      console.error('Import error:', error);
-      alert('Import failed: ' + error.message);
+    } catch (err) {
+      alert("Import failed: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset modal
-  const resetModal = () => {
-    setFile(null);
-    setUploadType(null);
-    setPreviewData([]);
-    setImportData([]);
-    setMapping({
-      date: '',
-      category: '',
-      amount: '',
-      note: ''
-    });
-    setImportResults(null);
-    setStep(1);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  // ── derived ────────────────────────────────────────────────────────────────
+  const csvHeaders = importData.length > 0 ? Object.keys(importData[0]) : [];
+  const unmatchedRowCount  = editableRows.filter((r) => !r.category).length;
+  const unmatchedCatCount  = Object.values(csvCatMap).filter((v) => !v).length;
+  const allImageRowsValid  = editableRows.every((r) => r.category && r.amount && r.date);
 
-  // Close handler
-  const handleClose = () => {
-    resetModal();
-    onClose();
-  };
-
-  // Get headers from preview data
-  const headers = previewData.length > 0 ? Object.keys(previewData[0]) : [];
+  const stepTitle = {
+    1: "Import Expenses",
+    2: "Map Columns",
+    3: uploadType === "image" ? "Review & Edit" : "Resolve Categories",
+    4: "Confirm Import",
+    5: "Import Complete",
+  }[step] || "Import";
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh]"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {step === 1 && "Import Expenses"}
-            {step === 2 && (uploadType === 'csv' ? "Map Columns" : "Review Extracted")}
-            {step === 3 && "Confirm Import"}
-            {step === 4 && "Import Complete"}
-          </h2>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+        {/* header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 flex-shrink-0">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">{stepTitle}</h2>
+            {step > 1 && step < 5 && (
+              <p className="text-xs text-gray-400 mt-0.5">Step {step} of 4</p>
+            )}
+          </div>
+          <button onClick={handleClose} className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[70vh]">
-          {/* Step 1: Upload */}
-          {step === 1 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                How would you like to import expenses?
-              </h3>
-              <p className="text-gray-600 mb-8">
-                Choose between uploading a file or scanning a screenshot from your wallet app.
-              </p>
+        {/* step progress bar */}
+        {step < 5 && (
+          <div className="h-0.5 bg-gray-100">
+            <div className="h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
+              style={{ width: `${((step - 1) / 3) * 100}%` }} />
+          </div>
+        )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* CSV/Excel Option */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="border-2 border-gray-200 rounded-2xl p-6 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all"
+        <div className="overflow-y-auto flex-1 px-6 py-6 space-y-5">
+
+          {/* ── Step 1: Choose upload type ────────────────────────────── */}
+          {step === 1 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <p className="text-sm text-gray-500 mb-6">
+                Import from a spreadsheet or extract expenses from a wallet/bank screenshot using AI.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* CSV */}
+                <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-gray-100 rounded-2xl p-6 text-left hover:border-blue-300 hover:bg-blue-50/40 transition-all group"
                 >
-                  <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                    <FileText className="w-8 h-8 text-blue-600" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                    <FileText className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Upload CSV/Excel</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Import expenses from a spreadsheet file
-                  </p>
+                  <h4 className="font-bold text-gray-900 mb-1">Upload CSV / Excel</h4>
+                  <p className="text-xs text-gray-500">Import from a spreadsheet file (.csv, .xlsx)</p>
                   <input
                     type="file"
                     ref={fileInputRef}
-                    onChange={(e) => handleFileSelect(e.target.files[0], 'csv')}
+                    onChange={(e) => handleFileSelect(e.target.files[0], "csv")}
                     accept=".csv,.xlsx,.xls"
                     className="hidden"
                   />
-                  <button className="text-sm text-blue-600 font-medium hover:text-blue-700">
-                    Choose File
-                  </button>
-                </motion.div>
-
-                {/* Screenshot Option */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="border-2 border-gray-200 rounded-2xl p-6 cursor-pointer hover:border-green-400 hover:bg-green-50 transition-all"
+                </button>
+                {/* Screenshot */}
+                <button
+                  type="button"
                   onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => handleFileSelect(e.target.files[0], 'image');
-                    input.click();
+                    const inp = document.createElement("input");
+                    inp.type = "file";
+                    inp.accept = "image/*";
+                    inp.onchange = (e) => handleFileSelect(e.target.files[0], "image");
+                    inp.click();
                   }}
+                  className="border-2 border-gray-100 rounded-2xl p-6 text-left hover:border-emerald-300 hover:bg-emerald-50/40 transition-all group"
                 >
-                  <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                    <Upload className="w-8 h-8 text-green-600" />
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+                    <Upload className="w-6 h-6 text-emerald-600" />
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Scan Screenshot</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Use AI to extract expenses from wallet screenshots
-                  </p>
-                  <button className="text-sm text-green-600 font-medium hover:text-green-700">
-                    Upload Screenshot
-                  </button>
-                </motion.div>
+                  <h4 className="font-bold text-gray-900 mb-1">Scan Screenshot</h4>
+                  <p className="text-xs text-gray-500">AI extracts expenses from wallet or bank screenshots</p>
+                </button>
               </div>
 
-              {/* Loading state for image processing */}
               {loading && (
-                <div className="mt-6 text-center">
-                  <div className="inline-flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-gray-600">Processing image...</span>
-                  </div>
+                <div className="flex items-center justify-center gap-3 mt-6 py-4 rounded-2xl bg-blue-50 text-blue-700 text-sm font-medium">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Processing screenshot with AI…
                 </div>
               )}
             </motion.div>
           )}
 
-          {/* Step 2: Mapping/Review */}
+          {/* ── Step 2: CSV column mapping ────────────────────────────── */}
           {step === 2 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {uploadType === 'csv' ? (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Map Your Columns
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Match your file columns to the required expense fields.
-                  </p>
-
-                  {importData.length > previewData.length && (
-                    <p className="text-sm text-gray-500 mb-4">
-                      Showing first {previewData.length} of {importData.length} rows for preview.
-                    </p>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {[
-                      { key: 'date', label: 'Date', required: true },
-                      { key: 'category', label: 'Category', required: true },
-                      { key: 'amount', label: 'Amount', required: true },
-                      { key: 'note', label: 'Note', required: false }
-                    ].map((field) => (
-                      <div key={field.key}>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {field.label} {field.required && <span className="text-red-500">*</span>}
-                        </label>
-                        <select
-                          value={mapping[field.key]}
-                          onChange={(e) => handleMappingChange(field.key, e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                          <option value="">Select column...</option>
-                          {headers.map(header => (
-                            <option key={header} value={header}>{header}</option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between">
-                    <button
-                      onClick={() => setStep(1)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => setStep(3)}
-                      disabled={!mapping.date || !mapping.amount || !mapping.category}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Continue
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Review Extracted Expenses
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    AI found {previewData.length} transaction{previewData.length !== 1 ? 's' : ''} in your screenshot.
-                  </p>
-
-                  <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Date</th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Category</th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Amount</th>
-                            <th className="px-4 py-3 text-left font-medium text-gray-700 border-b">Note</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {previewData.map((expense, index) => (
-                            <tr key={index} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
-                              <td className="px-4 py-3 text-gray-600">{expense.date}</td>
-                              <td className="px-4 py-3 text-gray-600">{expense.category}</td>
-                              <td className="px-4 py-3 text-gray-600 font-medium">${expense.amount}</td>
-                              <td className="px-4 py-3 text-gray-600 text-sm">{expense.note}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <button
-                      onClick={() => setStep(1)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => setStep(3)}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Continue
-                    </button>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          )}
-
-          {/* Step 3: Review */}
-          {step === 3 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {uploadType === 'csv' ? 'Confirm CSV Import' : 'Confirm Import'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Ready to import {importData.length} expense{importData.length !== 1 ? 's' : ''}?
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <p className="text-sm text-gray-500 mb-5">
+                Match your CSV columns to the expense fields. We auto-detected the best matches.
               </p>
-
-              {uploadType === 'csv' ? (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-yellow-800 font-medium">
-                        Column Mapping Summary
-                      </p>
-                      <ul className="text-sm text-yellow-700 mt-2 space-y-1">
-                        <li>• Total rows: {importData.length}</li>
-                        <li>• Date column: <span className="font-semibold">{mapping.date}</span></li>
-                        <li>• Category column: <span className="font-semibold">{mapping.category}</span></li>
-                        <li>• Amount column: <span className="font-semibold">{mapping.amount}</span></li>
-                        {mapping.note && <li>• Note column: <span className="font-semibold">{mapping.note}</span></li>}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-blue-800 font-medium">
-                        AI Extraction Summary
-                      </p>
-                      <p className="text-sm text-blue-700 mt-2">
-                        Successfully extracted <span className="font-semibold">{previewData.length} transaction{previewData.length !== 1 ? 's' : ''}</span> from your screenshot.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {importData.length > 10 && (
+                <p className="text-xs text-gray-400 mb-4">{importData.length} rows detected in file.</p>
               )}
-
-              <div className="flex justify-between">
-                <button
-                  onClick={() => setStep(2)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handleImport}
-                  disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Importing...
-                    </>
-                  ) : (
-                    'Start Import'
-                  )}
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { key: "date",     label: "Date",     req: true  },
+                  { key: "category", label: "Category", req: true  },
+                  { key: "amount",   label: "Amount",   req: true  },
+                  { key: "note",     label: "Note",     req: false },
+                ].map(({ key, label, req }) => (
+                  <div key={key}>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                      {label} {req && <span className="text-rose-400">*</span>}
+                    </label>
+                    <select
+                      value={mapping[key]}
+                      onChange={(e) => setMapping((p) => ({ ...p, [key]: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    >
+                      <option value="">Select column…</option>
+                      {csvHeaders.map((h) => <option key={h} value={h}>{h}</option>)}
+                    </select>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}
 
-          {/* Step 4: Complete */}
-          {step === 4 && importResults && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center"
-            >
-              {importResults.importedCount > 0 ? (
-                <>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-2xl flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                  
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Import Complete!
-                  </h3>
-                  
-                  <p className="text-sm text-gray-600 mb-4">
-                    Redirecting to expense list...
+          {/* ── Step 3: Review & Edit ─────────────────────────────────── */}
+          {step === 3 && uploadType === "image" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+              {/* summary banner */}
+              <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${unmatchedRowCount > 0 ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>
+                {unmatchedRowCount > 0
+                  ? <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                  : <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />}
+                <div>
+                  <p className="text-sm font-bold text-gray-800">
+                    {editableRows.length} expense{editableRows.length !== 1 ? "s" : ""} extracted
+                    {unmatchedRowCount > 0 && ` · ${unmatchedRowCount} need a category`}
                   </p>
-                  
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-                    <p className="text-green-800 font-medium">
-                      Successfully imported {importResults.importedCount} expense{importResults.importedCount !== 1 ? 's' : ''}
-                    </p>
-                    {importResults.errors.length > 0 && (
-                      <div className="mt-3 text-left">
-                        <p className="text-sm font-medium text-yellow-800 mb-2">
-                          ⚠️ Some rows had errors:
-                        </p>
-                        <ul className="text-sm text-yellow-700 space-y-1 max-h-32 overflow-y-auto">
-                          {importResults.errors.map((error, index) => (
-                            <li key={index}>• {error}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-2xl flex items-center justify-center">
-                    <AlertCircle className="w-8 h-8 text-red-600" />
-                  </div>
-                  
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Import Failed
-                  </h3>
-                  
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-                    <p className="text-red-800 font-medium mb-3">
-                      No expenses could be imported. Please check the following:
-                    </p>
-                    <ul className="text-sm text-red-700 space-y-2 text-left max-h-40 overflow-y-auto">
-                      {importResults.errors.length > 0 ? (
-                        importResults.errors.map((error, index) => (
-                          <li key={index}>• {error}</li>
-                        ))
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Review each expense below. Click a row to expand and edit.
+                  </p>
+                </div>
+              </div>
+
+              {editableRows.map((row, i) => (
+                <EditableRowCard
+                  key={row._id}
+                  row={row}
+                  index={i}
+                  onChange={updateRow}
+                  onDelete={deleteRow}
+                  categoryTree={categoryTree}
+                  onAddCategory={handleAddCategory}
+                />
+              ))}
+
+              {editableRows.length === 0 && (
+                <div className="text-center py-12 text-gray-400">
+                  <p className="font-semibold">All rows deleted.</p>
+                  <button onClick={() => setStep(1)} className="mt-2 text-sm text-blue-600 hover:underline">Start over</button>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {step === 3 && uploadType === "csv" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <p className="text-sm text-gray-500 mb-5">
+                We found <strong>{csvUniqNames.length}</strong> unique category name{csvUniqNames.length !== 1 ? "s" : ""} in your CSV.
+                Map each to a category in your hierarchy — this mapping is applied to all matching rows.
+              </p>
+              {unmatchedCatCount > 0 && (
+                <div className="flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 mb-4 text-xs text-amber-700 font-semibold">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  {unmatchedCatCount} name{unmatchedCatCount > 1 ? "s" : ""} still unresolved — rows without a category will be skipped on import.
+                </div>
+              )}
+              <CsvCategoryResolver
+                names={csvUniqNames}
+                mappings={csvCatMap}
+                onChange={(name, val) => setCsvCatMap((p) => ({ ...p, [name]: val }))}
+                categoryTree={categoryTree}
+                onAddCategory={handleAddCategory}
+              />
+            </motion.div>
+          )}
+
+          {/* ── Step 4: Confirm ──────────────────────────────────────── */}
+          {step === 4 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 mb-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-blue-900 text-sm">Ready to import</p>
+                    <ul className="mt-2 space-y-1 text-sm text-blue-700">
+                      {uploadType === "image" ? (
+                        <>
+                          <li>• <strong>{editableRows.length}</strong> expense{editableRows.length !== 1 ? "s" : ""} ready to save</li>
+                          {unmatchedRowCount > 0 && <li className="text-amber-700">• <strong>{unmatchedRowCount}</strong> without a category will be skipped</li>}
+                        </>
                       ) : (
                         <>
-                          <li>• Amount contains currency symbols or invalid format</li>
-                          <li>• Date format is not recognized (use YYYY-MM-DD)</li>
-                          <li>• Category is not properly formatted</li>
+                          <li>• <strong>{importData.length}</strong> rows in file</li>
+                          <li>• <strong>{csvUniqNames.length - unmatchedCatCount}</strong> of {csvUniqNames.length} categories resolved</li>
+                          {unmatchedCatCount > 0 && <li className="text-amber-700">• Rows with unresolved categories will be skipped</li>}
                         </>
                       )}
                     </ul>
                   </div>
-                </>
-              )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
-              {importResults.importedCount === 0 && (
-                <button
-                  onClick={handleClose}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Done
-                </button>
+          {/* ── Step 5: Complete ─────────────────────────────────────── */}
+          {step === 5 && importResults && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-4">
+              {importResults.importedCount > 0 ? (
+                <>
+                  <div className="w-16 h-16 mx-auto mb-5 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">Import complete!</h3>
+                  <p className="text-sm text-gray-500 mb-5">Closing automatically…</p>
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left">
+                    <p className="text-emerald-800 font-bold text-sm mb-1">
+                      ✅ {importResults.importedCount} expense{importResults.importedCount !== 1 ? "s" : ""} saved
+                    </p>
+                    {importResults.errors?.length > 0 && (
+                      <>
+                        <p className="text-amber-700 text-xs font-semibold mt-3 mb-1">⚠️ Some rows had issues:</p>
+                        <ul className="text-xs text-amber-600 space-y-1 max-h-28 overflow-y-auto">
+                          {importResults.errors.map((e, i) => <li key={i}>• {e}</li>)}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 mx-auto mb-5 bg-rose-100 rounded-2xl flex items-center justify-center">
+                    <AlertCircle className="w-8 h-8 text-rose-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">No expenses imported</h3>
+                  <p className="text-sm text-gray-500 mb-5">Please check the issues below and try again.</p>
+                  {importResults.errors?.length > 0 && (
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-left text-xs text-rose-700 space-y-1 max-h-40 overflow-y-auto">
+                      {importResults.errors.map((e, i) => <p key={i}>• {e}</p>)}
+                    </div>
+                  )}
+                  <button onClick={handleClose} className="mt-5 px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700">
+                    Close
+                  </button>
+                </>
               )}
             </motion.div>
           )}
         </div>
+
+        {/* footer navigation */}
+        {step < 5 && (
+          <div className="flex items-center justify-between gap-3 px-6 py-5 border-t border-gray-100 flex-shrink-0">
+            {step > 1 ? (
+              <button
+                onClick={() => setStep((p) => p - 1)}
+                disabled={loading}
+                className="px-5 py-2.5 text-sm font-bold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-40"
+              >
+                Back
+              </button>
+            ) : <div />}
+
+            {step === 1 && <div />}
+
+            {step === 2 && (
+              <button
+                onClick={buildCsvCategoryResolution}
+                disabled={!mapping.date || !mapping.amount || !mapping.category}
+                className="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                Continue
+              </button>
+            )}
+
+            {step === 3 && (
+              <button
+                onClick={() => setStep(4)}
+                disabled={uploadType === "image" && editableRows.length === 0}
+                className="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                {uploadType === "image" && unmatchedRowCount > 0
+                  ? `Continue (${unmatchedRowCount} unresolved)`
+                  : "Continue"}
+              </button>
+            )}
+
+            {step === 4 && (
+              <button
+                onClick={handleImport}
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20 disabled:opacity-50 transition-all"
+              >
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Importing…</> : "Start Import"}
+              </button>
+            )}
+          </div>
+        )}
       </motion.div>
     </div>
   );
