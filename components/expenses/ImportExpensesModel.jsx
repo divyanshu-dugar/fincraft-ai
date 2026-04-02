@@ -131,7 +131,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
             </div>
           )}
           <p className="text-xs text-gray-400 mt-0.5">
-            {row.date || "No date"} · ₹{row.amount || "0"}
+            {row.date || "No date"} · ${row.amount || "0"}
           </p>
         </div>
 
@@ -187,7 +187,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
             </div>
             {/* amount */}
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Amount (₹)</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Amount ($)</p>
               <input
                 type="number"
                 inputMode="decimal"

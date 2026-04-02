@@ -262,7 +262,7 @@ const EditExpense = () => {
             </label>
 
             <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-gray-100 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
-              <span className="text-4xl font-black text-gray-300 select-none">₹</span>
+              <span className="text-4xl font-black text-gray-300 select-none">$</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -298,7 +298,7 @@ const EditExpense = () => {
                         : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
                     }`}
                   >
-                    ₹{v.toLocaleString('en-IN')}
+                    ${v.toLocaleString('en-US')}
                   </button>
                 ))}
               </div>
