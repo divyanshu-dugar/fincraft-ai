@@ -102,7 +102,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories`,
+        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories?flat=true`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -116,7 +116,7 @@ const ExpenseList = () => {
       }
 
       const data = await response.json();
-      setCategories(data);
+      setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
