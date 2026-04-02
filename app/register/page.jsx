@@ -6,10 +6,11 @@ import { registerUser } from "@/lib/authenticate";
 import { createDefaultCategories } from "@/lib/utils/defaultCategoriesManager";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Lock, ArrowRight, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { User, Lock, ArrowRight, Eye, EyeOff, CheckCircle, Mail } from "lucide-react";
 
 export default function Register() {
   const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [warning, setWarning] = useState("");
@@ -36,7 +37,7 @@ export default function Register() {
     }
 
     try {
-      await registerUser(user, password, password2);
+      await registerUser(user, email, password, password2);
       router.push("/login");
     } catch (err) {
       setWarning(err.message);
@@ -148,6 +149,25 @@ export default function Register() {
                       required
                       className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
                       placeholder="Choose a username"
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Email Field */}
+                <motion.div variants={itemVariants}>
+                  <label htmlFor="email" className="block text-sm font-bold text-white mb-3">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 opacity-50" />
+                    <input
+                      type="email"
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
+                      placeholder="you@example.com"
                     />
                   </div>
                 </motion.div>

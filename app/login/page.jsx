@@ -180,7 +180,7 @@ export default function Login() {
                 {/* Forgot Password */}
                 <motion.div variants={itemVariants} className="flex justify-end">
                   <Link
-                    href="#"
+                    href="/forgot-password"
                     className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
                   >
                     Forgot password?

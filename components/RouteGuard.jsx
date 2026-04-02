@@ -10,7 +10,7 @@ const RouteGuard = ({ children }) => {
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    const publicPaths = ['/login', '/register', '/', '/tax-calculator', '/currency-converter'];
+    const publicPaths = ['/login', '/register', '/', '/tax-calculator', '/currency-converter', '/forgot-password', '/reset-password'];
 
     // If on a public route
     if (publicPaths.includes(pathname)) {
