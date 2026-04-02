@@ -1,376 +1,335 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
-import { QuickCategoryModal } from '@/components/categories/QuickCategoryModal';
+import { CategoryPicker } from '@/components/categories/CategoryPicker';
+import {
+  ArrowLeft,
+  CalendarDays,
+  Check,
+  IndianRupee,
+  Lightbulb,
+  Loader2,
+  NotebookPen,
+  Plus,
+  Sparkles,
+} from 'lucide-react';
 
-const AddExpense = () => {
+const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000];
+
+const toApiLocalDateTime = (dateString) => (dateString ? `${dateString}T00:00:00` : '');
+
+function today() {
+  return new Date().toLocaleDateString('en-CA');
+}
+
+export default function AddExpense() {
   const router = useRouter();
+
+  const [categoryTree, setCategoryTree] = useState([]);
+  const [seedLoading,  setSeedLoading]  = useState(false);
+
+  const [category, setCategory] = useState(null);
+  const [date,     setDate]     = useState(today());
+  const [amount,   setAmount]   = useState('');
+  const [note,     setNote]     = useState('');
+
+  const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [formData, setFormData] = useState({
-    date: new Date().toLocaleDateString('en-CA'),
-    category: '',
-    amount: '',
-    note: ''
-  });
-  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState(false);
 
-  const toApiLocalDateTime = (dateString) =>
-    dateString ? `${dateString}T00:00:00` : "";
-
-  // Fetch categories from backend
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = getToken();
-        if (!token) {
-          console.error("No token found");
-          return;
-        }
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `jwt ${token}`
-          }
-        });
-
-        if (!res.ok) throw new Error("Failed to load categories");
-
-        const data = await res.json();
-        setCategories(data);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-      }
-    };
-
-    fetchCategories();
+  // ── fetch category tree ──────────────────────────────────────────────────
+  const fetchCategories = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+        headers: { Authorization: `jwt ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.tree) setCategoryTree(data.tree);
+    } catch { /* silent */ }
   }, []);
 
+  const seedIfEmpty = useCallback(async () => {
+    const token = getToken();
+    if (!token || seedLoading) return;
+    setSeedLoading(true);
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+        method: 'POST',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      await fetchCategories();
+    } catch { /* silent */ }
+    finally { setSeedLoading(false); }
+  }, [fetchCategories, seedLoading]);
 
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+  useEffect(() => {
+    if (!seedLoading && categoryTree.length === 0) seedIfEmpty();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryTree.length]);
+
+  // ── add new category via CategoryPicker callback ─────────────────────────
+  const handleAddCategory = async (parentId, name, color) => {
+    const token = getToken();
+    if (!token) throw new Error('Not authenticated');
+    const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
+    if (color) body.color = color;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || 'Failed to create category');
     }
+    await fetchCategories();
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.date) {
-      newErrors.date = 'Date is required';
-    }
-
-    if (!formData.category) {
-      newErrors.category = 'Category is required';
-    }
-
-    if (!formData.amount || formData.amount <= 0) {
-      newErrors.amount = 'Please enter a valid amount';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  // ── validation ───────────────────────────────────────────────────────────
+  const validate = () => {
+    const e = {};
+    if (!date)                          e.date     = 'Date is required';
+    if (!category)                      e.category = 'Please select a category';
+    if (!amount || Number(amount) <= 0) e.amount   = 'Enter a valid amount';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
+  const clearError = (field) => setErrors((p) => ({ ...p, [field]: '' }));
+
+  // ── submit ───────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validate()) return;
     setLoading(true);
-    console.log(JSON.stringify(formData, null, 2));
     try {
       const token = getToken();
+      const categoryId = category.subcategoryId || category.parentId;
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `jwt ${token}`
-        },
-        body: JSON.stringify({
-          ...formData,
-          date: toApiLocalDateTime(formData.date),
-        })
+        headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+        body: JSON.stringify({ date: toApiLocalDateTime(date), category: categoryId, amount: Number(amount), note }),
       });
-
-      if (res.ok) {
-        const data = await res.json();        
-        // Show success message
-        // alert('Expense added successfully!');
-          
-        // Redirect to expense list
-        router.push('/expense/list');
-      } else {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to add expense');
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.message || 'Failed to add expense');
       }
-    } catch (error) {
-      console.error('Error adding expense:', error);
-      alert(error.message || 'Failed to add expense. Please try again.');
+      setSuccess(true);
+      setTimeout(() => router.push('/expense/list'), 900);
+    } catch (err) {
+      setErrors((p) => ({ ...p, form: err.message }));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
-  const handleCategoryCreated = (newCategory) => {
-    // Add the new category to the list
-    setCategories(prev => [...prev, newCategory]);
-    // Auto-select the newly created category
-    setFormData(prev => ({
-      ...prev,
-      category: newCategory.name
-    }));
-  };
+  const isAmountSet = amount && Number(amount) > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-18">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/10 pt-18">
+      {/* ── sticky header ─────────────────────────────────────────────────── */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
-            onClick={handleCancel}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors group"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Expenses
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            Back
           </button>
-          
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 6l-2.5 1.5M12 14l2.5 1.5M12 14v1m0 1v1m0 1l-2.5-1.5M12 17l2.5-1.5" />
-              </svg>
+          <div className="h-5 w-px bg-gray-200" />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+              <IndianRupee className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Expense</h1>
-              <p className="text-gray-600 mt-1">Track your spending and manage your budget</p>
+              <h1 className="text-base font-bold text-gray-900 leading-none">Add Expense</h1>
+              <p className="text-xs text-gray-400 leading-none mt-0.5">Track your spending</p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Date Field */}
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                Date <span className="text-red-500">*</span>
-              </label>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
+          {/* form error banner */}
+          {errors.form && (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 font-medium">
+              {errors.form}
+            </div>
+          )}
+
+          {/* ── amount hero card ─────────────────────────────────────────── */}
+          <div className="bg-white rounded-2xl border border-gray-200/70 shadow-sm p-6">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+              Amount <span className="text-rose-400">*</span>
+            </label>
+
+            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-gray-100 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
+              <span className="text-4xl font-black text-gray-300 select-none">₹</span>
               <input
-                type="date"
-                id="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.date ? 'border-red-300' : 'border-gray-300'
-                }`}
+                type="number"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => { setAmount(e.target.value); clearError('amount'); }}
+                onWheel={(e) => e.currentTarget.blur()}
+                placeholder="0"
+                min="0"
+                step="1"
+                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-gray-200 ${errors.amount ? 'text-rose-500' : 'text-gray-900'}`}
+                style={{ minWidth: 0 }}
               />
-              {errors.date && (
-                <p className="mt-1 text-sm text-red-600">{errors.date}</p>
-              )}
-            </div>
-
-            {/* Category Field */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category <span className="text-red-500">*</span>
-              </label>
-              
-              <div className="flex gap-2">
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.category ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(category => (
-                    <option key={category._id} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={() => setShowCategoryModal(true)}
-                  className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium whitespace-nowrap"
-                  title="Create a new category"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-              </div>
-
-              {errors.category && (
-                <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-              )}
-            </div>
-
-            {/* Amount Field */}
-            <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-                Amount <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm">$</span>
+              {isAmountSet && (
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-emerald-600" />
                 </div>
-                <input
-                  type="number"
-                  id="amount"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  className={`w-full pl-8 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.amount ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
-              </div>
-              {errors.amount && (
-                <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
               )}
             </div>
 
-            {/* Note Field */}
-            <div>
-              <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-2">
-                Note (Optional)
-              </label>
-              <textarea
-                id="note"
-                name="note"
-                value={formData.note}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Add a description or note about this expense..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                {formData.note.length}/500 characters
-              </p>
-            </div>
+            {errors.amount && <p className="text-xs text-rose-500 font-semibold -mt-3 mb-4">{errors.amount}</p>}
 
-            {/* Quick Amount Buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Quick Amount
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {[5, 10, 20, 50, 100, 200, 500, 1000].map(amount => (
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quick select</p>
+              <div className="flex flex-wrap gap-2">
+                {QUICK_AMOUNTS.map((v) => (
                   <button
-                    key={amount}
+                    key={v}
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                    onClick={() => { setAmount(v.toString()); clearError('amount'); }}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-150 ${
+                      Number(amount) === v
+                        ? 'bg-gray-900 text-white border-gray-900 shadow-md'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                    }`}
                   >
-                    ${amount}
+                    ₹{v.toLocaleString('en-IN')}
                   </button>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={loading}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Adding Expense...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Expense
-                  </>
-                )}
-              </button>
+          {/* ── details card ──────────────────────────────────────────────── */}
+          <div className="bg-white rounded-2xl border border-gray-200/70 shadow-sm divide-y divide-gray-100">
+
+            {/* category */}
+            <div className="px-6 py-5">
+              <label className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
+                Category <span className="text-rose-400">*</span>
+              </label>
+              {seedLoading ? (
+                <div className="flex items-center gap-2 text-sm text-gray-400 py-3">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Loading categories…
+                </div>
+              ) : (
+                <CategoryPicker
+                  tree={categoryTree}
+                  value={category}
+                  onChange={(v) => { setCategory(v); clearError('category'); }}
+                  onAddCategory={handleAddCategory}
+                  placeholder="Pick a category"
+                  error={errors.category}
+                />
+              )}
+              {errors.category && <p className="text-xs text-rose-500 font-semibold mt-2">{errors.category}</p>}
             </div>
-          </form>
-        </div>
 
-        {/* Tips Section */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-blue-900 mb-3">💡 Tips for Better Expense Tracking</h3>
-          <ul className="space-y-2 text-blue-800 text-sm">
-            <li className="flex items-start">
-              <span className="mr-2">•</span>
-              Be specific with categories to get better insights
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2">•</span>
-              Add notes to remember the context of expenses
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2">•</span>
-              Track expenses daily for accurate budgeting
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2">•</span>
-              Use consistent category names for better reports
-            </li>
-          </ul>
-        </div>
+            {/* date */}
+            <div className="px-6 py-5">
+              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                <CalendarDays className="w-3.5 h-3.5" />
+                Date <span className="text-rose-400">*</span>
+              </label>
+              <input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => { setDate(e.target.value); clearError('date'); }}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-gray-800 outline-none transition-all focus:ring-2 focus:ring-blue-100 focus:border-blue-400 ${
+                  errors.date ? 'border-rose-300 ring-2 ring-rose-100' : 'border-gray-200'
+                }`}
+              />
+              {errors.date && <p className="text-xs text-rose-500 font-semibold mt-2">{errors.date}</p>}
+            </div>
+
+            {/* note */}
+            <div className="px-6 py-5">
+              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                <NotebookPen className="w-3.5 h-3.5" />
+                Note
+                <span className="ml-auto font-normal normal-case tracking-normal text-gray-300">{note.length}/500</span>
+              </label>
+              <textarea
+                id="note"
+                value={note}
+                onChange={(e) => setNote(e.target.value.slice(0, 500))}
+                rows={3}
+                placeholder="What was this expense for?"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-800 placeholder:text-gray-300 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none"
+              />
+            </div>
+          </div>
+
+          {/* ── actions ───────────────────────────────────────────────────── */}
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              disabled={loading}
+              className="flex-1 px-6 py-3.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-40"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || success}
+              className={`flex-1 px-6 py-3.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 shadow-lg ${
+                success
+                  ? 'bg-emerald-500 shadow-emerald-500/30'
+                  : 'bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 shadow-rose-500/20 hover:shadow-rose-500/30'
+              } disabled:opacity-60 disabled:cursor-not-allowed`}
+            >
+              {success ? (
+                <><Check className="w-4 h-4" /> Saved!</>
+              ) : loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
+              ) : (
+                <><Plus className="w-4 h-4" /> Add Expense</>
+              )}
+            </button>
+          </div>
+
+          {/* tips */}
+          <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50/40 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb className="w-4 h-4 text-blue-500" />
+              <h3 className="text-sm font-bold text-blue-800">Tips for better tracking</h3>
+            </div>
+            <ul className="space-y-1.5 text-xs text-blue-700">
+              {[
+                'Use sub-categories for precise reports (e.g. Necessities › Groceries)',
+                'Add a note to remember the context later',
+                'Log expenses the same day for accuracy',
+              ].map((tip) => (
+                <li key={tip} className="flex items-start gap-2">
+                  <span className="mt-0.5 w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+        </form>
       </div>
-
-      {/* Quick Category Modal */}
-      <QuickCategoryModal
-        isOpen={showCategoryModal}
-        onClose={() => setShowCategoryModal(false)}
-        endpoint="/expense-categories"
-        onCategoryCreated={handleCategoryCreated}
-        existingCategories={categories}
-        defaultColor="#3b82f6"
-      />
     </div>
   );
-};
-
-export default AddExpense;
+}
