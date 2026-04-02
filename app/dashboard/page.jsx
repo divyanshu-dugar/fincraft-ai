@@ -233,17 +233,19 @@ export default function Dashboard() {
       // Budget health
       const budgetHealth = calculateBudgetHealth(budgetData);
 
-      // Monthly breakdown: group income & expenses by month
+      // Monthly breakdown: group income & expenses by month (use UTC to match stored dates)
       const monthlyMap = {};
+      const toMonthKey = (dateStr) => {
+        const d = new Date(dateStr);
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+      };
       incomeData.forEach((inc) => {
-        const d = new Date(inc.date);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const key = toMonthKey(inc.date);
         if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
         monthlyMap[key].income += inc.amount;
       });
       expensesData.forEach((exp) => {
-        const d = new Date(exp.date);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const key = toMonthKey(exp.date);
         if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
         monthlyMap[key].expense += exp.amount;
       });

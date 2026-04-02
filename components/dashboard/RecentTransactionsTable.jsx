@@ -57,6 +57,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
                       {
                         month: "short",
                         day: "numeric",
+                        timeZone: "UTC",
                       }
                     )}
                   </td>

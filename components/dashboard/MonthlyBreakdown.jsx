@@ -5,9 +5,10 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
 
   const formatMonth = (key) => {
     const [year, month] = key.split("-");
-    return new Date(year, month - 1).toLocaleDateString("en-US", {
+    return new Date(Date.UTC(year, month - 1)).toLocaleDateString("en-US", {
       month: "short",
       year: "numeric",
+      timeZone: "UTC",
     });
   };
 
