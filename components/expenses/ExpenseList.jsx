@@ -33,9 +33,6 @@ const DEFAULT_CATEGORY = "all";
 const CURRENCY_CODE = "USD";
 const AUTH_SCHEME = "jwt";
 
-const toApiLocalDateTime = (dateString) =>
-  dateString ? `${dateString}T00:00:00` : "";
-
 const ExpenseList = () => {
   /**
    * ================================
@@ -134,12 +131,17 @@ const ExpenseList = () => {
       const params = new URLSearchParams();
 
       if (dateRange.startDate && dateRange.endDate) {
-        params.append("startDate", toApiLocalDateTime(dateRange.startDate));
-        params.append("endDate", toApiLocalDateTime(dateRange.endDate));
+        params.append("startDate", dateRange.startDate);
+        params.append("endDate", dateRange.endDate);
+      }
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) {
+        throw new Error("NEXT_PUBLIC_API_URL is not defined. Restart the dev server.");
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses?${params.toString()}`,
+        `${apiUrl}/expenses?${params.toString()}`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -149,7 +151,7 @@ const ExpenseList = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch expenses");
+        throw new Error(`Failed to fetch expenses (${response.status} ${response.statusText}) from ${apiUrl}/expenses`);
       }
 
       const allExpenses = await response.json();
