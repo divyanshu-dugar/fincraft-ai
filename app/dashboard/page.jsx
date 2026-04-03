@@ -26,6 +26,7 @@ import { BudgetHealth } from "@/components/dashboard/BudgetHealth";
 import { AIInsights } from "@/components/dashboard/AIInsights";
 import { RecentTransactionsTable } from "@/components/dashboard/RecentTransactionsTable";
 import { MonthlyBreakdown } from "@/components/dashboard/MonthlyBreakdown";
+import { SectionToggler } from "@/components/dashboard/SectionToggler";
 import {
   formatCurrency,
   formatCurrencyDetailed,
@@ -49,6 +50,16 @@ export default function Dashboard() {
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
+  const [activeSections, setActiveSections] = useState({
+    categories: true,
+    monthly: true,
+    budgets: true,
+    insights: true,
+    transactions: true,
+  });
+
+  const toggleSection = (key) =>
+    setActiveSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
   useEffect(() => {
     loadDashboardData();
@@ -323,7 +334,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Top Metrics */}
+        {/* Top Metrics — always visible */}
         <MetricCards
           dashboardData={dashboardData}
           timeRange={timeRange}
@@ -331,38 +342,68 @@ export default function Dashboard() {
           formatPercentage={formatPercentage}
         />
 
-        {/* Quick Actions */}
+        {/* Quick Actions + Links */}
         <QuickActions />
 
-        {/* Middle Section - Charts & Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Left Column - Category Breakdown */}
-          <div className="lg:col-span-2">
-            <CategoryBreakdown
-              dashboardData={dashboardData}
-              formatCurrency={formatCurrency}
-              getCategoryIcon={getCategoryIcon}
-            />
-          </div>
+        {/* Section Toggler */}
+        <SectionToggler
+          activeSections={activeSections}
+          toggleSection={toggleSection}
+        />
 
-          {/* Right Column - Budget Health & AI Insights */}
-          <div className="space-y-8">
-            <BudgetHealth dashboardData={dashboardData} />
-            <AIInsights insights={insights} />
+        {/* Toggleable sections */}
+        {activeSections.categories && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            {/* Category Breakdown takes 2/3 */}
+            <div className="lg:col-span-2">
+              <CategoryBreakdown
+                dashboardData={dashboardData}
+                formatCurrency={formatCurrency}
+                getCategoryIcon={getCategoryIcon}
+              />
+            </div>
+
+            {/* Budget Health + AI Insights stacked in 1/3 if their toggles are also on */}
+            <div className="space-y-8">
+              {activeSections.budgets && (
+                <BudgetHealth dashboardData={dashboardData} />
+              )}
+              {activeSections.insights && (
+                <AIInsights insights={insights} />
+              )}
+              {/* If both budgets & insights are off but categories is on, show a placeholder */}
+              {!activeSections.budgets && !activeSections.insights && (
+                <div />
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* If categories is off but budgets/insights are on, render them in a 2-col row */}
+        {!activeSections.categories && (activeSections.budgets || activeSections.insights) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {activeSections.budgets && <BudgetHealth dashboardData={dashboardData} />}
+            {activeSections.insights && <AIInsights insights={insights} />}
+          </div>
+        )}
 
         {/* Monthly Breakdown */}
-        <MonthlyBreakdown
-          dashboardData={dashboardData}
-          formatCurrency={formatCurrency}
-        />
+        {activeSections.monthly && (
+          <div className="mb-8">
+            <MonthlyBreakdown
+              dashboardData={dashboardData}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+        )}
 
         {/* Recent Transactions */}
-        <RecentTransactionsTable
-          dashboardData={dashboardData}
-          formatCurrencyDetailed={formatCurrencyDetailed}
-        />
+        {activeSections.transactions && (
+          <RecentTransactionsTable
+            dashboardData={dashboardData}
+            formatCurrencyDetailed={formatCurrencyDetailed}
+          />
+        )}
       </div>
     </div>
   );

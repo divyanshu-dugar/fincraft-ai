@@ -1,188 +1,415 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { useCategories } from '@/lib/hooks/useCategories';
-import { restoreDefaultCategories } from '@/lib/utils/defaultCategoriesManager';
-import { CategoryForm } from '@/components/categories/CategoryForm';
-import { CategoryList } from '@/components/categories/CategoryList';
+import { getToken } from '@/lib/authenticate';
+import {
+  AlertTriangle,
+  Check,
+  Edit3,
+  Loader2,
+  Plus,
+  Search,
+  Tags,
+  Trash2,
+  X,
+} from 'lucide-react';
+
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+// ── color palette ────────────────────────────────────────────────────────────
+const COLOR_PALETTE = [
+  '#10b981', '#22c55e', '#14b8a6', '#34d399',
+  '#3b82f6', '#60a5fa', '#6366f1', '#8b5cf6',
+  '#f59e0b', '#f97316', '#ef4444', '#f43f5e',
+  '#64748b', '#0ea5e9', '#a855f7', '#ec4899',
+];
+
+const ICON_OPTIONS = [
+  '💰','💵','💳','🏦','📈','📊','💼','🏠','🚗','✈️',
+  '🎁','🛒','🍽️','☕','📱','💡','🎮','📚','🏥','🛡️',
+  '💪','❤️','👶','🐾','🎵','🎬','🌐','🔖',
+];
+
+function IconSelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+  return (
+    <div className="relative" ref={ref}>
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-lg hover:border-emerald-300 hover:bg-emerald-50/50 transition-all">
+        {value || '💰'}
+      </button>
+      {open && (
+        <div className="absolute top-12 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-2 grid grid-cols-7 gap-1 w-60">
+          {ICON_OPTIONS.map((ic) => (
+            <button key={ic} type="button" onClick={() => { onChange(ic); setOpen(false); }}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:bg-emerald-50 transition-colors ${value === ic ? 'bg-emerald-100 ring-2 ring-emerald-400' : ''}`}>
+              {ic}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ColorSelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+  return (
+    <div className="relative" ref={ref}>
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="w-9 h-9 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all"
+        style={{ backgroundColor: value || '#10b981' }}
+        title="Pick color"
+      />
+      {open && (
+        <div className="absolute top-11 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-2 grid grid-cols-4 gap-1.5 w-44">
+          {COLOR_PALETTE.map((c) => (
+            <button key={c} type="button"
+              onClick={() => { onChange(c); setOpen(false); }}
+              className={`w-8 h-8 rounded-lg transition-all hover:scale-110 ${value === c ? 'ring-2 ring-offset-1 ring-emerald-500' : ''}`}
+              style={{ backgroundColor: c }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── inline form ──────────────────────────────────────────────────────────────
+function InlineForm({ initial = {}, onSave, onCancel, loading, placeholder = 'Category name' }) {
+  const [name,  setName]  = useState(initial.name  || '');
+  const [icon,  setIcon]  = useState(initial.icon  || '💰');
+  const [color, setColor] = useState(initial.color || '#10b981');
+  const handleSubmit = (e) => { e.preventDefault(); if (!name.trim()) return; onSave({ name: name.trim(), icon, color }); };
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center gap-2">
+      <IconSelect value={icon} onChange={setIcon} />
+      <ColorSelect value={color} onChange={setColor} />
+      <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+        placeholder={placeholder} autoFocus
+        className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-medium outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all" />
+      <button type="submit" disabled={!name.trim() || loading}
+        className="p-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40 transition-all">
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+      </button>
+      <button type="button" onClick={onCancel}
+        className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-all">
+        <X className="w-4 h-4" />
+      </button>
+    </form>
+  );
+}
+
+// ── delete modal ─────────────────────────────────────────────────────────────
+function DeleteModal({ item, onConfirm, onCancel, loading }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div className="flex items-start gap-4 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900 text-lg">Delete Category</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              Are you sure you want to delete <strong>{item.icon} {item.name}</strong>? This cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-3">
+          <button onClick={onCancel} disabled={loading}
+            className="px-5 py-2.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-40">
+            Cancel
+          </button>
+          <button onClick={onConfirm} disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-all">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            Delete
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── category card ─────────────────────────────────────────────────────────────
+function CategoryCard({ cat, onEdit, onDelete }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      className="group flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all"
+    >
+      <span
+        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+        style={{ backgroundColor: (cat.color || '#10b981') + '22', border: `2px solid ${cat.color || '#10b981'}55` }}
+      >
+        {cat.icon || '💰'}
+      </span>
+      <span className="flex-1 text-sm font-semibold text-gray-800 min-w-0 truncate">{cat.name}</span>
+      <div
+        className="w-3 h-3 rounded-full flex-shrink-0"
+        style={{ backgroundColor: cat.color || '#10b981' }}
+        title={cat.color}
+      />
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={() => onEdit(cat)}
+          className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all" title="Edit">
+          <Edit3 className="w-3.5 h-3.5" />
+        </button>
+        <button onClick={() => onDelete(cat)}
+          className="p-1.5 rounded-lg hover:bg-rose-50 text-gray-400 hover:text-rose-600 transition-all" title="Delete">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── main page ────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
 
 export default function IncomeCategoryPage() {
-  const {
-    categories,
-    loading,
-    fetchCategories,
-    addCategory,
-    updateCategory,
-    deleteCategory,
-  } = useCategories('/income-categories');
+  const [categories,    setCategories]    = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [search,        setSearch]        = useState('');
+  const [adding,        setAdding]        = useState(false);
+  const [editingCat,    setEditingCat]    = useState(null);
+  const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const [submitting, setSubmitting] = useState(false);
-  const [deleting, setDeleting] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [editingData, setEditingData] = useState({ name: '', color: '#10B981' });
-
-  useEffect(() => {
-    fetchCategories().catch(() => {
+  const fetchCategories = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = getToken();
+      if (!token) return;
+      const res = await fetch(`${API}/income-categories`, { headers: { Authorization: `jwt ${token}` } });
+      if (!res.ok) throw new Error();
+      setCategories(await res.json());
+    } catch {
       toast.error('Failed to load categories');
-    });
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const handleAddCategory = async (data) => {
-    setSubmitting(true);
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
+
+  const handleAdd = async (data) => {
+    setActionLoading(true);
     try {
-      await addCategory(data.name, data.color);
-      toast.success('Category added successfully!');
-    } catch (error) {
-      toast.error(error.message || 'Failed to add category');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleEditClick = (category) => {
-    setEditingId(category._id);
-    setEditingData({ name: category.name, color: category.color });
-  };
-
-  const handleUpdateCategory = async (data) => {
-    setSubmitting(true);
-    try {
-      await updateCategory(editingId, data);
-      toast.success('Category updated successfully!');
-      setEditingId(null);
-      setEditingData({ name: '', color: '#10B981' });
-    } catch (error) {
-      toast.error(error.message || 'Failed to update category');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDeleteCategory = async (id) => {
-    setDeleting(id);
-    try {
-      await deleteCategory(id);
-      toast.success('Category deleted successfully!');
-    } catch (error) {
-      toast.error(error.message || 'Failed to delete category');
-    } finally {
-      setDeleting(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditingData({ name: '', color: '#10B981' });
-  };
-
-  const handleRestoreDefaults = async () => {
-    setSubmitting(true);
-    try {
-      await restoreDefaultCategories('/income-categories');
+      const token = getToken();
+      const res = await fetch(`${API}/income-categories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to create'); }
       await fetchCategories();
-      toast.success('Default income categories restored!');
-    } catch (error) {
-      toast.error(error.message || 'Failed to restore categories');
+      setAdding(false);
+      toast.success('Category created!');
+    } catch (err) {
+      toast.error(err.message || 'Failed to create category');
     } finally {
-      setSubmitting(false);
+      setActionLoading(false);
     }
   };
+
+  const handleEdit = async (data) => {
+    setActionLoading(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`${API}/income-categories/${editingCat._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to update'); }
+      await fetchCategories();
+      setEditingCat(null);
+      toast.success('Category updated!');
+    } catch (err) {
+      toast.error(err.message || 'Failed to update category');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setActionLoading(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`${API}/income-categories/${deleteTarget._id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete');
+      await fetchCategories();
+      setDeleteTarget(null);
+      toast.success('Category deleted');
+    } catch {
+      toast.error('Failed to delete category');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const filtered = categories.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50/30 px-4 py-8 sm:py-20">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Income Categories
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Organize your income streams with custom categories. Choose unique colors to
-            easily identify your earnings sources.
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-green-50/10 pt-18">
+      {/* delete modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <DeleteModal
+            item={deleteTarget}
+            onConfirm={handleDelete}
+            onCancel={() => setDeleteTarget(null)}
+            loading={actionLoading}
+          />
+        )}
+      </AnimatePresence>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8"
-          >
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              {editingId ? 'Edit Income Category' : 'Add New Income Category'}
-            </h2>
+      {/* ── sticky header ─────────────────────────────────────────────────── */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <Tags className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-900 leading-none">Income Categories</h1>
+              <p className="text-xs text-gray-400 leading-none mt-0.5">{categories.length} categor{categories.length === 1 ? 'y' : 'ies'}</p>
+            </div>
+          </div>
+          <div className="ml-auto">
+            <button
+              onClick={() => { setAdding(true); setEditingCat(null); }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-md shadow-emerald-500/20 hover:from-emerald-600 hover:to-green-700 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              New Category
+            </button>
+          </div>
+        </div>
+      </div>
 
-            <CategoryForm
-              onSubmit={editingId ? handleUpdateCategory : handleAddCategory}
-              initialName={editingData.name}
-              initialColor={editingData.color}
-              loading={submitting}
-              existingCategories={categories}
-              editingId={editingId}
-            />
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-5">
 
-            {editingId && (
+        {/* ── add form ──────────────────────────────────────────────────────── */}
+        <AnimatePresence>
+          {adding && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="bg-white rounded-2xl border border-emerald-200 shadow-sm p-5"
+            >
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">New Category</p>
+              <InlineForm
+                onSave={handleAdd}
+                onCancel={() => setAdding(false)}
+                loading={actionLoading}
+                placeholder="e.g. Salary, Freelance, Investments…"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── search ────────────────────────────────────────────────────────── */}
+        <div className="flex items-center gap-2 px-4 py-3 bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search categories…"
+            className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* ── list ──────────────────────────────────────────────────────────── */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="flex items-center gap-3 text-gray-400">
+              <Loader2 className="w-5 h-5 animate-spin text-emerald-500" />
+              <span className="text-sm font-medium">Loading categories…</span>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Tags className="w-7 h-7 text-gray-300" />
+            </div>
+            <p className="text-sm font-semibold text-gray-500">
+              {search ? 'No categories match your search' : 'No categories yet'}
+            </p>
+            {!search && (
               <button
-                onClick={handleCancelEdit}
-                className="w-full mt-4 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                onClick={() => setAdding(true)}
+                className="mt-4 text-sm font-bold text-emerald-600 hover:underline"
               >
-                Cancel Edit
+                Create your first category →
               </button>
             )}
-          </motion.div>
-
-          {/* Category List */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">Categories</h2>
-              <span className="bg-gray-100 text-gray-600 text-sm font-medium px-3 py-1 rounded-full">
-                {categories.length}
-              </span>
-            </div>
-
-            <CategoryList
-              categories={categories}
-              loading={loading}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteCategory}
-              deleting={deleting}
-              onRestore={handleRestoreDefaults}
-              isRestoring={submitting}
-            />
-
-            {/* Tips */}
-            <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-100">
-              <h3 className="text-sm font-semibold text-green-900 mb-2 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clipRule="evenodd"
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <AnimatePresence>
+              {filtered.map((cat) =>
+                editingCat?._id === cat._id ? (
+                  <motion.div
+                    key={cat._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="bg-white rounded-2xl border border-blue-200 shadow-sm p-5"
+                  >
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Edit Category</p>
+                    <InlineForm
+                      initial={cat}
+                      onSave={handleEdit}
+                      onCancel={() => setEditingCat(null)}
+                      loading={actionLoading}
+                    />
+                  </motion.div>
+                ) : (
+                  <CategoryCard
+                    key={cat._id}
+                    cat={cat}
+                    onEdit={setEditingCat}
+                    onDelete={setDeleteTarget}
                   />
-                </svg>
-                Tips
-              </h3>
-              <ul className="text-xs text-green-700 space-y-1">
-                <li>• Use distinct colors for better visual separation</li>
-                <li>• Edit or delete categories as needed</li>
-                <li>• Green tones work well for income-related categories</li>
-              </ul>
-            </div>
-          </motion.div>
-        </div>
+                )
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );

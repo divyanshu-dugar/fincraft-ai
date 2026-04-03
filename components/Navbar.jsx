@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
-import { Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -84,6 +84,7 @@ export default function Navbar() {
             { name: 'Income List', href: '/income/list' },
             { name: 'Add Income', href: '/income/add' },
             { name: 'Add Category', href: '/income/category' },
+            { name: 'Analytics', href: '/income/analytics' },
           ],
         },
         {
@@ -92,6 +93,7 @@ export default function Navbar() {
             { name: 'Expense List', href: '/expense/list' },
             { name: 'Add Expense', href: '/expense/add' },
             { name: 'Manage Category', href: '/expense/category' },
+            { name: 'Analytics', href: '/expense/analytics' },
           ],
         },
       ],
@@ -162,6 +164,23 @@ export default function Navbar() {
                 Home
               </motion.button>
             </Link>
+
+            {authenticated && (
+              <Link href="/chat">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-1.5 ${
+                    pathname === '/chat'
+                      ? 'text-emerald-300 border border-emerald-400/50 bg-emerald-400/10'
+                      : 'text-slate-300 hover:text-emerald-300 hover:border-emerald-400/30 border border-transparent'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  AI Chat
+                </motion.button>
+              </Link>
+            )}
 
             {menuItems.map((menu) => (
               <div key={menu.name} className="relative group">
@@ -381,6 +400,24 @@ export default function Navbar() {
                     Home
                   </motion.button>
                 </Link>
+
+                {/* AI Chat Link (mobile) */}
+                {authenticated && (
+                  <Link href="/chat" onClick={() => setMobileMenuOpen(false)}>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
+                        pathname === '/chat'
+                          ? 'text-emerald-300 bg-emerald-400/10 border border-emerald-400/50'
+                          : 'text-slate-300 hover:text-emerald-300 hover:bg-emerald-400/10 border border-emerald-400/20'
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      AI Chat
+                    </motion.button>
+                  </Link>
+                )}
 
                 {/* Menu Items */}
                 {menuItems.map((menu, idx) => (

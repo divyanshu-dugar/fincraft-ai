@@ -1,7 +1,11 @@
-import { CalendarRange, TrendingUp, TrendingDown, Minus } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { CalendarRange, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from "lucide-react";
 
 export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
   const rows = dashboardData?.monthlyBreakdown || [];
+  const [collapsed, setCollapsed] = useState(false);
 
   const formatMonth = (key) => {
     const [year, month] = key.split("-");
@@ -24,15 +28,49 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/50 shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Monthly Breakdown</h2>
           <p className="text-gray-500 text-sm">
-            Income vs Expenses - month on month
+            Income vs Expenses — month on month
           </p>
         </div>
-        <div className="p-3 bg-indigo-100 rounded-xl">
-          <CalendarRange className="w-5 h-5 text-indigo-600" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            {collapsed ? (
+              <>
+                <ChevronDown size={14} /> Expand
+              </>
+            ) : (
+              <>
+                <ChevronUp size={14} /> Collapse
+              </>
+            )}
+          </button>
+          <div className="p-2.5 bg-indigo-100 rounded-xl">
+            <CalendarRange className="w-5 h-5 text-indigo-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Totals summary — always visible */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="bg-emerald-50 rounded-xl p-3 text-center">
+          <p className="text-xs text-emerald-600 font-medium mb-1">Total Income</p>
+          <p className="text-base font-bold text-emerald-700">{formatCurrency(totals.income)}</p>
+        </div>
+        <div className="bg-rose-50 rounded-xl p-3 text-center">
+          <p className="text-xs text-rose-600 font-medium mb-1">Total Expense</p>
+          <p className="text-base font-bold text-rose-700">{formatCurrency(totals.expense)}</p>
+        </div>
+        <div className={`${totals.variance >= 0 ? "bg-blue-50" : "bg-orange-50"} rounded-xl p-3 text-center`}>
+          <p className={`text-xs font-medium mb-1 ${totals.variance >= 0 ? "text-blue-600" : "text-orange-600"}`}>Net Variance</p>
+          <p className={`text-base font-bold ${totals.variance >= 0 ? "text-blue-700" : "text-orange-700"}`}>
+            {totals.variance >= 0 ? "+" : ""}{formatCurrency(totals.variance)}
+          </p>
         </div>
       </div>
 
@@ -40,7 +78,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
         <p className="text-gray-400 text-sm text-center py-8">
           No data for this period.
         </p>
-      ) : (
+      ) : !collapsed && (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
