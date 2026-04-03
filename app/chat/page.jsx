@@ -387,7 +387,7 @@ export default function ChatPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${AI_API}/ai/chat-sessions`, { headers: headers() });
+        const res = await fetch(`${AI_API}/chat-sessions`, { headers: headers() });
         if (!res.ok) throw new Error("Failed to load sessions");
         const data = await res.json();
         setSessions(data);
@@ -411,7 +411,7 @@ export default function ChatPage() {
     setLoadingMessages(true);
     setError("");
     try {
-      const res = await fetch(`${AI_API}/ai/chat-sessions/${sessionId}/messages`, {
+      const res = await fetch(`${AI_API}/chat-sessions/${sessionId}/messages`, {
         headers: headers(),
       });
       if (!res.ok) throw new Error("Failed to load messages");
@@ -425,7 +425,7 @@ export default function ChatPage() {
 
   // ── create new session ─────────────────────────────────────────────────────
   const createSession = useCallback(async (firstMessage) => {
-    const res = await fetch(`${AI_API}/ai/chat-session`, {
+    const res = await fetch(`${AI_API}/chat-session`, {
       method:  "POST",
       headers: headers(),
       body:    JSON.stringify({ sessionName: firstMessage?.substring(0, 50) || undefined }),
@@ -451,7 +451,7 @@ export default function ChatPage() {
   // ── delete session ─────────────────────────────────────────────────────────
   const deleteSession = useCallback(async (sessionId) => {
     try {
-      await fetch(`${AI_API}/ai/chat-sessions/${sessionId}`, {
+      await fetch(`${AI_API}/chat-sessions/${sessionId}`, {
         method:  "DELETE",
         headers: headers(),
       });
@@ -495,7 +495,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, optimistic]);
 
     try {
-      const res = await fetch(`${AI_API}/ai/chat-message`, {
+      const res = await fetch(`${AI_API}/chat-message`, {
         method:  "POST",
         headers: headers(),
         body:    JSON.stringify({ sessionId, userQuery: content }),

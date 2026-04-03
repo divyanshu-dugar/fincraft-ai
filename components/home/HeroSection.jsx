@@ -3,12 +3,9 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, TrendingUp, BarChart3, PieChart, Sparkles } from "lucide-react";
-import { useState } from "react";
 import { isAuthenticated } from "@/lib/authenticate";
-import AIInsightsModal from "./AIInsightsModal";
 
 export default function HeroSection() {
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const authenticated = isAuthenticated();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -133,24 +130,12 @@ export default function HeroSection() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
-              {authenticated ? (
-                <button
-                  onClick={() => setIsAIModalOpen(true)}
-                  className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-                >
+              <Link href={authenticated ? "/chat" : "/login"}>
+                <button className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 border border-cyan-400/50 text-white font-bold rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm">
                   <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
-                  View Insights
+                  {authenticated ? "AI Insights" : "Login for Insights"}
                 </button>
-              ) : (
-                <Link href="/login">
-                  <button
-                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 border border-slate-400/50 text-slate-300 font-bold rounded-xl hover:text-white hover:border-slate-300 hover:bg-slate-500/10 transition-all duration-300 backdrop-blur-sm"
-                  >
-                    <Sparkles className="w-5 h-5 group-hover:animate-pulse" />
-                    Login for Insights
-                  </button>
-                </Link>
-              )}
+              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -246,10 +231,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <AIInsightsModal 
-        isOpen={isAIModalOpen} 
-        onClose={() => setIsAIModalOpen(false)} 
-      />
     </section>
   );
 }
