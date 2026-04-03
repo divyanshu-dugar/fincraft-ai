@@ -209,7 +209,7 @@ function BurnRateTooltip({ active, payload, label }) {
 // ── sort icon ────────────────────────────────────────────────────────────────
 
 function SortIcon({ col, sortKey, sortDir }) {
-  if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-300" />;
+  if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-slate-600" />;
   return sortDir === "asc"
     ? <ChevronUp className="w-3.5 h-3.5 text-indigo-500" />
     : <ChevronDown className="w-3.5 h-3.5 text-indigo-500" />;
@@ -579,7 +579,7 @@ export default function BudgetAnalyticsPage() {
                 <h2 className="text-base font-bold text-white mb-1">Budget vs. Spending by Category</h2>
                 <p className="text-xs text-slate-400 mb-6">Allocated budget (blue) compared to actual spending (status-colored)</p>
                 {isFirstLoad ? (
-                  <div className="h-[320px] bg-gradient-to-b from-gray-100 to-gray-50 rounded-xl animate-pulse" />
+                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl animate-pulse" />
                 ) : (
                   <ResponsiveContainer width="100%" height={320}>
                     <BarChart
