@@ -86,8 +86,8 @@ function InputField({ label, icon: Icon, type = 'text', value, onChange, placeho
         </div>
         <input
           type={type}
-          value={value}
-          onChange={onChange}
+          value={value ?? ''}
+          onChange={onChange ?? (() => {})}
           placeholder={placeholder}
           disabled={disabled}
           readOnly={readOnly}
