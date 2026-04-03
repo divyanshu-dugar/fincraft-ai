@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
-import { Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3 } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User } from 'lucide-react';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -278,6 +278,14 @@ export default function Navbar() {
                       >
                         Dashboard
                       </Link>
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-b border-cyan-400/10 transition-all"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        <User className="w-4 h-4" />
+                        My Profile
+                      </Link>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         onClick={handleLogout}
@@ -487,6 +495,17 @@ export default function Navbar() {
                           className="w-full px-4 py-3 bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/50 rounded-xl font-medium transition-all"
                         >
                           Dashboard
+                        </motion.button>
+                      </Link>
+
+                      <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full px-4 py-3 bg-slate-800/60 text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-white/10 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                        >
+                          <User className="w-4 h-4" />
+                          My Profile
                         </motion.button>
                       </Link>
 
