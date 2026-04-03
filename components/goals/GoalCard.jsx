@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   calculateMonthlySavings,
   calculateYearlySavings,
@@ -231,7 +232,7 @@ export default function GoalCard({
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => {
                     setEditAmount(goal.savedAmount ? parseFloat(goal.savedAmount).toFixed(2) : "0.00");
@@ -247,6 +248,12 @@ export default function GoalCard({
                 >
                   ➕ Add
                 </button>
+                <Link
+                  href={`/goal/${goal._id}`}
+                  className="px-3 py-2.5 bg-purple-50 text-purple-700 text-xs font-semibold rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 text-center"
+                >
+                  📊 Details
+                </Link>
               </div>
             </div>
           ) : null}

@@ -5,16 +5,20 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
-import { Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles } from 'lucide-react';
+import {
+  Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles,
+  LayoutDashboard, Home, TrendingUp, TrendingDown, Wallet, Target,
+  List, Plus, Tag, BarChart2, Settings,
+} from 'lucide-react';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
   const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState(null);
-  
-  const dropdownRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  const hoverTimeout = useRef(null);
   const mobileMenuRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -22,13 +26,16 @@ export default function Navbar() {
   const authenticated = isAuthenticated();
   const user = readToken();
 
-  // Close dropdown when clicking outside
+  // Scroll-aware navbar
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setActiveDropdown(null);
-        setActiveSubmenu(null);
-      }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
         setMobileMenuOpen(false);
         setMobileActiveDropdown(null);
@@ -46,22 +53,27 @@ export default function Navbar() {
     setMobileActiveSubmenu(null);
   }, [pathname]);
 
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => { if (hoverTimeout.current) clearTimeout(hoverTimeout.current); };
+  }, []);
+
   const handleLogout = () => {
     removeToken();
     setActiveDropdown(null);
-    setActiveSubmenu(null);
     setMobileMenuOpen(false);
     router.replace('/');
     router.refresh();
   };
 
-  const toggleDropdown = (menuName) => {
-    setActiveDropdown(activeDropdown === menuName ? null : menuName);
-    setActiveSubmenu(null);
+  // Hover handlers with a small delay to bridge the button→dropdown gap
+  const handleMenuEnter = (menuName) => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    setActiveDropdown(menuName);
   };
 
-  const toggleSubmenu = (title) => {
-    setActiveSubmenu(activeSubmenu === title ? null : title);
+  const handleMenuLeave = () => {
+    hoverTimeout.current = setTimeout(() => setActiveDropdown(null), 150);
   };
 
   const toggleMobileDropdown = (menuName) => {
@@ -73,27 +85,32 @@ export default function Navbar() {
     setMobileActiveSubmenu(mobileActiveSubmenu === title ? null : title);
   };
 
-  // Authenticated menu items
+  const isLinkActive = (href) => pathname === href;
+
+  // Authenticated menu items with icons
   const authenticatedMenuItems = [
     {
       name: 'Ledgerify',
+      isMegaMenu: true,
       items: [
         {
           title: 'Income Tracker',
+          icon: TrendingUp,
           items: [
-            { name: 'Income List', href: '/income/list' },
-            { name: 'Add Income', href: '/income/add' },
-            { name: 'Add Category', href: '/income/category' },
-            { name: 'Analytics', href: '/income/analytics' },
+            { name: 'Income List', href: '/income/list', icon: List },
+            { name: 'Add Income', href: '/income/add', icon: Plus },
+            { name: 'Add Category', href: '/income/category', icon: Tag },
+            { name: 'Analytics', href: '/income/analytics', icon: BarChart2 },
           ],
         },
         {
           title: 'Expenses Tracker',
+          icon: TrendingDown,
           items: [
-            { name: 'Expense List', href: '/expense/list' },
-            { name: 'Add Expense', href: '/expense/add' },
-            { name: 'Manage Category', href: '/expense/category' },
-            { name: 'Analytics', href: '/expense/analytics' },
+            { name: 'Expense List', href: '/expense/list', icon: List },
+            { name: 'Add Expense', href: '/expense/add', icon: Plus },
+            { name: 'Manage Category', href: '/expense/category', icon: Settings },
+            { name: 'Analytics', href: '/expense/analytics', icon: BarChart2 },
           ],
         },
       ],
@@ -101,36 +118,38 @@ export default function Navbar() {
     {
       name: 'Budgetify',
       items: [
-        { name: 'Budget List', href: '/budget/list' },
-        { name: 'Add Budget', href: '/budget/add' },
+        { name: 'Budget List', href: '/budget/list', icon: List },
+        { name: 'Add Budget', href: '/budget/add', icon: Plus },
+        { name: 'Analytics', href: '/budget/analytics', icon: BarChart2 },
       ],
     },
     {
       name: 'Goalify',
       items: [
-        { name: 'Savings Goal List', href: '/goal/list' },
+        { name: 'Savings Goal List', href: '/goal/list', icon: Target },
       ],
     },
   ];
 
-  // const publicMenuItems = [
-  //   {
-  //     name: 'Tools',
-  //     items: [
-  //       { name: 'Tax Calculator', href: '/tax-calculator' },
-  //       { name: 'Currency Converter', href: '/currency-converter' },
-  //     ],
-  //   },
-  // ];
-
   const menuItems = authenticated ? authenticatedMenuItems : [];
 
+  const isHome = pathname === '/';
+  const solidNav = !isHome || scrolled;
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border-b border-cyan-400/10 backdrop-blur-xl" ref={dropdownRef}>
-      {/* Background gradient orb */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 right-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-full blur-3xl" />
-      </div>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        solidNav
+          ? 'bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-b border-cyan-400/10 backdrop-blur-xl shadow-lg shadow-black/20'
+          : 'bg-transparent border-b border-transparent'
+      }`}
+    >
+      {/* Background gradient orb — only when solid */}
+      {solidNav && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-40 right-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-full blur-3xl" />
+        </div>
+      )}
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -155,12 +174,13 @@ export default function Navbar() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`px-4 py-2 rounded-lg transition-all font-medium ${
+                className={`px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-1.5 ${
                   pathname === '/'
                     ? 'text-cyan-300 border border-cyan-400/50 bg-cyan-400/10'
                     : 'text-slate-300 hover:text-cyan-300 hover:border-cyan-400/30 border border-transparent'
                 }`}
               >
+                <Home className="w-3.5 h-3.5" />
                 Home
               </motion.button>
             </Link>
@@ -183,12 +203,26 @@ export default function Navbar() {
             )}
 
             {menuItems.map((menu) => (
-              <div key={menu.name} className="relative group">
+              <div
+                key={menu.name}
+                className="relative"
+                onMouseEnter={() => handleMenuEnter(menu.name)}
+                onMouseLeave={handleMenuLeave}
+              >
                 <motion.button
-                  onClick={() => toggleDropdown(menu.name)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-slate-300 hover:text-cyan-300 rounded-lg flex items-center space-x-1 transition-all cursor-pointer border border-transparent hover:border-cyan-400/30"
+                  aria-haspopup="true"
+                  aria-expanded={activeDropdown === menu.name}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setActiveDropdown(null);
+                    if (e.key === 'Enter' || e.key === ' ') handleMenuEnter(menu.name);
+                  }}
+                  className={`px-4 py-2 rounded-lg flex items-center space-x-1 transition-all cursor-pointer border ${
+                    activeDropdown === menu.name
+                      ? 'text-cyan-300 border-cyan-400/50 bg-cyan-400/10'
+                      : 'text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
+                  }`}
                 >
                   <span>{menu.name}</span>
                   <motion.div animate={{ rotate: activeDropdown === menu.name ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -196,64 +230,61 @@ export default function Navbar() {
                   </motion.div>
                 </motion.button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown */}
                 <AnimatePresence>
                   {activeDropdown === menu.name && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
+                      initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute left-0 top-full mt-2 w-56 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden"
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                      role="menu"
+                      onMouseEnter={() => handleMenuEnter(menu.name)}
+                      onMouseLeave={handleMenuLeave}
+                      className={`absolute left-0 top-full mt-2 ${menu.isMegaMenu ? 'w-[26rem]' : 'w-52'} bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden`}
                     >
-                      {menu.items[0]?.items ? (
-                        menu.items.map((group) => (
-                          <div key={group.title} className="border-b border-cyan-400/10 last:border-0">
-                            <button
-                              onClick={() => toggleSubmenu(group.title)}
-                              className="w-full flex justify-between items-center px-4 py-3 text-sm font-semibold text-cyan-400 hover:bg-cyan-400/10 transition-all"
-                            >
-                              <span>{group.title}</span>
-                              <motion.div animate={{ rotate: activeSubmenu === group.title ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                                <ChevronDown className="w-3 h-3" />
-                              </motion.div>
-                            </button>
-
-                            <AnimatePresence>
-                              {activeSubmenu === group.title && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  transition={{ duration: 0.2 }}
-                                  className="overflow-hidden"
+                      {menu.isMegaMenu ? (
+                        /* Mega-menu: both groups side by side — no nested accordion needed */
+                        <div className="flex divide-x divide-cyan-400/10">
+                          {menu.items.map((group) => (
+                            <div key={group.title} className="flex-1 p-3">
+                              <div className="flex items-center gap-1.5 px-2 pb-2 mb-1 border-b border-cyan-400/10">
+                                {group.icon && <group.icon className="w-3.5 h-3.5 text-cyan-400" />}
+                                <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">{group.title}</span>
+                              </div>
+                              {group.items.map((sub) => (
+                                <Link
+                                  key={sub.name}
+                                  href={sub.href}
+                                  role="menuitem"
+                                  className={`flex items-center gap-2 px-2 py-2 text-sm rounded-lg transition-all ${
+                                    isLinkActive(sub.href)
+                                      ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                                      : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                  }`}
+                                  onClick={() => setActiveDropdown(null)}
                                 >
-                                  {group.items.map((sub) => (
-                                    <Link
-                                      key={sub.name}
-                                      href={sub.href}
-                                      className="block px-6 py-2 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all"
-                                      onClick={() => {
-                                        setActiveDropdown(null);
-                                        setActiveSubmenu(null);
-                                      }}
-                                    >
-                                      {sub.name}
-                                    </Link>
-                                  ))}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ))
+                                  {sub.icon && <sub.icon className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
+                                  {sub.name}
+                                </Link>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
                       ) : (
                         menu.items.map((item) => (
                           <Link
                             key={item.name}
                             href={item.href}
-                            className="block px-4 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border-b border-cyan-400/10 last:border-0"
+                            role="menuitem"
+                            className={`flex items-center gap-2 px-4 py-3 text-sm transition-all border-b border-cyan-400/10 last:border-0 ${
+                              isLinkActive(item.href)
+                                ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                                : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                            }`}
                             onClick={() => setActiveDropdown(null)}
                           >
+                            {item.icon && <item.icon className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
                             {item.name}
                           </Link>
                         ))
@@ -266,53 +297,84 @@ export default function Navbar() {
 
             {/* Auth Buttons */}
             {authenticated ? (
-              <div className="relative">
+              <div
+                className="relative"
+                onMouseEnter={() => handleMenuEnter('user')}
+                onMouseLeave={handleMenuLeave}
+              >
                 <motion.button
-                  onClick={() => toggleDropdown('user')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-4 py-2 text-slate-300 hover:text-cyan-300 rounded-lg flex items-center space-x-2 border border-transparent hover:border-cyan-400/30 transition-all"
+                  aria-haspopup="true"
+                  aria-expanded={activeDropdown === 'user'}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setActiveDropdown(null);
+                    if (e.key === 'Enter' || e.key === ' ') handleMenuEnter('user');
+                  }}
+                  className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all border ${
+                    activeDropdown === 'user'
+                      ? 'text-cyan-300 border-cyan-400/40 bg-cyan-400/10'
+                      : 'text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
+                  }`}
                 >
                   <span className="w-8 h-8 bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 rounded-full flex items-center justify-center text-cyan-300 font-bold text-sm">
                     {user?.userName?.charAt(0)?.toUpperCase() || 'U'}
                   </span>
                   <span>Account</span>
+                  <motion.div animate={{ rotate: activeDropdown === 'user' ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.div>
                 </motion.button>
 
                 <AnimatePresence>
                   {activeDropdown === 'user' && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
+                      initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-2 w-56 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden"
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                      role="menu"
+                      onMouseEnter={() => handleMenuEnter('user')}
+                      onMouseLeave={handleMenuLeave}
+                      className="absolute right-0 mt-2 w-56 bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden"
                     >
                       <div className="px-4 py-3 text-sm text-slate-400 border-b border-cyan-400/10">
                         Signed in as <span className="text-cyan-300 font-bold">{user?.userName}</span>
                       </div>
                       <Link
                         href="/dashboard"
-                        className="block px-4 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-b border-cyan-400/10 transition-all"
+                        role="menuitem"
+                        className={`flex items-center gap-2 px-4 py-3 text-sm border-b border-cyan-400/10 transition-all ${
+                          isLinkActive('/dashboard')
+                            ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                            : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                        }`}
                         onClick={() => setActiveDropdown(null)}
                       >
+                        <LayoutDashboard className="w-4 h-4" />
                         Dashboard
                       </Link>
                       <Link
                         href="/profile"
-                        className="flex items-center gap-2 px-4 py-3 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-b border-cyan-400/10 transition-all"
+                        role="menuitem"
+                        className={`flex items-center gap-2 px-4 py-3 text-sm border-b border-cyan-400/10 transition-all ${
+                          isLinkActive('/profile')
+                            ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                            : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                        }`}
                         onClick={() => setActiveDropdown(null)}
                       >
                         <User className="w-4 h-4" />
                         My Profile
                       </Link>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
+                      <button
+                        role="menuitem"
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center gap-2"
                       >
                         <LogOut className="w-4 h-4" />
                         Logout
-                      </motion.button>
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -352,6 +414,7 @@ export default function Navbar() {
             whileTap={{ scale: 0.95 }}
             className="md:hidden text-slate-300 hover:text-cyan-300 p-2 rounded-lg border border-transparent hover:border-cyan-400/30 transition-all"
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
           >
             <motion.div
               animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
@@ -387,26 +450,27 @@ export default function Navbar() {
             >
               <div className="p-4 space-y-3">
                 {/* Home Link */}
-                <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/"
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                       pathname === '/'
                         ? 'text-cyan-300 bg-cyan-400/10 border border-cyan-400/50'
                         : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20'
                     }`}
                   >
+                    <Home className="w-4 h-4" />
                     Home
-                  </motion.button>
-                </Link>
+                  </Link>
+                </motion.div>
 
-                {/* AI Chat Link (mobile) */}
+                {/* AI Chat Link */}
                 {authenticated && (
-                  <Link href="/chat" onClick={() => setMobileMenuOpen(false)}>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Link
+                      href="/chat"
+                      onClick={() => setMobileMenuOpen(false)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                         pathname === '/chat'
                           ? 'text-emerald-300 bg-emerald-400/10 border border-emerald-400/50'
@@ -415,8 +479,8 @@ export default function Navbar() {
                     >
                       <Sparkles className="w-4 h-4" />
                       AI Chat
-                    </motion.button>
-                  </Link>
+                    </Link>
+                  </motion.div>
                 )}
 
                 {/* Menu Items */}
@@ -429,6 +493,7 @@ export default function Navbar() {
                   >
                     <button
                       onClick={() => toggleMobileDropdown(menu.name)}
+                      aria-expanded={mobileActiveDropdown === menu.name}
                       className="w-full flex justify-between items-center px-4 py-3 rounded-xl text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20 transition-all font-medium"
                     >
                       <span>{menu.name}</span>
@@ -449,15 +514,19 @@ export default function Navbar() {
                           transition={{ duration: 0.2 }}
                           className="overflow-hidden"
                         >
-                          <div className="pl-6 mt-2 space-y-2">
-                            {menu.items[0]?.items ? (
+                          <div className="pl-4 mt-2 space-y-1">
+                            {menu.isMegaMenu ? (
                               menu.items.map((group) => (
                                 <div key={group.title}>
                                   <button
                                     onClick={() => toggleMobileSubmenu(group.title)}
+                                    aria-expanded={mobileActiveSubmenu === group.title}
                                     className="w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border border-transparent hover:border-cyan-400/30"
                                   >
-                                    <span className="font-medium">{group.title}</span>
+                                    <div className="flex items-center gap-1.5">
+                                      {group.icon && <group.icon className="w-3.5 h-3.5 text-cyan-400" />}
+                                      <span className="font-medium">{group.title}</span>
+                                    </div>
                                     <motion.div
                                       animate={{ rotate: mobileActiveSubmenu === group.title ? 90 : 0 }}
                                       transition={{ duration: 0.2 }}
@@ -475,14 +544,19 @@ export default function Navbar() {
                                         transition={{ duration: 0.2 }}
                                         className="overflow-hidden"
                                       >
-                                        <div className="pl-4 mt-2 space-y-1">
+                                        <div className="pl-4 mt-1 space-y-1">
                                           {group.items.map((sub) => (
                                             <Link
                                               key={sub.name}
                                               href={sub.href}
-                                              className="block px-3 py-2 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all"
+                                              className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-all ${
+                                                isLinkActive(sub.href)
+                                                  ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                                                  : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                              }`}
                                               onClick={() => setMobileMenuOpen(false)}
                                             >
+                                              {sub.icon && <sub.icon className="w-3.5 h-3.5 opacity-60" />}
                                               {sub.name}
                                             </Link>
                                           ))}
@@ -497,9 +571,14 @@ export default function Navbar() {
                                 <Link
                                   key={item.name}
                                   href={item.href}
-                                  className="block px-3 py-2 text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-lg transition-all"
+                                  className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-all ${
+                                    isLinkActive(item.href)
+                                      ? 'text-cyan-300 bg-cyan-400/15 font-medium'
+                                      : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                  }`}
                                   onClick={() => setMobileMenuOpen(false)}
                                 >
+                                  {item.icon && <item.icon className="w-3.5 h-3.5 opacity-60" />}
                                   {item.name}
                                 </Link>
                               ))
@@ -525,26 +604,35 @@ export default function Navbar() {
                         <p className="font-bold text-cyan-300">{user?.userName}</p>
                       </div>
 
-                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full px-4 py-3 bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/50 rounded-xl font-medium transition-all"
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`w-full flex items-center justify-center gap-2 px-4 py-3 border rounded-xl font-medium transition-all ${
+                            isLinkActive('/dashboard')
+                              ? 'bg-cyan-500/30 text-cyan-200 border-cyan-400/70'
+                              : 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border-cyan-400/50'
+                          }`}
                         >
+                          <LayoutDashboard className="w-4 h-4" />
                           Dashboard
-                        </motion.button>
-                      </Link>
+                        </Link>
+                      </motion.div>
 
-                      <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full px-4 py-3 bg-slate-800/60 text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-white/10 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Link
+                          href="/profile"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`w-full flex items-center justify-center gap-2 px-4 py-3 border rounded-xl font-medium transition-all ${
+                            isLinkActive('/profile')
+                              ? 'bg-cyan-400/15 text-cyan-300 border-cyan-400/40'
+                              : 'bg-slate-800/60 text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-white/10'
+                          }`}
                         >
                           <User className="w-4 h-4" />
                           My Profile
-                        </motion.button>
-                      </Link>
+                        </Link>
+                      </motion.div>
 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -558,29 +646,29 @@ export default function Navbar() {
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className={`w-full px-4 py-3 rounded-xl font-medium transition-all border ${
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Link
+                          href="/login"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`w-full flex items-center justify-center px-4 py-3 rounded-xl font-medium transition-all border ${
                             pathname === '/login'
                               ? 'text-cyan-300 bg-cyan-400/10 border-cyan-400/50'
                               : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-cyan-400/20'
                           }`}
                         >
                           Login
-                        </motion.button>
-                      </Link>
+                        </Link>
+                      </motion.div>
 
-                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/30 rounded-xl font-medium transition-all"
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Link
+                          href="/register"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/30 rounded-xl font-medium transition-all"
                         >
                           Register
-                        </motion.button>
-                      </Link>
+                        </Link>
+                      </motion.div>
                     </>
                   )}
                 </motion.div>
