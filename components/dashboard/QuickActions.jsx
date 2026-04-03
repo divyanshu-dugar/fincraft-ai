@@ -40,42 +40,42 @@ const quickLinks = [
     label: "Expense Analytics",
     icon: BarChart2,
     route: "/expense/analytics",
-    style: "text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200",
+    style: "text-blue-400 bg-blue-500/15 hover:bg-blue-500/25 border-blue-500/30",
     badge: "Insights",
   },
   {
     label: "Income Analytics",
     icon: TrendingUp,
     route: "/income/analytics",
-    style: "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200",
+    style: "text-emerald-400 bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30",
     badge: "Insights",
   },
   {
     label: "Expense List",
     icon: List,
     route: "/expense/list",
-    style: "text-slate-600 bg-slate-50 hover:bg-slate-100 border-slate-200",
+    style: "text-slate-300 bg-slate-700/50 hover:bg-slate-700 border-slate-600",
     badge: null,
   },
   {
     label: "Income List",
     icon: BookOpen,
     route: "/income/list",
-    style: "text-slate-600 bg-slate-50 hover:bg-slate-100 border-slate-200",
+    style: "text-slate-300 bg-slate-700/50 hover:bg-slate-700 border-slate-600",
     badge: null,
   },
   {
     label: "Budgets",
     icon: PieChart,
     route: "/budget/list",
-    style: "text-orange-600 bg-orange-50 hover:bg-orange-100 border-orange-200",
+    style: "text-orange-400 bg-orange-500/15 hover:bg-orange-500/25 border-orange-500/30",
     badge: null,
   },
   {
     label: "Categories",
     icon: Zap,
     route: "/expense/category",
-    style: "text-violet-600 bg-violet-50 hover:bg-violet-100 border-violet-200",
+    style: "text-violet-400 bg-violet-500/15 hover:bg-violet-500/25 border-violet-500/30",
     badge: null,
   },
 ];
@@ -102,8 +102,8 @@ export function QuickActions() {
       </div>
 
       {/* Quick navigation links */}
-      <div className="bg-white rounded-2xl border border-gray-200/50 shadow-sm p-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
           Quick Links
         </p>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">

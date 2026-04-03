@@ -12,23 +12,23 @@ export default function GoalsHeader({ onNewGoal }) {
       className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-600 p-[1px] shadow-xl mb-10"
     >
       {/* Glassmorphism inner container */}
-      <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl px-8 py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-3xl px-8 py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
         {/* Left Section */}
         <div className="flex items-center space-x-5">
           <motion.div
             initial={{ scale: 0.8, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl ring-4 ring-white/30"
+            className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl ring-4 ring-white/10"
           >
             <PiggyBank size={36} className="text-white" />
           </motion.div>
 
           <div>
-            <h1 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-tight leading-snug">
+            <h1 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-white via-purple-300 to-pink-400 bg-clip-text text-transparent tracking-tight leading-snug">
               Your Savings Goals
             </h1>
-            <p className="text-gray-600 text-lg mt-2 max-w-xl">
+            <p className="text-slate-400 text-lg mt-2 max-w-xl">
               Stay on top of your progress, visualize your achievements, and make every dollar count.
             </p>
           </div>

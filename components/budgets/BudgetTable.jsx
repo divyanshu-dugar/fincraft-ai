@@ -20,10 +20,10 @@ export default function BudgetTable({
   // Generate subtle background colors based on index
   const getRowBackgroundColor = (index) => {
     const colors = [
-      "from-white to-gray-50/80",
-      "from-purple-50/30 to-indigo-50/20",
-      "from-blue-50/20 to-cyan-50/10",
-      "from-violet-50/15 to-purple-50/10",
+      "from-slate-800/90 to-slate-800/70",
+      "from-slate-800/80 to-indigo-900/20",
+      "from-slate-800/80 to-blue-900/10",
+      "from-slate-800/80 to-violet-900/10",
     ];
     return colors[index % colors.length];
   };
@@ -38,25 +38,25 @@ export default function BudgetTable({
       return {
         label: "Upcoming",
         color: "blue",
-        textColor: "text-blue-700",
-        bgColor: "bg-blue-100",
-        borderColor: "border-blue-200",
+        textColor: "text-blue-400",
+        bgColor: "bg-blue-500/15",
+        borderColor: "border-blue-500/30",
       };
     } else if (today > endDate) {
       return {
         label: "Expired",
         color: "gray",
-        textColor: "text-gray-700",
-        bgColor: "bg-gray-100",
-        borderColor: "border-gray-200",
+        textColor: "text-slate-400",
+        bgColor: "bg-slate-700/50",
+        borderColor: "border-slate-600/30",
       };
     } else {
       return {
         label: "Current",
         color: "green",
-        textColor: "text-green-700",
-        bgColor: "bg-green-100",
-        borderColor: "border-green-200",
+        textColor: "text-emerald-400",
+        bgColor: "bg-emerald-500/15",
+        borderColor: "border-emerald-500/30",
       };
     }
   };
@@ -64,10 +64,10 @@ export default function BudgetTable({
   // Get hover gradient based on index
   const getHoverGradient = (index) => {
     const gradients = [
-      "hover:from-purple-50/40 hover:to-indigo-50/30",
-      "hover:from-blue-50/30 hover:to-cyan-50/20",
-      "hover:from-violet-50/25 hover:to-purple-50/15",
-      "hover:from-indigo-50/20 hover:to-blue-50/10",
+      "hover:from-slate-700/40 hover:to-slate-700/30",
+      "hover:from-slate-700/30 hover:to-slate-700/20",
+      "hover:from-slate-700/25 hover:to-slate-700/15",
+      "hover:from-slate-700/20 hover:to-slate-700/10",
     ];
     return gradients[index % gradients.length];
   };
@@ -100,36 +100,36 @@ const getBudgetStatus = (budget) => {
       color: "red",
       icon: AlertTriangle,
       label: "Exceeded",
-      textColor: "text-red-700",
-      bgColor: "bg-red-100",
-      borderColor: "border-red-200",
+      textColor: "text-red-400",
+      bgColor: "bg-red-500/15",
+      borderColor: "border-red-500/30",
     };
   } else if (percentage === 100) { // New: exactly at 100%
     return {
       color: "blue",
       icon: CheckCircle,
       label: "Limit Reached",
-      textColor: "text-blue-700",
-      bgColor: "bg-blue-100",
-      borderColor: "border-blue-200",
+      textColor: "text-blue-400",
+      bgColor: "bg-blue-500/15",
+      borderColor: "border-blue-500/30",
     };
   } else if (percentage >= 80) {
     return {
       color: "orange",
       icon: AlertTriangle,
       label: "Almost Exceeded",
-      textColor: "text-orange-700",
-      bgColor: "bg-orange-100",
-      borderColor: "border-orange-200",
+      textColor: "text-amber-400",
+      bgColor: "bg-amber-500/15",
+      borderColor: "border-amber-500/30",
     };
   } else {
     return {
       color: "green",
       icon: CheckCircle,
       label: "On Track",
-      textColor: "text-green-700",
-      bgColor: "bg-green-100",
-      borderColor: "border-green-200",
+      textColor: "text-emerald-400",
+      bgColor: "bg-emerald-500/15",
+      borderColor: "border-emerald-500/30",
     };
   }
 };
@@ -143,7 +143,7 @@ const getBudgetStatus = (budget) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white rounded-3xl shadow-2xl border border-gray-200/60 overflow-hidden mb-8"
+      className="bg-slate-800/60 rounded-3xl border border-cyan-400/20 overflow-hidden mb-8"
     >
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -157,7 +157,7 @@ const getBudgetStatus = (budget) => {
           </colgroup>
 
           <thead>
-            <tr className="border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 to-gray-100/50">
+            <tr className="border-b border-slate-700/60 bg-gradient-to-r from-slate-800/80 to-slate-800/50">
               {[
                 "Budget Name",
                 "Category",
@@ -168,12 +168,12 @@ const getBudgetStatus = (budget) => {
               ].map((header, index) => (
                 <th
                   key={header}
-                  className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500 tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-semibold uppercase text-slate-400 tracking-wider"
                 >
                   <div className="flex items-center gap-2">
                     {header}
                     {header === "Progress" && (
-                      <TrendingUp size={14} className="text-gray-400" />
+                      <TrendingUp size={14} className="text-slate-500" />
                     )}
                   </div>
                 </th>
@@ -202,12 +202,12 @@ const getBudgetStatus = (budget) => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-gray-100/30 last:border-b-0`}
+                    className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-slate-700/30 last:border-b-0`}
                   >
                     {/* Budget Name */}
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-gray-900 group-hover:text-gray-800 transition-colors">
+                        <span className="font-semibold text-slate-200 group-hover:text-white transition-colors">
                           {budget.name}
                         </span>
                         <div className="flex items-center gap-2 mt-1">
@@ -225,7 +225,7 @@ const getBudgetStatus = (budget) => {
                             </span>
                           )}
                           {!budget.isActive && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-slate-700/50 text-slate-400 border border-slate-600">
                               Inactive
                             </span>
                           )}
@@ -252,25 +252,25 @@ const getBudgetStatus = (budget) => {
                     <td className="px-6 py-5">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Spent</span>
-                          <span className="font-medium text-gray-900">
+                          <span className="text-slate-400">Spent</span>
+                          <span className="font-medium text-slate-200">
                             {formatCurrency(currentSpent)} /{" "}
                             {formatCurrency(budget.amount)}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div className="w-full bg-slate-700 rounded-full h-2.5">
                           <div
                             className={`h-2.5 rounded-full transition-all duration-500 ${
                               percentage >= 100
                                 ? "bg-red-500"
                                 : percentage >= 80
-                                ? "bg-orange-500"
-                                : "bg-green-500"
+                                ? "bg-amber-500"
+                                : "bg-emerald-500"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-xs text-gray-500">
+                        <div className="flex justify-between text-xs text-slate-500">
                           <span>{percentage.toFixed(1)}% used</span>
                           <span>{formatCurrency(remaining)} left</span>
                         </div>
@@ -280,10 +280,10 @@ const getBudgetStatus = (budget) => {
                     {/* Amount */}
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-lg font-bold text-gray-900 group-hover:text-gray-800 transition-colors">
+                        <span className="text-lg font-bold text-white group-hover:text-slate-100 transition-colors">
                           {formatCurrency(budget.amount)}
                         </span>
-                        <span className="text-sm text-gray-500 capitalize">
+                        <span className="text-sm text-slate-400 capitalize">
                           {budget.period}
                         </span>
                       </div>
@@ -291,12 +291,12 @@ const getBudgetStatus = (budget) => {
 
                     {/* Period */}
                     <td className="px-6 py-5">
-                      <div className="flex flex-col text-sm text-gray-600">
-                        <span className="font-medium">
+                      <div className="flex flex-col text-sm text-slate-400">
+                        <span className="font-medium text-slate-300">
                           {formatDate(budget.startDate)}
                         </span>
-                        <span className="text-gray-400">to</span>
-                        <span className="font-medium">
+                        <span className="text-slate-500">to</span>
+                        <span className="font-medium text-slate-300">
                           {formatDate(budget.endDate)}
                         </span>
                       </div>
@@ -311,7 +311,7 @@ const getBudgetStatus = (budget) => {
                           onClick={() =>
                             router.push(`/budget/edit/${budget._id}`)
                           }
-                          className="p-2.5 bg-white text-purple-600 rounded-xl border border-purple-200/60 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
+                          className="p-2.5 bg-slate-700/50 text-purple-400 rounded-xl border border-purple-500/30 hover:bg-purple-500/15 hover:border-purple-400/50 transition-all duration-200 group/btn"
                         >
                           <Pencil size={18} />
                           <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
@@ -323,7 +323,7 @@ const getBudgetStatus = (budget) => {
                           whileHover={{ scale: 1.1, y: -1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => deleteBudget(budget._id)}
-                          className="p-2.5 bg-white text-red-600 rounded-xl border border-red-200/60 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md group/btn"
+                          className="p-2.5 bg-slate-700/50 text-rose-400 rounded-xl border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-400/50 transition-all duration-200 group/btn"
                         >
                           <Trash2 size={18} />
                           <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
@@ -345,14 +345,14 @@ const getBudgetStatus = (budget) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-gradient-to-r from-gray-50 to-purple-50/30 px-8 py-6 border-t border-gray-200/60"
+        className="bg-slate-800/80 px-8 py-6 border-t border-slate-700/60"
       >
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Showing <span className="font-semibold">{budgets.length}</span>{" "}
+          <div className="text-sm text-slate-400">
+            Showing <span className="font-semibold text-slate-200">{budgets.length}</span>{" "}
             budgets
             {budgets.some((b) => !b.isActive) && (
-              <span className="ml-2 text-orange-600">
+              <span className="ml-2 text-amber-400">
                 ({budgets.filter((b) => !b.isActive).length} inactive)
               </span>
             )}

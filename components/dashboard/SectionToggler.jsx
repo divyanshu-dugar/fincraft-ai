@@ -21,14 +21,14 @@ export function SectionToggler({ activeSections, toggleSection }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/50 shadow-sm p-4 mb-8">
+    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4 mb-8">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
           Visible Panels
         </p>
         <button
           onClick={toggleAll}
-          className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
         >
           {allOn ? "Collapse All" : "Expand All"}
         </button>
@@ -42,8 +42,8 @@ export function SectionToggler({ activeSections, toggleSection }) {
               onClick={() => toggleSection(key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                 isActive
-                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
+                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-sm"
+                  : "bg-slate-700/50 text-slate-400 border-slate-600 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-slate-700"
               }`}
             >
               <Icon size={15} />

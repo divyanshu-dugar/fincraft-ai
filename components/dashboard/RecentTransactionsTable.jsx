@@ -8,8 +8,8 @@ const PREVIEW_COUNT = 5;
 
 function TransactionRow({ t, formatCurrencyDetailed }) {
   return (
-    <tr className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-      <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+    <tr className="border-b border-slate-700/50 last:border-0 hover:bg-slate-700/40 transition-colors">
+      <td className="py-3 px-4 text-sm text-slate-400 whitespace-nowrap">
         {new Date(t.date).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
@@ -17,7 +17,7 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
         })}
       </td>
       <td className="py-3 px-4">
-        <p className="font-medium text-gray-900 text-sm truncate max-w-[160px]">
+        <p className="font-medium text-slate-200 text-sm truncate max-w-[160px]">
           {t.note || "No description"}
         </p>
       </td>
@@ -27,7 +27,7 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: t.category?.color || "#9CA3AF" }}
           />
-          <span className="text-sm text-gray-600 truncate max-w-[100px]">
+          <span className="text-sm text-slate-400 truncate max-w-[100px]">
             {t.category?.name || "Uncategorized"}
           </span>
         </div>
@@ -36,8 +36,8 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
         <span
           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
             t.__typename === "Income"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-blue-100 text-blue-700"
+              ? "bg-emerald-500/20 text-emerald-400"
+              : "bg-blue-500/20 text-blue-400"
           }`}
         >
           {t.__typename === "Income" ? "Income" : "Expense"}
@@ -60,9 +60,9 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
 function FilterPills({ value, onChange }) {
   const filters = ["all", "expense", "income"];
   const pillStyle = {
-    all: "bg-gray-800 text-white",
-    expense: "bg-blue-100 text-blue-700",
-    income: "bg-emerald-100 text-emerald-700",
+    all: "bg-cyan-500/30 text-cyan-300",
+    expense: "bg-blue-500/20 text-blue-400",
+    income: "bg-emerald-500/20 text-emerald-400",
   };
   return (
     <div className="flex gap-2">
@@ -73,7 +73,7 @@ function FilterPills({ value, onChange }) {
           className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
             value === f
               ? pillStyle[f]
-              : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
           }`}
         >
           {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -104,32 +104,32 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
 
   return (
     <>
-      <div className="bg-white rounded-2xl border border-gray-200/50 shadow-lg p-6">
+      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Recent Transactions</h2>
-            <p className="text-gray-500 text-sm">
+            <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
+            <p className="text-slate-400 text-sm">
               {allTransactions.length} transactions this period
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors"
             >
               <Filter size={13} />
               Full View
             </button>
             <button
               onClick={() => router.push("/expense/list")}
-              className="text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors"
+              className="text-blue-400 text-sm font-medium hover:text-blue-300 transition-colors"
             >
               Expenses →
             </button>
             <button
               onClick={() => router.push("/income/list")}
-              className="text-emerald-600 text-sm font-medium hover:text-emerald-700 transition-colors"
+              className="text-emerald-400 text-sm font-medium hover:text-emerald-300 transition-colors"
             >
               Income →
             </button>
@@ -145,11 +145,11 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr className="border-b border-slate-700">
                 {["Date", "Description", "Category", "Type", "Amount"].map((h) => (
                   <th
                     key={h}
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider ${
                       h === "Amount" ? "text-right" : "text-left"
                     }`}
                   >
@@ -167,10 +167,10 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
 
           {allTransactions.length === 0 && (
             <div className="text-center py-12">
-              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <List className="w-7 h-7 text-gray-400" />
+              <div className="w-14 h-14 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <List className="w-7 h-7 text-slate-500" />
               </div>
-              <p className="text-gray-400 text-sm">No transactions yet</p>
+              <p className="text-slate-500 text-sm">No transactions yet</p>
             </div>
           )}
         </div>
@@ -180,7 +180,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              className="flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
             >
               {expanded ? (
                 <>
@@ -200,12 +200,12 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
       {/* Full-screen Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+          <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">All Transactions</h2>
-                <p className="text-gray-500 text-sm">
+                <h2 className="text-xl font-bold text-white">All Transactions</h2>
+                <p className="text-slate-400 text-sm">
                   {allTransactions.length} total this period
                 </p>
               </div>
@@ -218,9 +218,9 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
             </div>
 
             {/* Modal filter bar */}
-            <div className="px-6 py-3 border-b border-gray-100 flex items-center gap-3">
+            <div className="px-6 py-3 border-b border-slate-700 flex items-center gap-3">
               <FilterPills value={filterType} onChange={setFilterType} />
-              <span className="ml-auto text-xs text-gray-400">
+              <span className="ml-auto text-xs text-slate-500">
                 {applyFilter(allTransactions, filterType).length} results
               </span>
             </div>
@@ -228,12 +228,12 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
             {/* Scrollable table */}
             <div className="overflow-y-auto flex-1">
               <table className="w-full">
-                <thead className="sticky top-0 bg-white border-b border-gray-100">
+                <thead className="sticky top-0 bg-slate-800 border-b border-slate-700">
                   <tr>
                     {["Date", "Description", "Category", "Type", "Amount"].map((h) => (
                       <th
                         key={h}
-                        className={`py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                        className={`py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider ${
                           h === "Amount" ? "text-right" : "text-left"
                         }`}
                       >
@@ -249,20 +249,20 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
                 </tbody>
               </table>
               {applyFilter(allTransactions, filterType).length === 0 && (
-                <div className="text-center py-10 text-gray-400 text-sm">
+                <div className="text-center py-10 text-slate-500 text-sm">
                   No transactions match this filter
                 </div>
               )}
             </div>
 
             {/* Modal footer */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-2 justify-end bg-gray-50/50">
+            <div className="px-6 py-4 border-t border-slate-700 flex items-center gap-2 justify-end bg-slate-900/50">
               <button
                 onClick={() => {
                   router.push("/expense/list");
                   setModalOpen(false);
                 }}
-                className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-blue-400 bg-blue-500/15 hover:bg-blue-500/25 rounded-xl transition-colors"
               >
                 Expense List
               </button>
@@ -271,13 +271,13 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
                   router.push("/income/list");
                   setModalOpen(false);
                 }}
-                className="px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-emerald-400 bg-emerald-500/15 hover:bg-emerald-500/25 rounded-xl transition-colors"
               >
                 Income List
               </button>
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors"
               >
                 Close
               </button>

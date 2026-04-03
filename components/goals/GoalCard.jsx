@@ -77,7 +77,7 @@ export default function GoalCard({
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-100/50 shadow-lg hover:shadow-xl transition-all duration-500 group">
+    <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 shadow-lg hover:shadow-xl transition-all duration-500 group">
       {/* Header */}
       <div
         className={`bg-gradient-to-r ${getPriorityColor(
@@ -110,26 +110,26 @@ export default function GoalCard({
 
       {/* Content */}
       <div className="p-6 space-y-4">
-        <h3 className="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors duration-300">
+        <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors duration-300">
           {goal.name}
         </h3>
-        <p className="text-gray-600 text-sm">
+        <p className="text-slate-400 text-sm">
           {goal.description || "No description provided"}
         </p>
 
         {/* Target and Deadline */}
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span className="text-gray-500 text-sm">Target Amount</span>
-            <span className="text-2xl font-bold text-purple-600">
+            <span className="text-slate-500 text-sm">Target Amount</span>
+            <span className="text-2xl font-bold text-purple-400">
               {formatCurrency(goal.amount)}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Deadline</span>
+            <span className="text-slate-500 text-sm">Deadline</span>
             <div className="text-right">
-              <div className="font-semibold text-gray-700">
+              <div className="font-semibold text-slate-200">
                 {formatDate(goal.deadline)}
               </div>
               <div
@@ -152,10 +152,10 @@ export default function GoalCard({
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Progress</span>
-            <span className="font-semibold text-gray-700">{progress.toFixed(1)}%</span>
+            <span className="text-slate-500">Progress</span>
+            <span className="font-semibold text-slate-300">{progress.toFixed(1)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-slate-700 rounded-full h-3">
             <div
               className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full"
               style={{ width: `${progress}%` }}
@@ -166,35 +166,35 @@ export default function GoalCard({
         {/* Toggle Savings Details Button */}
         <button
           onClick={() => setShowSavingsDetails(!showSavingsDetails)}
-          className="text-xs font-semibold text-purple-600 hover:text-purple-700 hover:underline cursor-pointer"
+          className="text-xs font-semibold text-purple-400 hover:text-purple-300 hover:underline cursor-pointer"
         >
           {showSavingsDetails ? "Hide" : "Show"} Savings Plan
         </button>
 
         {/* Savings Calculation Section - Collapsible */}
         {showSavingsDetails && (
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl space-y-3 border border-purple-100/50">
+          <div className="bg-purple-500/10 p-4 rounded-xl space-y-3 border border-purple-500/20">
             <div className="grid grid-cols-2 gap-3">
               {/* Amount Remaining */}
               <div className="space-y-1">
-                <div className="text-xs font-medium text-gray-600">Amount Remaining</div>
-                <div className="text-lg font-bold text-purple-600">
+                <div className="text-xs font-medium text-slate-400">Amount Remaining</div>
+                <div className="text-lg font-bold text-purple-400">
                   {formatCurrency(amountRemaining)}
                 </div>
               </div>
 
               {/* Daily Savings */}
               <div className="space-y-1">
-                <div className="text-xs font-medium text-gray-600">Per Day</div>
-                <div className="text-lg font-bold text-blue-600">
+                <div className="text-xs font-medium text-slate-400">Per Day</div>
+                <div className="text-lg font-bold text-blue-400">
                   {formatCurrency(dailySavings)}
                 </div>
               </div>
 
               {/* Monthly Savings */}
               <div className="space-y-1">
-                <div className="text-xs font-medium text-gray-600">Per Month</div>
-                <div className="text-lg font-bold text-indigo-600">
+                <div className="text-xs font-medium text-slate-400">Per Month</div>
+                <div className="text-lg font-bold text-indigo-400">
                   {formatCurrency(monthlySavings)}
                 </div>
               </div>
@@ -202,8 +202,8 @@ export default function GoalCard({
               {/* Yearly Savings - Only show if days > 365 */}
               {daysRemaining > 365 && (
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-gray-600">Per Year</div>
-                  <div className="text-lg font-bold text-emerald-600">
+                  <div className="text-xs font-medium text-slate-400">Per Year</div>
+                  <div className="text-lg font-bold text-emerald-400">
                     {formatCurrency(yearlySavings)}
                   </div>
                 </div>
@@ -212,7 +212,7 @@ export default function GoalCard({
 
             {/* Info text */}
             {daysRemaining > 0 && (
-              <div className="text-xs text-gray-600 pt-2 border-t border-purple-100">
+              <div className="text-xs text-slate-400 pt-2 border-t border-purple-500/30">
                 Save {formatCurrency(amountRemaining)} in {daysRemaining} days to reach your goal
               </div>
             )}
@@ -220,13 +220,13 @@ export default function GoalCard({
         )}
 
         {/* Saved Amount Update - SaaS Style */}
-        <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
+        <div className="mt-6 pt-4 border-t border-slate-700 space-y-3">
           {/* Current Saved Amount Display */}
           {!isEditingAmount && !isAddingAmount ? (
             <div className="space-y-3">
               <div className="flex items-baseline justify-between">
-                <span className="text-gray-600 text-sm font-medium">Amount Saved</span>
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-slate-400 text-sm font-medium">Amount Saved</span>
+                <span className="text-2xl font-bold text-emerald-400">
                   {formatCurrency(goal.savedAmount || 0)}
                 </span>
               </div>
@@ -238,19 +238,19 @@ export default function GoalCard({
                     setEditAmount(goal.savedAmount ? parseFloat(goal.savedAmount).toFixed(2) : "0.00");
                     setIsEditingAmount(true);
                   }}
-                  className="px-3 py-2.5 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors cursor-pointer border border-blue-200"
+                  className="px-3 py-2.5 bg-blue-500/15 text-blue-400 text-xs font-semibold rounded-lg hover:bg-blue-500/25 transition-colors cursor-pointer border border-blue-500/30"
                 >
                   ✏️ Edit
                 </button>
                 <button
                   onClick={() => setIsAddingAmount(true)}
-                  className="px-3 py-2.5 bg-green-50 text-green-700 text-xs font-semibold rounded-lg hover:bg-green-100 transition-colors cursor-pointer border border-green-200"
+                  className="px-3 py-2.5 bg-emerald-500/15 text-emerald-400 text-xs font-semibold rounded-lg hover:bg-emerald-500/25 transition-colors cursor-pointer border border-emerald-500/30"
                 >
                   ➕ Add
                 </button>
                 <Link
                   href={`/goal/${goal._id}`}
-                  className="px-3 py-2.5 bg-purple-50 text-purple-700 text-xs font-semibold rounded-lg hover:bg-purple-100 transition-colors border border-purple-200 text-center"
+                  className="px-3 py-2.5 bg-purple-500/15 text-purple-400 text-xs font-semibold rounded-lg hover:bg-purple-500/25 transition-colors border border-purple-500/30 text-center"
                 >
                   📊 Details
                 </Link>
@@ -260,14 +260,14 @@ export default function GoalCard({
 
           {/* Edit Mode */}
           {isEditingAmount && (
-            <div className="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div className="space-y-3 bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
               <div className="space-y-1">
-                <label className="text-gray-600 text-sm font-medium">Set Amount Saved</label>
-                <div className="text-xs text-gray-500">Current: {formatCurrency(goal.savedAmount || 0)}</div>
+                <label className="text-slate-300 text-sm font-medium">Set Amount Saved</label>
+                <div className="text-xs text-slate-500">Current: {formatCurrency(goal.savedAmount || 0)}</div>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="flex-1 relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">$</span>
                   <input
                     type="number"
                     min="0"
@@ -276,7 +276,7 @@ export default function GoalCard({
                     value={editAmount}
                     onChange={(e) => setEditAmount(e.target.value)}
                     autoFocus
-                    className="w-full pl-7 pr-3 py-2.5 border border-blue-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full pl-7 pr-3 py-2.5 border border-slate-600 bg-slate-700 text-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                   />
                 </div>
                 <button
@@ -296,7 +296,7 @@ export default function GoalCard({
                     setEditAmount(goal.savedAmount ? parseFloat(goal.savedAmount).toFixed(2) : "0.00");
                     setIsEditingAmount(false);
                   }}
-                  className="px-4 py-2.5 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-400 transition-all cursor-pointer"
+                  className="px-4 py-2.5 bg-slate-600 text-slate-300 text-sm font-semibold rounded-lg hover:bg-slate-500 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -306,39 +306,39 @@ export default function GoalCard({
 
           {/* Add Mode */}
           {isAddingAmount && (
-            <div className="space-y-3 bg-green-50 p-4 rounded-lg border border-green-100">
+            <div className="space-y-3 bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
               <div className="flex items-baseline justify-between">
-                <label className="text-gray-600 text-sm font-medium">Add to Savings</label>
-                <span className="text-xs text-gray-500">Current: {formatCurrency(goal.savedAmount || 0)}</span>
+                <label className="text-slate-300 text-sm font-medium">Add to Savings</label>
+                <span className="text-xs text-slate-500">Current: {formatCurrency(goal.savedAmount || 0)}</span>
               </div>
 
               {/* Quick Action Buttons */}
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleAddAmount(dailySavings)}
-                  className="px-3 py-2 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors cursor-pointer border border-blue-200"
+                  className="px-3 py-2 bg-blue-500/15 text-blue-400 text-xs font-semibold rounded-lg hover:bg-blue-500/25 transition-colors cursor-pointer border border-blue-500/30"
                   title={`Add today's target: ${formatCurrency(dailySavings)}`}
                 >
                   +{formatCurrency(dailySavings)}
-                  <div className="text-xs font-normal text-blue-600">Today</div>
+                  <div className="text-xs font-normal text-blue-400">Today</div>
                 </button>
 
                 <button
                   onClick={() => handleAddAmount(monthlySavings)}
-                  className="px-3 py-2 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-lg hover:bg-indigo-100 transition-colors cursor-pointer border border-indigo-200"
+                  className="px-3 py-2 bg-indigo-500/15 text-indigo-400 text-xs font-semibold rounded-lg hover:bg-indigo-500/25 transition-colors cursor-pointer border border-indigo-500/30"
                   title={`Add monthly target: ${formatCurrency(monthlySavings)}`}
                 >
                   +{formatCurrency(monthlySavings)}
-                  <div className="text-xs font-normal text-indigo-600">Monthly</div>
+                  <div className="text-xs font-normal text-indigo-400">Monthly</div>
                 </button>
               </div>
 
               {/* Custom Input */}
-              <div className="space-y-2 pt-2 border-t border-green-200">
-                <label className="text-xs font-medium text-gray-600">Or Enter Custom Amount</label>
+              <div className="space-y-2 pt-2 border-t border-emerald-500/30">
+                <label className="text-xs font-medium text-slate-400">Or Enter Custom Amount</label>
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">$</span>
                     <input
                       type="number"
                       min="0"
@@ -351,7 +351,7 @@ export default function GoalCard({
                           handleManualSave();
                         }
                       }}
-                      className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                      className="w-full pl-7 pr-3 py-2.5 border border-slate-600 bg-slate-700 text-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                     />
                   </div>
                   <button
@@ -367,7 +367,7 @@ export default function GoalCard({
               {/* Close Button */}
               <button
                 onClick={() => setIsAddingAmount(false)}
-                className="w-full px-3 py-2 text-gray-600 text-sm font-medium rounded-lg hover:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2 text-slate-400 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors cursor-pointer"
               >
                 ← Back
               </button>

@@ -83,17 +83,17 @@ function defaultRange() {
 }
 
 const STATUS_CONFIG = {
-  on_track:        { label: "On Track",        color: "text-emerald-700", bg: "bg-emerald-100", bar: "#10b981", dot: "bg-emerald-500" },
-  almost_exceeded: { label: "Near Limit",      color: "text-amber-700",   bg: "bg-amber-100",   bar: "#f59e0b", dot: "bg-amber-500"   },
-  limit_reached:   { label: "Limit Reached",   color: "text-orange-700",  bg: "bg-orange-100",  bar: "#f97316", dot: "bg-orange-500"  },
-  exceeded:        { label: "Exceeded",         color: "text-red-700",     bg: "bg-red-100",     bar: "#ef4444", dot: "bg-red-500"     },
+  on_track:        { label: "On Track",        color: "text-emerald-400", bg: "bg-emerald-500/15", bar: "#10b981", dot: "bg-emerald-500" },
+  almost_exceeded: { label: "Near Limit",      color: "text-amber-400",   bg: "bg-amber-500/15",   bar: "#f59e0b", dot: "bg-amber-500"   },
+  limit_reached:   { label: "Limit Reached",   color: "text-orange-400",  bg: "bg-orange-500/15",  bar: "#f97316", dot: "bg-orange-500"  },
+  exceeded:        { label: "Exceeded",         color: "text-red-400",     bg: "bg-red-500/15",     bar: "#ef4444", dot: "bg-red-500"     },
 };
 
 const ALERT_TYPE_CONFIG = {
-  threshold_reached:      { label: "Threshold Reached",  icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" },
-  budget_almost_exceeded: { label: "Near Limit",         icon: AlertTriangle, color: "text-orange-600",bg: "bg-orange-50",border: "border-orange-200" },
-  budget_exceeded:        { label: "Budget Exceeded",    icon: ShieldAlert,   color: "text-red-600",   bg: "bg-red-50",   border: "border-red-200"   },
-  budget_limit_reached:   { label: "Limit Reached",      icon: ShieldAlert,   color: "text-orange-600",bg: "bg-orange-50",border: "border-orange-200"},
+  threshold_reached:      { label: "Threshold Reached",  icon: AlertTriangle, color: "text-amber-400",  bg: "bg-amber-500/15",  border: "border-amber-500/30"  },
+  budget_almost_exceeded: { label: "Near Limit",         icon: AlertTriangle, color: "text-orange-400", bg: "bg-orange-500/15", border: "border-orange-500/30" },
+  budget_exceeded:        { label: "Budget Exceeded",    icon: ShieldAlert,   color: "text-red-400",    bg: "bg-red-500/15",    border: "border-red-500/30"    },
+  budget_limit_reached:   { label: "Limit Reached",      icon: ShieldAlert,   color: "text-orange-400", bg: "bg-orange-500/15", border: "border-orange-500/30" },
 };
 
 const RANGE_PRESETS = [
@@ -107,23 +107,23 @@ const RANGE_PRESETS = [
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
+    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 animate-pulse">
       <div className="flex justify-between mb-4">
-        <div className="w-10 h-10 bg-gray-200 rounded-xl" />
-        <div className="w-20 h-5 bg-gray-100 rounded-full" />
+        <div className="w-10 h-10 bg-slate-700 rounded-xl" />
+        <div className="w-20 h-5 bg-slate-700/50 rounded-full" />
       </div>
-      <div className="h-7 bg-gray-200 rounded w-28 mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-36 mb-1" />
+      <div className="h-7 bg-slate-700 rounded w-28 mb-2" />
+      <div className="h-3 bg-slate-700/50 rounded w-36 mb-1" />
     </div>
   );
 }
 
 function ChartSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
-      <div className="h-5 bg-gray-200 rounded w-48 mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-72 mb-8" />
-      <div className="h-[320px] bg-gradient-to-b from-gray-100 to-gray-50 rounded-xl" />
+    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 animate-pulse">
+      <div className="h-5 bg-slate-700 rounded w-48 mb-2" />
+      <div className="h-3 bg-slate-700/50 rounded w-72 mb-8" />
+      <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl" />
     </div>
   );
 }
@@ -131,17 +131,17 @@ function ChartSkeleton() {
 // ── KPI card ─────────────────────────────────────────────────────────────────
 
 const TONES = {
-  blue:    { bg: "from-white to-blue-50/40",    border: "border-blue-100/60",    icon: "bg-blue-100 text-blue-600"    },
-  emerald: { bg: "from-white to-emerald-50/40", border: "border-emerald-100/60", icon: "bg-emerald-100 text-emerald-600" },
-  rose:    { bg: "from-white to-rose-50/40",    border: "border-rose-100/60",    icon: "bg-rose-100 text-rose-600"    },
-  amber:   { bg: "from-white to-amber-50/40",   border: "border-amber-100/60",   icon: "bg-amber-100 text-amber-600"  },
-  purple:  { bg: "from-white to-purple-50/40",  border: "border-purple-100/60",  icon: "bg-purple-100 text-purple-600" },
-  indigo:  { bg: "from-white to-indigo-50/40",  border: "border-indigo-100/60",  icon: "bg-indigo-100 text-indigo-600" },
+  blue:    { bg: "from-slate-800/80 to-blue-500/10",    border: "border-blue-500/20",    icon: "bg-blue-500/20 text-blue-400"    },
+  emerald: { bg: "from-slate-800/80 to-emerald-500/10", border: "border-emerald-500/20", icon: "bg-emerald-500/20 text-emerald-400" },
+  rose:    { bg: "from-slate-800/80 to-rose-500/10",    border: "border-rose-500/20",    icon: "bg-rose-500/20 text-rose-400"    },
+  amber:   { bg: "from-slate-800/80 to-amber-500/10",   border: "border-amber-500/20",   icon: "bg-amber-500/20 text-amber-400"  },
+  purple:  { bg: "from-slate-800/80 to-purple-500/10",  border: "border-purple-500/20",  icon: "bg-purple-500/20 text-purple-400" },
+  indigo:  { bg: "from-slate-800/80 to-indigo-500/10",  border: "border-indigo-500/20",  icon: "bg-indigo-500/20 text-indigo-400" },
 };
 
 function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge, badgeTone }) {
   const t = TONES[tone] || TONES.blue;
-  const badgeColors = badgeTone === "rose" ? "bg-rose-100 text-rose-700" : "bg-emerald-100 text-emerald-700";
+  const badgeColors = badgeTone === "rose" ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/15 text-emerald-400";
   return (
     <div className={`bg-gradient-to-br ${t.bg} rounded-2xl border ${t.border} p-6 shadow-lg hover:shadow-xl transition-all duration-300 group`}>
       <div className="flex items-center justify-between mb-4">
@@ -152,9 +152,9 @@ function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge, badgeTon
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${badgeColors}`}>{badge}</span>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-900 leading-tight truncate">{value}</p>
-      <p className="text-sm text-gray-600 mt-1">{label}</p>
-      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+      <p className="text-2xl font-bold text-white leading-tight truncate">{value}</p>
+      <p className="text-sm text-slate-400 mt-1">{label}</p>
+      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -164,25 +164,25 @@ function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge, badgeTon
 function BudgetBarTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-2xl p-4 min-w-[200px]">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 truncate">{label}</p>
+    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[200px]">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 truncate">{label}</p>
       <div className="space-y-1.5">
         {payload.map((item) => (
           <div key={item.dataKey} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill || item.color }} />
-              <span className="text-sm text-gray-600 truncate">{item.name}</span>
+              <span className="text-sm text-slate-300 truncate">{item.name}</span>
             </div>
-            <span className="text-sm font-bold text-gray-900 whitespace-nowrap">{moneyExact(item.value)}</span>
+            <span className="text-sm font-bold text-white whitespace-nowrap">{moneyExact(item.value)}</span>
           </div>
         ))}
       </div>
       {payload.length >= 2 && payload[0] && payload[1] && (
-        <div className="mt-3 pt-3 border-t border-gray-100">
+        <div className="mt-3 pt-3 border-t border-slate-700">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Burn Rate</span>
+            <span className="text-xs font-medium text-slate-400">Burn Rate</span>
             <span className={`text-xs font-bold ${
-              payload[1].value > payload[0].value ? "text-red-600" : "text-emerald-600"
+              payload[1].value > payload[0].value ? "text-red-400" : "text-emerald-400"
             }`}>
               {payload[0].value > 0 ? `${Math.min((payload[1].value / payload[0].value) * 100, 999).toFixed(0)}%` : "—"}
             </span>
@@ -198,8 +198,8 @@ function BurnRateTooltip({ active, payload, label }) {
   const pct = payload[0]?.value ?? 0;
   const cfg = pct > 100 ? STATUS_CONFIG.exceeded : pct >= 80 ? STATUS_CONFIG.almost_exceeded : STATUS_CONFIG.on_track;
   return (
-    <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-2xl p-4 min-w-[180px]">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 truncate">{label}</p>
+    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[180px]">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">{label}</p>
       <p className={`text-2xl font-bold ${cfg.color}`}>{pct.toFixed(1)}%</p>
       <p className={`text-xs font-semibold mt-1 ${cfg.color}`}>{cfg.label}</p>
     </div>
@@ -378,20 +378,20 @@ export default function BudgetAnalyticsPage() {
   // ── render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/10 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">
 
       {/* ── sticky page header ─────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20 flex-shrink-0">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-indigo-700 to-purple-600 bg-clip-text text-transparent leading-none">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white via-indigo-300 to-purple-400 bg-clip-text text-transparent leading-none">
                 Budget Analytics
               </h1>
-              <p className="text-xs text-gray-500 leading-none mt-0.5 truncate">
+              <p className="text-xs text-slate-400 leading-none mt-0.5 truncate">
                 {fmtDate(range.startDate)} → {fmtDate(range.endDate)}
                 &nbsp;·&nbsp;{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""}
               </p>
@@ -405,13 +405,13 @@ export default function BudgetAnalyticsPage() {
             <button
               onClick={exportCSV}
               disabled={!budgetRows.length}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 border border-slate-600 hover:bg-slate-700/50 hover:border-slate-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Download className="w-3.5 h-3.5" /> Export CSV
             </button>
             <button
               onClick={() => { fetchStats(); fetchAlerts(); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-600 border border-indigo-200 hover:bg-indigo-50 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/10 transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Refresh
             </button>
@@ -422,7 +422,7 @@ export default function BudgetAnalyticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         {/* ── date range / presets ────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-wrap items-center gap-4">
+        <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-4 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 flex-wrap">
             {RANGE_PRESETS.map((p) => (
               <button
@@ -431,7 +431,7 @@ export default function BudgetAnalyticsPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                   activePreset === p.label
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
                 }`}
               >
                 {p.label}
@@ -441,21 +441,21 @@ export default function BudgetAnalyticsPage() {
 
           <div className="flex items-center gap-3 ml-auto flex-wrap">
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">From</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">From</label>
               <input
                 type="date"
                 value={range.startDate}
                 onChange={(e) => { setRange((r) => ({ ...r, startDate: e.target.value })); setActivePreset(""); }}
-                className="px-3 py-1.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-700/50 text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">To</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">To</label>
               <input
                 type="date"
                 value={range.endDate}
                 onChange={(e) => { setRange((r) => ({ ...r, endDate: e.target.value })); setActivePreset(""); }}
-                className="px-3 py-1.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-700/50 text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -463,9 +463,9 @@ export default function BudgetAnalyticsPage() {
 
         {/* ── error ──────────────────────────────────────────────────────── */}
         {error && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-            <p className="text-sm text-rose-700 font-medium">{error}</p>
+          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0" />
+            <p className="text-sm text-rose-400 font-medium">{error}</p>
           </div>
         )}
 
@@ -529,23 +529,23 @@ export default function BudgetAnalyticsPage() {
 
         {/* ── no data state ───────────────────────────────────────────────── */}
         {!isFirstLoad && stats && budgetRows.length === 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center mx-auto mb-6">
-              <Wallet className="w-9 h-9 text-indigo-300" />
+          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-16 text-center">
+            <div className="w-20 h-20 rounded-3xl bg-indigo-500/15 flex items-center justify-center mx-auto mb-6">
+              <Wallet className="w-9 h-9 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">No budgets found</h3>
-            <p className="text-gray-400">There are no active budgets for the selected date range. Try adjusting the dates.</p>
+            <h3 className="text-xl font-bold text-white mb-2">No budgets found</h3>
+            <p className="text-slate-400">There are no active budgets for the selected date range. Try adjusting the dates.</p>
           </div>
         )}
 
         {budgetRows.length > 0 && (
           <>
             {/* ── overall burn rate progress bar ─────────────────────────── */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h2 className="text-base font-bold text-gray-900">Overall Budget Utilization</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">Total spent vs. total allocated for this period</p>
+                  <h2 className="text-base font-bold text-white">Overall Budget Utilization</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Total spent vs. total allocated for this period</p>
                 </div>
                 <span className={`text-2xl font-black ${
                   (overallStats.overallPercentage ?? 0) > 100 ? "text-red-600"
@@ -555,7 +555,7 @@ export default function BudgetAnalyticsPage() {
                   {(overallStats.overallPercentage ?? 0).toFixed(1)}%
                 </span>
               </div>
-              <div className="h-5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-5 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ease-out ${
                     (overallStats.overallPercentage ?? 0) > 100 ? "bg-gradient-to-r from-red-400 to-rose-500"
@@ -565,7 +565,7 @@ export default function BudgetAnalyticsPage() {
                   style={{ width: `${Math.min(overallStats.overallPercentage ?? 0, 100)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between text-xs text-slate-500 mt-2">
                 <span>{moneyExact(overallStats.totalSpent)} spent</span>
                 <span>{moneyExact(overallStats.totalBudget)} budgeted</span>
               </div>
@@ -575,9 +575,9 @@ export default function BudgetAnalyticsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
               {/* Budget vs. Spending grouped bar chart */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Budget vs. Spending by Category</h2>
-                <p className="text-xs text-gray-400 mb-6">Allocated budget (blue) compared to actual spending (status-colored)</p>
+              <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+                <h2 className="text-base font-bold text-white mb-1">Budget vs. Spending by Category</h2>
+                <p className="text-xs text-slate-400 mb-6">Allocated budget (blue) compared to actual spending (status-colored)</p>
                 {isFirstLoad ? (
                   <div className="h-[320px] bg-gradient-to-b from-gray-100 to-gray-50 rounded-xl animate-pulse" />
                 ) : (
@@ -588,10 +588,10 @@ export default function BudgetAnalyticsPage() {
                       barCategoryGap="30%"
                       barGap={3}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 11, fontWeight: 600, fill: "#64748b" }}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                         angle={-35}
@@ -601,12 +601,12 @@ export default function BudgetAnalyticsPage() {
                       />
                       <YAxis
                         tickFormatter={yTickMoney}
-                        tick={{ fontSize: 11, fill: "#94a3b8" }}
+                        tick={{ fontSize: 11, fill: "#64748b" }}
                         axisLine={false}
                         tickLine={false}
                         width={60}
                       />
-                      <Tooltip content={<BudgetBarTooltip />} cursor={{ fill: "#f8fafc" }} />
+                      <Tooltip content={<BudgetBarTooltip />} cursor={{ fill: "#1e293b" }} />
                       <Legend wrapperStyle={{ paddingTop: "8px", fontSize: "12px", fontWeight: 600 }} />
                       <Bar dataKey="Budget" name="Budget" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={36} />
                       <Bar dataKey="Spent"  name="Spent"  radius={[4, 4, 0, 0]} maxBarSize={36}>
@@ -620,11 +620,11 @@ export default function BudgetAnalyticsPage() {
               </div>
 
               {/* Burn rate per category */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-1">Burn Rate by Category</h2>
-                <p className="text-xs text-gray-400 mb-6">% of budget used — sorted by highest utilization. Dashed line = 80% threshold.</p>
+              <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+                <h2 className="text-base font-bold text-white mb-1">Burn Rate by Category</h2>
+                <p className="text-xs text-slate-400 mb-6">% of budget used — sorted by highest utilization. Dashed line = 80% threshold.</p>
                 {isFirstLoad ? (
-                  <div className="h-[320px] bg-gradient-to-b from-gray-100 to-gray-50 rounded-xl animate-pulse" />
+                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl animate-pulse" />
                 ) : (
                   <ResponsiveContainer width="100%" height={320}>
                     <BarChart
@@ -633,24 +633,24 @@ export default function BudgetAnalyticsPage() {
                       margin={{ top: 4, right: 32, left: 8, bottom: 4 }}
                       barCategoryGap="20%"
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
                       <XAxis
                         type="number"
                         domain={[0, Math.max(100, ...burnRateData.map((d) => d.percentage))]}
                         tickFormatter={yTickPct}
-                        tick={{ fontSize: 11, fill: "#94a3b8" }}
+                        tick={{ fontSize: 11, fill: "#64748b" }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
                         type="category"
                         dataKey="name"
-                        tick={{ fontSize: 11, fontWeight: 600, fill: "#64748b" }}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                         width={80}
                       />
-                      <Tooltip content={<BurnRateTooltip />} cursor={{ fill: "#f8fafc" }} />
+                      <Tooltip content={<BurnRateTooltip />} cursor={{ fill: "#1e293b" }} />
                       <ReferenceLine x={80} stroke="#f59e0b" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: "80%", position: "top", fontSize: 10, fill: "#f59e0b", fontWeight: 700 }} />
                       <ReferenceLine x={100} stroke="#ef4444" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: "100%", position: "top", fontSize: 10, fill: "#ef4444", fontWeight: 700 }} />
                       <Bar dataKey="percentage" radius={[0, 4, 4, 0]} maxBarSize={22}>
@@ -665,18 +665,18 @@ export default function BudgetAnalyticsPage() {
             </div>
 
             {/* ── budget detail table ─────────────────────────────────────── */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-50">
+            <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
+              <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-700/50">
                 <div>
-                  <h2 className="text-base font-bold text-gray-900">Budget Breakdown</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""} for this period</p>
+                  <h2 className="text-base font-bold text-white">Budget Breakdown</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""} for this period</p>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-gray-50/80">
+                    <tr className="bg-slate-800/80">
                       {[
                         { key: "name",             label: "Budget Name"   },
                         { key: "category",         label: "Category"      },
@@ -689,7 +689,7 @@ export default function BudgetAnalyticsPage() {
                         <th
                           key={key}
                           onClick={() => handleSort(key)}
-                          className="px-4 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 whitespace-nowrap select-none"
+                          className="px-4 py-3 text-left font-bold text-xs text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-200 whitespace-nowrap select-none"
                         >
                           <span className="inline-flex items-center gap-1">
                             {label}
@@ -697,39 +697,39 @@ export default function BudgetAnalyticsPage() {
                           </span>
                         </th>
                       ))}
-                      <th className="px-4 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider whitespace-nowrap">Period</th>
+                      <th className="px-4 py-3 text-left font-bold text-xs text-slate-400 uppercase tracking-wider whitespace-nowrap">Period</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-slate-700/30">
                     {displayedRows.map((b, i) => {
                       const cfg = STATUS_CONFIG[b.status] ?? STATUS_CONFIG.on_track;
                       const pct = Math.min(b.percentage ?? 0, 100);
                       return (
                         <tr
                           key={b._id ?? i}
-                          className="hover:bg-indigo-50/30 transition-colors group"
+                          className="hover:bg-slate-700/30 transition-colors group"
                         >
-                          <td className="px-4 py-3.5 font-semibold text-gray-800 whitespace-nowrap max-w-[160px] truncate">
+                          <td className="px-4 py-3.5 font-semibold text-slate-200 whitespace-nowrap max-w-[160px] truncate">
                             {b.name}
                           </td>
                           <td className="px-4 py-3.5 whitespace-nowrap">
                             <span className="flex items-center gap-2">
                               {b.category?.icon && <span>{b.category.icon}</span>}
-                              <span className="text-gray-700">{b.category?.name ?? "—"}</span>
+                              <span className="text-slate-300">{b.category?.name ?? "—"}</span>
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 font-semibold text-gray-900 whitespace-nowrap">
+                          <td className="px-4 py-3.5 font-semibold text-white whitespace-nowrap">
                             {moneyExact(b.proportionalBudget ?? b.amount)}
                           </td>
                           <td className="px-4 py-3.5 font-semibold whitespace-nowrap">
                             <span className={cfg.color}>{moneyExact(b.currentSpent ?? 0)}</span>
                           </td>
-                          <td className="px-4 py-3.5 text-gray-600 whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-slate-400 whitespace-nowrap">
                             {moneyExact(b.remaining ?? 0)}
                           </td>
                           <td className="px-4 py-3.5 whitespace-nowrap min-w-[140px]">
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all"
                                   style={{ width: `${pct}%`, backgroundColor: cfg.bar }}
@@ -746,7 +746,7 @@ export default function BudgetAnalyticsPage() {
                               {cfg.label}
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-slate-400 text-xs whitespace-nowrap">
                             {fmtDate(b.startDate)} → {fmtDate(b.endDate)}
                           </td>
                         </tr>
@@ -757,10 +757,10 @@ export default function BudgetAnalyticsPage() {
               </div>
 
               {sortedRows.length > 10 && (
-                <div className="px-6 py-3 border-t border-gray-50">
+                <div className="px-6 py-3 border-t border-slate-700">
                   <button
                     onClick={() => setShowAllBudgets((p) => !p)}
-                    className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                    className="flex items-center gap-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
                   >
                     {showAllBudgets ? <><ChevronUp className="w-4 h-4" /> Show less</> : <><ChevronDown className="w-4 h-4" /> Show all {sortedRows.length} budgets</>}
                   </button>
@@ -771,15 +771,15 @@ export default function BudgetAnalyticsPage() {
         )}
 
         {/* ── alert history ───────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-50">
+        <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
+          <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-700/50">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-50 rounded-xl">
-                <Bell className="w-5 h-5 text-amber-600" />
+              <div className="p-2 bg-amber-500/15 rounded-xl">
+                <Bell className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-900">Alert History</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <h2 className="text-base font-bold text-white">Alert History</h2>
+                <p className="text-xs text-slate-400 mt-0.5">
                   {alerts.length} total · {unreadCount} unread
                 </p>
               </div>
@@ -789,17 +789,17 @@ export default function BudgetAnalyticsPage() {
           {alertsLoading ? (
             <div className="p-8 space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 bg-gray-50 rounded-xl animate-pulse" />
+                <div key={i} className="h-16 bg-slate-700/50 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : alerts.length === 0 ? (
             <div className="py-16 text-center">
-              <BellOff className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-400 font-medium">No alerts yet</p>
-              <p className="text-gray-300 text-sm mt-1">Alerts appear when budgets approach or exceed their limits.</p>
+              <BellOff className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400 font-medium">No alerts yet</p>
+              <p className="text-slate-500 text-sm mt-1">Alerts appear when budgets approach or exceed their limits.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-slate-700/30">
               {alertsToShow.map((alert) => {
                 const cfg = ALERT_TYPE_CONFIG[alert.type] ?? ALERT_TYPE_CONFIG.threshold_reached;
                 const AlertIcon = cfg.icon;
@@ -807,7 +807,7 @@ export default function BudgetAnalyticsPage() {
                   <div
                     key={alert._id}
                     className={`flex items-start gap-4 px-6 py-4 transition-colors ${
-                      !alert.isRead ? "bg-amber-50/40" : "hover:bg-gray-50/60"
+                      !alert.isRead ? "bg-amber-500/10" : "hover:bg-slate-700/30"
                     }`}
                   >
                     <div className={`p-2 rounded-xl flex-shrink-0 ${cfg.bg} border ${cfg.border}`}>
@@ -816,8 +816,8 @@ export default function BudgetAnalyticsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{alert.message}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-sm font-semibold text-slate-200">{alert.message}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
                             {fmtRelative(alert.createdAt)} ·{" "}
                             <span className={`font-semibold ${cfg.color}`}>{cfg.label}</span>
                             {" · "}{(alert.percentage ?? 0).toFixed(1)}% used
@@ -826,18 +826,18 @@ export default function BudgetAnalyticsPage() {
                         {!alert.isRead && (
                           <button
                             onClick={() => markAlertRead(alert._id)}
-                            className="flex-shrink-0 text-xs font-semibold text-indigo-600 hover:text-indigo-800 px-2.5 py-1 rounded-lg hover:bg-indigo-50 transition-colors whitespace-nowrap"
+                            className="flex-shrink-0 text-xs font-semibold text-indigo-400 hover:text-indigo-300 px-2.5 py-1 rounded-lg hover:bg-indigo-500/10 transition-colors whitespace-nowrap"
                           >
                             Mark read
                           </button>
                         )}
                         {alert.isRead && (
-                          <span className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-300 font-medium">
+                          <span className="flex-shrink-0 flex items-center gap-1 text-xs text-slate-500 font-medium">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Read
                           </span>
                         )}
                       </div>
-                      <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden w-48">
+                      <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden w-48">
                         <div
                           className={`h-full rounded-full ${
                             (alert.percentage ?? 0) > 100 ? "bg-red-400"
@@ -856,10 +856,10 @@ export default function BudgetAnalyticsPage() {
               })}
 
               {alerts.length > 8 && (
-                <div className="px-6 py-3">
+                <div className="px-6 py-3 border-t border-slate-700">
                   <button
                     onClick={() => setShowAllAlerts((p) => !p)}
-                    className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                    className="flex items-center gap-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
                   >
                     {showAllAlerts ? <><ChevronUp className="w-4 h-4" /> Show less</> : <><ChevronDown className="w-4 h-4" /> Show all {alerts.length} alerts</>}
                   </button>
@@ -874,7 +874,7 @@ export default function BudgetAnalyticsPage() {
           {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
             <div key={key} className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${cfg.dot}`} />
-              <span className="text-xs text-gray-500 font-medium">{cfg.label}</span>
+              <span className="text-xs text-slate-500 font-medium">{cfg.label}</span>
             </div>
           ))}
         </div>

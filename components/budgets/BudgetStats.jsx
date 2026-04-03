@@ -101,7 +101,7 @@ export default function BudgetStats({ stats, formatCurrency }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-2xl shadow-lg border border-gray-200/60 p-6 hover:shadow-xl transition-all duration-300"
+            className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 hover:shadow-xl transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-xl bg-${stat.color}-100`}>
@@ -116,10 +116,10 @@ export default function BudgetStats({ stats, formatCurrency }) {
               )}
             </div>
 
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">
+            <h3 className="text-2xl font-bold text-white mb-1">
               {stat.value}
             </h3>
-            <p className="text-sm text-gray-500">{stat.description}</p>
+            <p className="text-sm text-slate-400">{stat.description}</p>
           </motion.div>
         ))}
       </div>
@@ -130,17 +130,17 @@ export default function BudgetStats({ stats, formatCurrency }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-lg border border-gray-200/60 p-6"
+          className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div
                 className={`p-3 rounded-xl ${
                   overallPercentage >= 100
-                    ? "bg-red-100"
+                    ? "bg-red-500/15"
                     : overallPercentage >= 80
-                    ? "bg-orange-100"
-                    : "bg-green-100"
+                    ? "bg-amber-500/15"
+                    : "bg-emerald-500/15"
                 }`}
               >
                 <TrendingUp
@@ -154,26 +154,26 @@ export default function BudgetStats({ stats, formatCurrency }) {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-white">
                   Overall Budget Usage
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-slate-400">
                   Across all active budgets
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-white">
                 {overallPercentage.toFixed(1)}%
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-slate-400">
                 {formatCurrency(totalSpent)} of {formatCurrency(totalBudget)}
               </div>
             </div>
           </div>
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <div className="flex justify-between text-sm text-slate-400 mb-2">
               <span>Spending Progress</span>
               <span
                 className={`font-semibold ${
@@ -191,21 +191,21 @@ export default function BudgetStats({ stats, formatCurrency }) {
                   : "On Track"}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-slate-700 rounded-full h-3">
               <div
                 className={`h-3 rounded-full transition-all duration-500 ${
                   overallPercentage >= 100
                     ? "bg-red-500"
                     : overallPercentage >= 80
-                    ? "bg-orange-500"
-                    : "bg-green-500"
+                    ? "bg-amber-500"
+                    : "bg-emerald-500"
                 }`}
                 style={{ width: `${Math.min(overallPercentage, 100)}%` }}
               />
             </div>
 
             {/* Threshold Markers */}
-            <div className="flex justify-between text-xs text-gray-400 mt-2">
+            <div className="flex justify-between text-xs text-slate-500 mt-2">
               <span>0%</span>
               <span>Budget Limit</span>
               <span>100%</span>
@@ -213,32 +213,32 @@ export default function BudgetStats({ stats, formatCurrency }) {
           </div>
           {/* Budget Status Summary */}
           <div className="mt-6 grid grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-3 bg-green-50 rounded-xl border border-green-200">
-              <div className="font-semibold text-green-700">
+            <div className="text-center p-3 bg-emerald-500/15 rounded-xl border border-emerald-500/30">
+              <div className="font-semibold text-emerald-400">
                 {activeBudgets.length -
                   exceededBudgets -
                   almostExceededBudgets -
                   limitReachedBudgets}
               </div>
-              <div className="text-green-600">On Track</div>
+              <div className="text-emerald-500">On Track</div>
             </div>
-            <div className="text-center p-3 bg-blue-50 rounded-xl border border-blue-200">
-              <div className="font-semibold text-blue-700">
+            <div className="text-center p-3 bg-blue-500/15 rounded-xl border border-blue-500/30">
+              <div className="font-semibold text-blue-400">
                 {limitReachedBudgets}
               </div>
-              <div className="text-blue-600">Limit Reached</div>
+              <div className="text-blue-500">Limit Reached</div>
             </div>
-            <div className="text-center p-3 bg-orange-50 rounded-xl border border-orange-200">
-              <div className="font-semibold text-orange-700">
+            <div className="text-center p-3 bg-amber-500/15 rounded-xl border border-amber-500/30">
+              <div className="font-semibold text-amber-400">
                 {almostExceededBudgets}
               </div>
-              <div className="text-orange-600">Almost Exceeded</div>
+              <div className="text-amber-500">Almost Exceeded</div>
             </div>
-            <div className="text-center p-3 bg-red-50 rounded-xl border border-red-200">
-              <div className="font-semibold text-red-700">
+            <div className="text-center p-3 bg-red-500/15 rounded-xl border border-red-500/30">
+              <div className="font-semibold text-red-400">
                 {exceededBudgets}
               </div>
-              <div className="text-red-600">Exceeded</div>
+              <div className="text-red-500">Exceeded</div>
             </div>
           </div>
         </motion.div>

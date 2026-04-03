@@ -111,7 +111,7 @@ function MessageBubble({ msg }) {
         <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
           isUser
             ? "bg-gradient-to-br from-cyan-600 to-blue-700 text-white rounded-br-sm"
-            : "bg-white border border-gray-200/70 text-gray-800 rounded-bl-sm"
+            : "bg-slate-800 border border-slate-700/50 text-slate-200 rounded-bl-sm"
         }`}>
           {isUser ? (
             <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -123,7 +123,7 @@ function MessageBubble({ msg }) {
           )}
         </div>
         {time && (
-          <span className="text-[10px] text-gray-400 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-[10px] text-slate-500 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {time}
           </span>
         )}
@@ -144,12 +144,12 @@ function TypingIndicator() {
       <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
         <Bot className="w-4 h-4 text-white" />
       </div>
-      <div className="bg-white border border-gray-200/70 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+      <div className="bg-slate-800 border border-slate-700/50 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
         <div className="flex gap-1 items-center h-4">
           {[0, 0.2, 0.4].map((delay) => (
             <motion.div
               key={delay}
-              className="w-2 h-2 rounded-full bg-gray-400"
+              className="w-2 h-2 rounded-full bg-slate-500"
               animate={{ y: [0, -5, 0] }}
               transition={{ duration: 0.7, repeat: Infinity, delay }}
             />
@@ -312,7 +312,7 @@ function WelcomeState({ onPrompt }) {
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-2xl font-bold text-gray-900 mb-2"
+        className="text-2xl font-bold text-white mb-2"
       >
         How can I help you today?
       </motion.h2>
@@ -320,7 +320,7 @@ function WelcomeState({ onPrompt }) {
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="text-sm text-gray-500 mb-8 max-w-sm"
+        className="text-sm text-slate-400 mb-8 max-w-sm"
       >
         I'm your personal finance AI. Ask me anything about your spending, income, budgets, or savings goals.
       </motion.p>
@@ -335,10 +335,10 @@ function WelcomeState({ onPrompt }) {
           <button
             key={text}
             onClick={() => onPrompt(text)}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white text-left text-sm text-gray-700 hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-800 transition-all shadow-sm hover:shadow-md group"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-800/60 text-left text-sm text-slate-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300 transition-all shadow-sm hover:shadow-md group"
           >
-            <span className="flex-shrink-0 w-7 h-7 bg-gray-100 group-hover:bg-emerald-100 rounded-lg flex items-center justify-center transition-colors">
-              <Icon className="w-4 h-4 text-gray-500 group-hover:text-emerald-600 transition-colors" />
+            <span className="flex-shrink-0 w-7 h-7 bg-slate-700 group-hover:bg-emerald-500/20 rounded-lg flex items-center justify-center transition-colors">
+              <Icon className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 transition-colors" />
             </span>
             <span className="line-clamp-2 leading-snug">{text}</span>
           </button>
@@ -544,7 +544,7 @@ export default function ChatPage() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen pt-16 bg-slate-50 overflow-hidden">
+    <div className="flex h-screen pt-16 bg-slate-950 overflow-hidden">
 
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <Sidebar
@@ -562,10 +562,10 @@ export default function ChatPage() {
       <main className="flex-1 flex flex-col min-w-0 h-full">
 
         {/* Chat header */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 sm:px-6 h-14 bg-white border-b border-gray-200/70 shadow-sm">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 sm:px-6 h-14 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/60 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -575,10 +575,10 @@ export default function ChatPage() {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 truncate">
+              <p className="text-sm font-bold text-white truncate">
                 {activeSession?.sessionName || "Fincraft AI"}
               </p>
-              <p className="text-[10px] text-emerald-600 font-semibold">● Online</p>
+              <p className="text-[10px] text-emerald-400 font-semibold">● Online</p>
             </div>
           </div>
         </div>
@@ -609,14 +609,14 @@ export default function ChatPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 shadow-sm mx-auto max-w-xl"
+                className="flex items-start gap-3 bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-3 shadow-sm mx-auto max-w-xl"
               >
-                <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-red-800">Error</p>
-                  <p className="text-xs text-red-600 mt-0.5">{error}</p>
+                  <p className="text-sm font-semibold text-red-300">Error</p>
+                  <p className="text-xs text-red-400 mt-0.5">{error}</p>
                 </div>
-                <button onClick={() => setError("")} className="text-red-400 hover:text-red-600 flex-shrink-0">
+                <button onClick={() => setError("")} className="text-red-400 hover:text-red-300 flex-shrink-0">
                   <X className="w-4 h-4" />
                 </button>
               </motion.div>
@@ -627,14 +627,14 @@ export default function ChatPage() {
         </div>
 
         {/* Input bar */}
-        <div className="flex-shrink-0 border-t border-gray-200/70 bg-white px-4 sm:px-6 py-4">
+        <div className="flex-shrink-0 border-t border-slate-800/60 bg-slate-900/80 backdrop-blur-xl px-4 sm:px-6 py-4">
           {!activeSession && (
-            <p className="text-xs text-gray-400 text-center mb-3">
+            <p className="text-xs text-slate-500 text-center mb-3">
               Typing a message will automatically start a new conversation.
             </p>
           )}
-          <div className={`flex items-end gap-3 rounded-2xl border bg-white shadow-sm transition-all ${
-            sending ? "border-gray-200" : "border-gray-300 focus-within:border-emerald-400 focus-within:shadow-emerald-100 focus-within:shadow-md"
+          <div className={`flex items-end gap-3 rounded-2xl border bg-slate-800 shadow-sm transition-all ${
+            sending ? "border-slate-700" : "border-slate-700 focus-within:border-emerald-500 focus-within:shadow-emerald-500/10 focus-within:shadow-md"
           }`}>
             <textarea
               ref={textareaRef}
@@ -644,7 +644,7 @@ export default function ChatPage() {
               disabled={sending}
               placeholder="Ask about your finances… (Enter to send, Shift+Enter for new line)"
               rows={1}
-              className="flex-1 resize-none bg-transparent px-4 py-3.5 text-sm text-gray-800 placeholder-gray-400 outline-none leading-relaxed max-h-40 disabled:opacity-60"
+              className="flex-1 resize-none bg-transparent px-4 py-3.5 text-sm text-slate-200 placeholder-slate-500 outline-none leading-relaxed max-h-40 disabled:opacity-60"
             />
             <div className="flex items-center gap-2 pr-3 pb-3 flex-shrink-0">
               <button
@@ -659,7 +659,7 @@ export default function ChatPage() {
               </button>
             </div>
           </div>
-          <p className="text-[10px] text-gray-400 text-center mt-2">
+          <p className="text-[10px] text-slate-500 text-center mt-2">
             Fincraft AI can make mistakes. Verify important financial decisions independently.
           </p>
         </div>
@@ -676,11 +676,11 @@ export default function ChatPage() {
         .markdown-content code {
           font-family: 'Menlo', 'Monaco', monospace;
           font-size: 0.8em;
-          background: #f1f5f9;
-          border: 1px solid #e2e8f0;
+          background: #1e293b;
+          border: 1px solid #334155;
           border-radius: 4px;
           padding: 0.1em 0.4em;
-          color: #0f172a;
+          color: #e2e8f0;
         }
         .markdown-content pre {
           background: #0f172a;
@@ -700,7 +700,7 @@ export default function ChatPage() {
         }
         .markdown-content h1 { font-size: 1.15em; font-weight: 800; margin: 0.75rem 0 0.4rem; }
         .markdown-content h2 { font-size: 1.05em; font-weight: 700; margin: 0.6rem 0 0.35rem; }
-        .markdown-content h3 { font-size: 0.95em; font-weight: 700; margin: 0.5rem 0 0.3rem; color: #374151; }
+        .markdown-content h3 { font-size: 0.95em; font-weight: 700; margin: 0.5rem 0 0.3rem; color: #94a3b8; }
       `}</style>
     </div>
   );

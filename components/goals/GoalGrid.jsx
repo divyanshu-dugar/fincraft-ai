@@ -100,13 +100,13 @@ export default function GoalGrid({
 
   if (!goals.length) {
     return (
-      <div className="bg-white/80 rounded-3xl border border-gray-100/50 shadow-xl p-12 text-center">
+      <div className="bg-slate-800/60 rounded-3xl border border-cyan-400/20 shadow-xl p-12 text-center">
         <div className="max-w-md mx-auto space-y-6">
-          <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-32 h-32 bg-purple-500/15 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
             <span className="text-5xl">🎯</span>
           </div>
-          <h3 className="text-3xl font-bold text-gray-700">No Goals Yet</h3>
-          <p className="text-gray-500 text-lg">
+          <h3 className="text-3xl font-bold text-white">No Goals Yet</h3>
+          <p className="text-slate-400 text-lg">
             Start your financial journey by creating your first savings goal.
           </p>
         </div>
@@ -117,19 +117,19 @@ export default function GoalGrid({
   return (
     <div className="space-y-8">
       {/* View Toggle */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 flex justify-between items-center shadow-sm">
-        <div className="text-sm font-medium text-gray-700">
+      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-4 flex justify-between items-center shadow-sm">
+        <div className="text-sm font-medium text-slate-300">
           {goals.length} goal{goals.length !== 1 ? "s" : ""} total
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">View by:</span>
-          <div className="flex bg-gray-100 rounded-xl p-1">
+          <span className="text-sm text-slate-400">View by:</span>
+          <div className="flex bg-slate-700 rounded-xl p-1">
             <button
               onClick={() => setViewMode("year")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 viewMode === "year"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-slate-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
               Year
@@ -138,8 +138,8 @@ export default function GoalGrid({
               onClick={() => setViewMode("priority")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 viewMode === "priority"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-slate-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
               Priority
@@ -165,38 +165,38 @@ export default function GoalGrid({
                       className={`h-10 w-10 rounded-xl ${
                         isCurrentYear
                           ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                          : "bg-gray-100"
+                          : "bg-slate-700"
                       } flex items-center justify-center`}
                     >
                       <span
                         className={`font-bold ${
-                          isCurrentYear ? "text-white" : "text-gray-700"
+                          isCurrentYear ? "text-white" : "text-slate-300"
                         }`}
                       >
                         {isNoDeadline ? "∞" : year.slice(-2)}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">
+                      <h3 className="text-xl font-bold text-white">
                         {isCurrentYear
                           ? `This Year (${year})`
                           : isNoDeadline
                           ? "No Deadline"
                           : `Year ${year}`}
                         {isCurrentYear && (
-                          <span className="ml-2 text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                          <span className="ml-2 text-xs font-medium px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">
                             Current
                           </span>
                         )}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-slate-400">
                         {yearGoals.length} goal
                         {yearGoals.length !== 1 ? "s" : ""}
                       </p>
                     </div>
                   </div>
                   {!isNoDeadline && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-slate-500">
                       {isCurrentYear ? "Due this year" : `Upcoming in ${year}`}
                     </div>
                   )}
@@ -258,10 +258,10 @@ export default function GoalGrid({
                     {priorityLabels[priority].emoji}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-white">
                       {priorityLabels[priority].label}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-slate-400">
                       {goalsByPriorityGroup[priority].length} goal
                       {goalsByPriorityGroup[priority].length !== 1 ? "s" : ""}
                     </p>

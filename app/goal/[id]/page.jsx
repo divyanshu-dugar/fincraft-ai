@@ -54,9 +54,9 @@ const formatRelative = (d) => {
 };
 
 const getPriorityConfig = (p) => {
-  if (p === "high") return { label: "High", color: "text-red-600", bg: "bg-red-50", border: "border-red-200", dot: "bg-red-500" };
-  if (p === "medium") return { label: "Medium", color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", dot: "bg-yellow-500" };
-  return { label: "Low", color: "text-green-600", bg: "bg-green-50", border: "border-green-200", dot: "bg-green-500" };
+  if (p === "high") return { label: "High", color: "text-red-400", bg: "bg-red-500/15", border: "border-red-500/30", dot: "bg-red-500" };
+  if (p === "medium") return { label: "Medium", color: "text-yellow-400", bg: "bg-yellow-500/15", border: "border-yellow-500/30", dot: "bg-yellow-500" };
+  return { label: "Low", color: "text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500/30", dot: "bg-emerald-500" };
 };
 
 /** Circular SVG progress ring */
@@ -68,7 +68,7 @@ function ProgressRing({ percent, size = 160, stroke = 12 }) {
 
   return (
     <svg width={size} height={size} className="-rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1f5f9" strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -208,10 +208,10 @@ export default function GoalDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin" />
-          <p className="text-gray-500 font-medium">Loading goal…</p>
+          <div className="w-12 h-12 rounded-full border-4 border-purple-800 border-t-purple-400 animate-spin" />
+          <p className="text-slate-400 font-medium">Loading goal…</p>
         </div>
       </div>
     );
@@ -219,10 +219,10 @@ export default function GoalDetailPage() {
 
   if (error || !goal) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-red-500 font-medium">{error || "Goal not found"}</p>
-          <Link href="/goal/list" className="text-purple-600 underline text-sm">Back to goals</Link>
+          <p className="text-red-400 font-medium">{error || "Goal not found"}</p>
+          <Link href="/goal/list" className="text-purple-400 underline text-sm">Back to goals</Link>
         </div>
       </div>
     );
@@ -266,23 +266,23 @@ export default function GoalDetailPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 py-18 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Back + Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Link
             href="/goal/list"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft size={16} /> Back to Goals
           </Link>
 
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{goal.name}</h1>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight">{goal.name}</h1>
               {goal.description && (
-                <p className="text-gray-500 mt-1 max-w-xl">{goal.description}</p>
+                <p className="text-slate-400 mt-1 max-w-xl">{goal.description}</p>
               )}
             </div>
 
@@ -293,7 +293,7 @@ export default function GoalDetailPage() {
               </span>
               <Link
                 href="/goal/list"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 shadow-sm transition-colors"
               >
                 <Edit3 size={14} /> Edit Goal
               </Link>
@@ -306,43 +306,43 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-3xl shadow-xl border border-gray-100/60 p-8"
+          className="bg-slate-800/60 rounded-3xl shadow-xl border border-cyan-400/20 p-8"
         >
           <div className="flex flex-col sm:flex-row items-center gap-8">
             {/* Ring */}
             <div className="relative flex-shrink-0">
               <ProgressRing percent={percent} size={160} stroke={14} />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-extrabold text-gray-900">{Math.round(percent)}%</span>
-                <span className="text-xs text-gray-400 font-medium">complete</span>
+              <span className="text-3xl font-extrabold text-white">{Math.round(percent)}%</span>
+              <span className="text-xs text-slate-500 font-medium">complete</span>
               </div>
             </div>
 
             {/* Stats */}
             <div className="flex-1 grid grid-cols-2 gap-4 w-full">
-              <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
-                <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide">Saved</p>
-                <p className="text-2xl font-extrabold text-emerald-700 mt-1">{formatCurrency(saved)}</p>
+              <div className="bg-emerald-500/15 rounded-2xl p-4 border border-emerald-500/30">
+                <p className="text-xs font-medium text-emerald-400 uppercase tracking-wide">Saved</p>
+                <p className="text-2xl font-extrabold text-emerald-300 mt-1">{formatCurrency(saved)}</p>
                 <p className="text-xs text-emerald-500 mt-0.5">of {formatCurrency(target)}</p>
               </div>
 
-              <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
-                <p className="text-xs font-medium text-purple-600 uppercase tracking-wide">Remaining</p>
-                <p className="text-2xl font-extrabold text-purple-700 mt-1">{formatCurrency(remaining)}</p>
+              <div className="bg-purple-500/15 rounded-2xl p-4 border border-purple-500/30">
+                <p className="text-xs font-medium text-purple-400 uppercase tracking-wide">Remaining</p>
+                <p className="text-2xl font-extrabold text-purple-300 mt-1">{formatCurrency(remaining)}</p>
                 <p className="text-xs text-purple-500 mt-0.5">to go</p>
               </div>
 
-              <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
-                <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Deadline</p>
-                <p className="text-lg font-bold text-blue-700 mt-1">{formatDate(goal.deadline)}</p>
+              <div className="bg-blue-500/15 rounded-2xl p-4 border border-blue-500/30">
+                <p className="text-xs font-medium text-blue-400 uppercase tracking-wide">Deadline</p>
+                <p className="text-lg font-bold text-blue-300 mt-1">{formatDate(goal.deadline)}</p>
                 <p className="text-xs text-blue-500 mt-0.5">
                   {daysLeft === null ? "No deadline" : daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? "Due today" : `${daysLeft} days left`}
                 </p>
               </div>
 
-              <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
-                <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">Avg/Month</p>
-                <p className="text-lg font-bold text-orange-700 mt-1">{formatCurrency(allTimeMonthly)}</p>
+              <div className="bg-orange-500/15 rounded-2xl p-4 border border-orange-500/30">
+                <p className="text-xs font-medium text-orange-400 uppercase tracking-wide">Avg/Month</p>
+                <p className="text-lg font-bold text-orange-300 mt-1">{formatCurrency(allTimeMonthly)}</p>
                 <p className="text-xs text-orange-500 mt-0.5">{goal.contributions?.length ?? 0} contributions</p>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function GoalDetailPage() {
 
           {/* Progress bar */}
           <div className="mt-6">
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${percent}%` }}
@@ -449,14 +449,14 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-md border border-gray-100/60 p-6"
+          className="bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-                <PiggyBank size={18} className="text-emerald-600" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <PiggyBank size={18} className="text-emerald-400" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Log Contribution</h2>
+              <h2 className="text-lg font-bold text-white">Log Contribution</h2>
             </div>
             {!isComplete && !showContribForm && (
               <button
@@ -480,9 +480,9 @@ export default function GoalDetailPage() {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Amount *</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
                       <input
                         type="number"
                         min="0.01"
@@ -491,19 +491,19 @@ export default function GoalDetailPage() {
                         placeholder="0.00"
                         value={contribAmount}
                         onChange={(e) => setContribAmount(e.target.value)}
-                        className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                        className="w-full pl-8 pr-4 py-2.5 border border-slate-600 bg-slate-700/50 text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Note (optional)</label>
                     <input
                       type="text"
                       placeholder="e.g. November savings"
                       value={contribNote}
                       onChange={(e) => setContribNote(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                      className="w-full px-4 py-2.5 border border-slate-600 bg-slate-700/50 text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                     />
                   </div>
                 </div>
@@ -511,7 +511,7 @@ export default function GoalDetailPage() {
                 {/* Quick amounts */}
                 {target > 0 && (
                   <div>
-                    <p className="text-xs text-gray-500 mb-2">Quick amounts:</p>
+                    <p className="text-xs text-slate-500 mb-2">Quick amounts:</p>
                     <div className="flex gap-2 flex-wrap">
                       {[
                         { label: "Daily", value: remaining > 0 && daysLeft > 0 ? remaining / daysLeft : null },
@@ -525,7 +525,7 @@ export default function GoalDetailPage() {
                             key={q.label}
                             type="button"
                             onClick={() => setContribAmount(q.value.toFixed(2))}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors border border-gray-200"
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/50 text-slate-300 hover:bg-emerald-500/15 hover:text-emerald-400 transition-colors border border-slate-600"
                           >
                             {q.label}: {formatCurrency(q.value)}
                           </button>
@@ -545,7 +545,7 @@ export default function GoalDetailPage() {
                   <button
                     type="button"
                     onClick={() => { setShowContribForm(false); setContribAmount(""); setContribNote(""); }}
-                    className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors"
+                    className="px-5 py-2.5 rounded-xl border border-slate-600 text-slate-400 font-medium text-sm hover:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -564,22 +564,22 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-md border border-gray-100/60 p-6"
+          className="bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Target size={18} className="text-blue-600" />
+              <div className="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <Target size={18} className="text-blue-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Contribution History</h2>
-                <p className="text-xs text-gray-400">{goal.contributions?.length ?? 0} total entries</p>
+                <h2 className="text-lg font-bold text-white">Contribution History</h2>
+                <p className="text-xs text-slate-500">{goal.contributions?.length ?? 0} total entries</p>
               </div>
             </div>
           </div>
 
           {!sortedContribs.length ? (
-            <div className="text-center py-10 text-gray-400">
+            <div className="text-center py-10 text-slate-500">
               <PiggyBank size={40} className="mx-auto mb-3 opacity-30" />
               <p className="font-medium">No contributions yet</p>
               <p className="text-sm mt-1">Log your first contribution to start tracking progress.</p>
@@ -587,7 +587,7 @@ export default function GoalDetailPage() {
           ) : (
             <div className="space-y-1">
               {/* Running total header */}
-              <div className="flex items-center justify-between text-xs font-semibold text-gray-400 uppercase tracking-wide pb-2 border-b border-gray-100">
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wide pb-2 border-b border-slate-700">
                 <span>Contribution</span>
                 <span>Amount</span>
               </div>
@@ -606,45 +606,45 @@ export default function GoalDetailPage() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8 }}
                       transition={{ duration: 0.2, delay: idx * 0.04 }}
-                      className="group flex items-center gap-4 py-3 px-3 rounded-xl hover:bg-gray-50 transition-colors"
+                      className="group flex items-center gap-4 py-3 px-3 rounded-xl hover:bg-slate-700/40 transition-colors"
                     >
                       {/* Timeline dot */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-white ring-offset-1" />
+                        <div className="w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-slate-800 ring-offset-1 ring-offset-slate-800" />
                         {idx < displayedContribs.length - 1 && (
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gray-100" />
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-6 bg-slate-700" />
                         )}
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2">
-                          <span className="font-semibold text-gray-900">{formatCurrency(c.amount)}</span>
-                          {c.note && (
-                            <span className="text-sm text-gray-500 truncate">{c.note}</span>
-                          )}
+                            <span className="font-semibold text-slate-200">{formatCurrency(c.amount)}</span>
+                            {c.note && (
+                              <span className="text-sm text-slate-400 truncate">{c.note}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">{formatRelative(c.date)} · {new Date(c.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
                         </div>
-                        <p className="text-xs text-gray-400 mt-0.5">{formatRelative(c.date)} · {new Date(c.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
-                      </div>
 
-                      {/* Running total */}
-                      <div className="hidden sm:block text-xs text-gray-400 text-right min-w-[80px]">
-                        <p className="font-medium text-gray-600">{formatCurrency(runningTotal)}</p>
-                        <p>total at this point</p>
-                      </div>
+                        {/* Running total */}
+                        <div className="hidden sm:block text-xs text-slate-500 text-right min-w-[80px]">
+                          <p className="font-medium text-slate-300">{formatCurrency(runningTotal)}</p>
+                          <p>total at this point</p>
+                        </div>
 
                       {/* Delete */}
                       {deleteConfirmId === c._id ? (
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleDeleteContribution(c._id)}
-                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
                           >
                             Yes
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(null)}
-                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
                           >
                             No
                           </button>
@@ -652,7 +652,7 @@ export default function GoalDetailPage() {
                       ) : (
                         <button
                           onClick={() => setDeleteConfirmId(c._id)}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/15 text-slate-500 hover:text-red-400 transition-all"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -665,7 +665,7 @@ export default function GoalDetailPage() {
               {sortedContribs.length > 5 && (
                 <button
                   onClick={() => setShowAllHistory(!showAllHistory)}
-                  className="w-full mt-2 py-2 text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center justify-center gap-1 transition-colors"
+                  className="w-full mt-2 py-2 text-sm text-slate-400 hover:text-slate-200 font-medium flex items-center justify-center gap-1 transition-colors"
                 >
                   {showAllHistory ? (
                     <><ChevronUp size={16} /> Show less</>
