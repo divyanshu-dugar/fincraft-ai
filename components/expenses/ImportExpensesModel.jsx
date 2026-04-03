@@ -95,14 +95,14 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
   const unmatched = !row.category;
 
   return (
-    <div className={`rounded-2xl border ${unmatched ? "border-amber-200 bg-amber-50/40" : "border-gray-100 bg-white"} shadow-sm overflow-hidden`}>
+    <div className={`rounded-2xl border ${unmatched ? "border-amber-500/30 bg-amber-500/10" : "border-slate-700 bg-slate-800/60"} overflow-hidden`}>
       {/* card header */}
       <button
         type="button"
         onClick={() => setOpen(p => !p)}
         className="w-full flex items-center gap-3 px-5 py-4 text-left"
       >
-        <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">
+        <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 flex-shrink-0">
           {index + 1}
         </span>
 
@@ -110,13 +110,13 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
         <div className="flex-1 min-w-0">
           {row.category ? (
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-sm font-semibold text-gray-700 truncate">
+              <span className="text-sm font-semibold text-slate-300 truncate">
                 {row.category.parentIcon} {row.category.parentName}
               </span>
               {row.category.subcategoryName && (
                 <>
                   <span className="text-gray-300">›</span>
-                  <span className="text-sm font-bold text-gray-900 truncate">
+                  <span className="text-sm font-bold text-white truncate">
                     {row.category.subcategoryIcon} {row.category.subcategoryName}
                   </span>
                 </>
@@ -125,37 +125,37 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
           ) : (
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-              <span className="text-sm font-semibold text-amber-700">
+              <span className="text-sm font-semibold text-amber-400">
                 {row.aiCategory ? `"${row.aiCategory}" — needs category` : "No category set"}
               </span>
             </div>
           )}
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             {row.date || "No date"} · ${row.amount || "0"}
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {row.category && <Check className="w-4 h-4 text-emerald-500" />}
-          {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          {open ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
         </div>
       </button>
 
       {/* editable fields */}
       {open && (
-        <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+        <div className="px-5 pb-5 space-y-4 border-t border-slate-700 pt-4">
           {/* ai suggestion hint */}
           {row.aiCategory && !row.category && (
-            <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs">
-              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/30 px-4 py-3 text-xs">
+              <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-bold text-amber-800">AI suggested: "{row.aiCategory}"</p>
-                <p className="text-amber-700 mt-0.5">This doesn't match any existing category. Please pick one below, or create a new sub-category.</p>
+                <p className="font-bold text-amber-300">AI suggested: "{row.aiCategory}"</p>
+                <p className="text-amber-400 mt-0.5">This doesn't match any existing category. Please pick one below, or create a new sub-category.</p>
               </div>
             </div>
           )}
           {row.aiCategory && row.category && (
-            <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
+            <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-2.5">
               <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
               AI suggested "{row.aiCategory}" — auto-matched above. Change if needed.
             </div>
@@ -163,7 +163,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
 
           {/* category picker */}
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Category <span className="text-rose-400">*</span></p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Category <span className="text-rose-400">*</span></p>
             <CategoryPicker
               tree={categoryTree}
               value={row.category}
@@ -177,17 +177,17 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
           <div className="grid grid-cols-2 gap-3">
             {/* date */}
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Date</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Date</p>
               <input
                 type="date"
                 value={row.date}
                 onChange={(e) => onChange(row._id, "date", e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
             {/* amount */}
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Amount ($)</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Amount ($)</p>
               <input
                 type="number"
                 inputMode="decimal"
@@ -195,20 +195,20 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
                 min="0"
                 onWheel={(e) => e.currentTarget.blur()}
                 onChange={(e) => onChange(row._id, "amount", e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
           </div>
 
           {/* note */}
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Note</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Note</p>
             <input
               type="text"
               value={row.note}
               onChange={(e) => onChange(row._id, "note", e.target.value)}
               placeholder="Optional note…"
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
             />
           </div>
 
@@ -216,7 +216,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
           <button
             type="button"
             onClick={() => onDelete(row._id)}
-            className="flex items-center gap-2 text-xs font-semibold text-rose-500 hover:text-rose-700 transition-colors"
+            className="flex items-center gap-2 text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" /> Remove this expense
           </button>
@@ -234,18 +234,18 @@ function CsvCategoryResolver({ names, mappings, onChange, categoryTree, onAddCat
       {names.map((name) => {
         const cat = mappings[name];
         return (
-          <div key={name} className={`rounded-2xl border p-4 ${cat ? "border-gray-100 bg-white" : "border-amber-200 bg-amber-50/40"}`}>
+          <div key={name} className={`rounded-2xl border p-4 ${cat ? "border-slate-700 bg-slate-800/60" : "border-amber-500/30 bg-amber-500/10"}`}>
             <div className="flex items-center gap-3 mb-3">
               {cat
                 ? <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                 : <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />}
-              <span className="text-sm font-bold text-gray-700">"{name}"</span>
+              <span className="text-sm font-bold text-slate-300">"{name}"</span>
               {cat ? (
-                <span className="ml-auto text-xs text-emerald-600 font-semibold">
+                <span className="ml-auto text-xs text-emerald-400 font-semibold">
                   → {cat.parentName}{cat.subcategoryName ? ` › ${cat.subcategoryName}` : ""}
                 </span>
               ) : (
-                <span className="ml-auto text-xs text-amber-600 font-semibold">needs selection</span>
+                <span className="ml-auto text-xs text-amber-400 font-semibold">needs selection</span>
               )}
             </div>
             <CategoryPicker
@@ -566,24 +566,24 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[92vh]"
+        className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 w-full max-w-2xl flex flex-col max-h-[92vh]"
       >
         {/* header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">{stepTitle}</h2>
+            <h2 className="text-lg font-bold text-white">{stepTitle}</h2>
             {step > 1 && step < 5 && (
-              <p className="text-xs text-gray-400 mt-0.5">Step {step} of 4</p>
+              <p className="text-xs text-slate-400 mt-0.5">Step {step} of 4</p>
             )}
           </div>
-          <button onClick={handleClose} className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700">
+          <button onClick={handleClose} className="p-2 rounded-xl hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-200">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* step progress bar */}
         {step < 5 && (
-          <div className="h-0.5 bg-gray-100">
+          <div className="h-0.5 bg-slate-700">
             <div className="h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
               style={{ width: `${((step - 1) / 3) * 100}%` }} />
           </div>
@@ -594,7 +594,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {/* ── Step 1: Choose upload type ────────────────────────────── */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-slate-400 mb-6">
                 Import from a spreadsheet or extract expenses from a wallet/bank screenshot using AI.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -602,13 +602,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-gray-100 rounded-2xl p-6 text-left hover:border-blue-300 hover:bg-blue-50/40 transition-all group"
+                  className="border-2 border-slate-700 rounded-2xl p-6 text-left hover:border-blue-400/60 hover:bg-blue-500/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                    <FileText className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-colors">
+                    <FileText className="w-6 h-6 text-blue-400" />
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">Upload CSV / Excel</h4>
-                  <p className="text-xs text-gray-500">Import from a spreadsheet file (.csv, .xlsx)</p>
+                  <h4 className="font-bold text-white mb-1">Upload CSV / Excel</h4>
+                  <p className="text-xs text-slate-400">Import from a spreadsheet file (.csv, .xlsx)</p>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -627,18 +627,18 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                     inp.onchange = (e) => handleFileSelect(e.target.files[0], "image");
                     inp.click();
                   }}
-                  className="border-2 border-gray-100 rounded-2xl p-6 text-left hover:border-emerald-300 hover:bg-emerald-50/40 transition-all group"
+                  className="border-2 border-slate-700 rounded-2xl p-6 text-left hover:border-emerald-400/60 hover:bg-emerald-500/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
-                    <Upload className="w-6 h-6 text-emerald-600" />
+                  <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/30 transition-colors">
+                    <Upload className="w-6 h-6 text-emerald-400" />
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">Scan Screenshot</h4>
-                  <p className="text-xs text-gray-500">AI extracts expenses from wallet or bank screenshots</p>
+                  <h4 className="font-bold text-white mb-1">Scan Screenshot</h4>
+                  <p className="text-xs text-slate-400">AI extracts expenses from wallet or bank screenshots</p>
                 </button>
               </div>
 
               {loading && (
-                <div className="flex items-center justify-center gap-3 mt-6 py-4 rounded-2xl bg-blue-50 text-blue-700 text-sm font-medium">
+                <div className="flex items-center justify-center gap-3 mt-6 py-4 rounded-2xl bg-blue-500/15 text-blue-400 text-sm font-medium">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Processing screenshot with AI…
                 </div>
@@ -649,11 +649,11 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {/* ── Step 2: CSV column mapping ────────────────────────────── */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-gray-500 mb-5">
+              <p className="text-sm text-slate-400 mb-5">
                 Match your CSV columns to the expense fields. We auto-detected the best matches.
               </p>
               {importData.length > 10 && (
-                <p className="text-xs text-gray-400 mb-4">{importData.length} rows detected in file.</p>
+                <p className="text-xs text-slate-400 mb-4">{importData.length} rows detected in file.</p>
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -663,13 +663,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                   { key: "note",     label: "Note",     req: false },
                 ].map(({ key, label, req }) => (
                   <div key={key}>
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">
                       {label} {req && <span className="text-rose-400">*</span>}
                     </label>
                     <select
                       value={mapping[key]}
                       onChange={(e) => setMapping((p) => ({ ...p, [key]: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                      className="w-full border border-slate-600 bg-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
                     >
                       <option value="">Select column…</option>
                       {csvHeaders.map((h) => <option key={h} value={h}>{h}</option>)}
@@ -684,16 +684,16 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {step === 3 && uploadType === "image" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
               {/* summary banner */}
-              <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${unmatchedRowCount > 0 ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>
+              <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${unmatchedRowCount > 0 ? "border-amber-500/30 bg-amber-500/10" : "border-emerald-500/30 bg-emerald-500/10"}`}>
                 {unmatchedRowCount > 0
-                  ? <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  : <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />}
+                  ? <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  : <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />}
                 <div>
-                  <p className="text-sm font-bold text-gray-800">
+                  <p className="text-sm font-bold text-white">
                     {editableRows.length} expense{editableRows.length !== 1 ? "s" : ""} extracted
                     {unmatchedRowCount > 0 && ` · ${unmatchedRowCount} need a category`}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-slate-400 mt-0.5">
                     Review each expense below. Click a row to expand and edit.
                   </p>
                 </div>
@@ -712,9 +712,9 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
               ))}
 
               {editableRows.length === 0 && (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-slate-400">
                   <p className="font-semibold">All rows deleted.</p>
-                  <button onClick={() => setStep(1)} className="mt-2 text-sm text-blue-600 hover:underline">Start over</button>
+                  <button onClick={() => setStep(1)} className="mt-2 text-sm text-blue-400 hover:underline">Start over</button>
                 </div>
               )}
             </motion.div>
@@ -722,12 +722,12 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
           {step === 3 && uploadType === "csv" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-gray-500 mb-5">
-                We found <strong>{csvUniqNames.length}</strong> unique category name{csvUniqNames.length !== 1 ? "s" : ""} in your CSV.
+              <p className="text-sm text-slate-400 mb-5">
+                We found <strong className="text-white">{csvUniqNames.length}</strong> unique category name{csvUniqNames.length !== 1 ? "s" : ""} in your CSV.
                 Map each to a category in your hierarchy — this mapping is applied to all matching rows.
               </p>
               {unmatchedCatCount > 0 && (
-                <div className="flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 mb-4 text-xs text-amber-700 font-semibold">
+                <div className="flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 mb-4 text-xs text-amber-400 font-semibold">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                   {unmatchedCatCount} name{unmatchedCatCount > 1 ? "s" : ""} still unresolved — rows without a category will be skipped on import.
                 </div>
@@ -745,22 +745,22 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {/* ── Step 4: Confirm ──────────────────────────────────────── */}
           {step === 4 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 mb-4">
+              <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-5 mb-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-bold text-blue-900 text-sm">Ready to import</p>
-                    <ul className="mt-2 space-y-1 text-sm text-blue-700">
+                    <p className="font-bold text-blue-300 text-sm">Ready to import</p>
+                    <ul className="mt-2 space-y-1 text-sm text-blue-400">
                       {uploadType === "image" ? (
                         <>
                           <li>• <strong>{editableRows.length}</strong> expense{editableRows.length !== 1 ? "s" : ""} ready to save</li>
-                          {unmatchedRowCount > 0 && <li className="text-amber-700">• <strong>{unmatchedRowCount}</strong> without a category will be skipped</li>}
+                          {unmatchedRowCount > 0 && <li className="text-amber-400">• <strong>{unmatchedRowCount}</strong> without a category will be skipped</li>}
                         </>
                       ) : (
                         <>
                           <li>• <strong>{importData.length}</strong> rows in file</li>
                           <li>• <strong>{csvUniqNames.length - unmatchedCatCount}</strong> of {csvUniqNames.length} categories resolved</li>
-                          {unmatchedCatCount > 0 && <li className="text-amber-700">• Rows with unresolved categories will be skipped</li>}
+                          {unmatchedCatCount > 0 && <li className="text-amber-400">• Rows with unresolved categories will be skipped</li>}
                         </>
                       )}
                     </ul>
@@ -775,19 +775,19 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-4">
               {importResults.importedCount > 0 ? (
                 <>
-                  <div className="w-16 h-16 mx-auto mb-5 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                  <div className="w-16 h-16 mx-auto mb-5 bg-emerald-500/20 rounded-2xl flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Import complete!</h3>
-                  <p className="text-sm text-gray-500 mb-5">Closing automatically…</p>
-                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left">
-                    <p className="text-emerald-800 font-bold text-sm mb-1">
+                  <h3 className="text-xl font-bold text-white mb-1">Import complete!</h3>
+                  <p className="text-sm text-slate-400 mb-5">Closing automatically…</p>
+                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-left">
+                    <p className="text-emerald-400 font-bold text-sm mb-1">
                       ✅ {importResults.importedCount} expense{importResults.importedCount !== 1 ? "s" : ""} saved
                     </p>
                     {importResults.errors?.length > 0 && (
                       <>
-                        <p className="text-amber-700 text-xs font-semibold mt-3 mb-1">⚠️ Some rows had issues:</p>
-                        <ul className="text-xs text-amber-600 space-y-1 max-h-28 overflow-y-auto">
+                        <p className="text-amber-400 text-xs font-semibold mt-3 mb-1">⚠️ Some rows had issues:</p>
+                        <ul className="text-xs text-amber-400 space-y-1 max-h-28 overflow-y-auto">
                           {importResults.errors.map((e, i) => <li key={i}>• {e}</li>)}
                         </ul>
                       </>
@@ -796,13 +796,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                 </>
               ) : (
                 <>
-                  <div className="w-16 h-16 mx-auto mb-5 bg-rose-100 rounded-2xl flex items-center justify-center">
-                    <AlertCircle className="w-8 h-8 text-rose-600" />
+                  <div className="w-16 h-16 mx-auto mb-5 bg-rose-500/20 rounded-2xl flex items-center justify-center">
+                    <AlertCircle className="w-8 h-8 text-rose-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">No expenses imported</h3>
-                  <p className="text-sm text-gray-500 mb-5">Please check the issues below and try again.</p>
+                  <h3 className="text-xl font-bold text-white mb-1">No expenses imported</h3>
+                  <p className="text-sm text-slate-400 mb-5">Please check the issues below and try again.</p>
                   {importResults.errors?.length > 0 && (
-                    <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-left text-xs text-rose-700 space-y-1 max-h-40 overflow-y-auto">
+                    <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-left text-xs text-rose-400 space-y-1 max-h-40 overflow-y-auto">
                       {importResults.errors.map((e, i) => <p key={i}>• {e}</p>)}
                     </div>
                   )}
@@ -817,12 +817,12 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
         {/* footer navigation */}
         {step < 5 && (
-          <div className="flex items-center justify-between gap-3 px-6 py-5 border-t border-gray-100 flex-shrink-0">
+          <div className="flex items-center justify-between gap-3 px-6 py-5 border-t border-slate-700 flex-shrink-0">
             {step > 1 ? (
               <button
                 onClick={() => setStep((p) => p - 1)}
                 disabled={loading}
-                className="px-5 py-2.5 text-sm font-bold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-40"
+                className="px-5 py-2.5 text-sm font-bold text-slate-400 border border-slate-600 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all disabled:opacity-40"
               >
                 Back
               </button>

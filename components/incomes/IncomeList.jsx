@@ -210,7 +210,7 @@ const IncomeList = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50/30 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 🌟 Enhanced Hero Section */}
         <motion.header
@@ -280,19 +280,19 @@ const IncomeList = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex justify-between items-center mt-8 p-6 bg-white rounded-2xl shadow-lg border border-gray-200/60"
+          className="flex justify-between items-center mt-8 p-6 bg-slate-800/60 rounded-2xl border border-cyan-400/20"
         >
           <motion.button
             whileHover={{ scale: 1.05, x: -2 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => changeMonth(-1)}
-            className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3 bg-slate-700 text-slate-300 font-semibold rounded-xl transition-all duration-200 hover:bg-slate-600 flex items-center gap-2 cursor-pointer"
           >
             ← Previous Month
           </motion.button>
 
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-white">
               {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString(
                 "default",
                 {
@@ -302,7 +302,7 @@ const IncomeList = () => {
                 }
               )}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-slate-400 mt-1">
               {incomes.length} income records this period
             </p>
           </div>
@@ -315,7 +315,7 @@ const IncomeList = () => {
               currentYear === todayUTC.getUTCFullYear() &&
               currentMonth === todayUTC.getUTCMonth()
             }
-            className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             Next Month →
           </motion.button>

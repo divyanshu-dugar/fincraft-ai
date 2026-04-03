@@ -32,14 +32,14 @@ function IconSelect({ value, onChange }) {
   return (
     <div className="relative">
       <button type="button" onClick={() => setOpen(!open)}
-        className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-lg hover:border-blue-300 hover:bg-blue-50/50 transition-all">
+        className="w-10 h-10 rounded-xl border border-slate-600 flex items-center justify-center text-lg hover:border-blue-400/60 hover:bg-blue-500/10 transition-all">
         {value || '💰'}
       </button>
       {open && (
-        <div className="absolute top-12 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-2 grid grid-cols-8 gap-1 w-72">
+        <div className="absolute top-12 left-0 z-50 bg-slate-800 rounded-xl border border-slate-700 p-2 grid grid-cols-8 gap-1 w-72">
           {ICON_OPTIONS.map((ic) => (
             <button key={ic} type="button" onClick={() => { onChange(ic); setOpen(false); }}
-              className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:bg-blue-50 transition-colors ${value === ic ? 'bg-blue-100 ring-2 ring-blue-400' : ''}`}>
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:bg-blue-500/15 transition-colors ${value === ic ? 'bg-blue-500/20 ring-2 ring-blue-400' : ''}`}>
               {ic}
             </button>
           ))}
@@ -73,12 +73,12 @@ function ColorSelect({ value, onChange }) {
   return (
     <div className="relative" ref={ref}>
       <button type="button" onClick={() => setOpen(!open)}
-        className="w-9 h-9 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center"
+        className="w-9 h-9 rounded-xl border-2 border-slate-600 hover:border-slate-500 transition-all flex items-center justify-center"
         style={{ backgroundColor: value || '#64748b' }}
         title="Pick color"
       />
       {open && (
-        <div className="absolute top-11 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-2 grid grid-cols-6 gap-1.5 w-52">
+        <div className="absolute top-11 left-0 z-50 bg-slate-800 rounded-xl border border-slate-700 p-2 grid grid-cols-6 gap-1.5 w-52">
           {COLOR_PALETTE.map((c) => (
             <button key={c} type="button"
               onClick={() => { onChange(c); setOpen(false); }}
@@ -115,13 +115,13 @@ function InlineForm({ initial = {}, onSave, onCancel, loading, placeholder = 'Ca
         onChange={(e) => setName(e.target.value)}
         placeholder={placeholder}
         autoFocus
-        className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
+        className="flex-1 px-3 py-2.5 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
       />
       <button type="submit" disabled={!name.trim() || loading}
         className="p-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 transition-all">
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
       </button>
-      <button type="button" onClick={onCancel} className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-all">
+      <button type="button" onClick={onCancel} className="p-2.5 rounded-xl border border-slate-600 bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all">
         <X className="w-4 h-4" />
       </button>
     </form>
@@ -134,23 +134,23 @@ function DeleteModal({ item, isParent, childCount, onConfirm, onCancel, loading 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 w-full max-w-md p-6">
         <div className="flex items-start gap-4 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-6 h-6 text-rose-400" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 text-lg">Delete {isParent ? 'Group' : 'Subcategory'}</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Are you sure you want to delete <strong>{item.icon} {item.name}</strong>?
+            <h3 className="font-bold text-white text-lg">Delete {isParent ? 'Group' : 'Subcategory'}</h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Are you sure you want to delete <strong className="text-white">{item.icon} {item.name}</strong>?
               {isParent && childCount > 0 && (
-                <span className="text-rose-600 font-semibold"> This will also delete {childCount} subcategor{childCount === 1 ? 'y' : 'ies'}.</span>
+                <span className="text-rose-400 font-semibold"> This will also delete {childCount} subcategor{childCount === 1 ? 'y' : 'ies'}.</span>
               )}
             </p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3">
-          <button onClick={onCancel} className="px-5 py-2.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+          <button onClick={onCancel} className="px-5 py-2.5 text-sm font-semibold text-slate-300 border border-slate-600 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all">
             Cancel
           </button>
           <button onClick={onConfirm} disabled={loading}
@@ -172,15 +172,15 @@ function SubcategoryRow({ sub, onEdit, onDelete }) {
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -12 }}
-      className="group flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all"
+      className="group flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 transition-all"
     >
       <span className="text-base">{sub.icon || '💰'}</span>
-      <span className="flex-1 text-sm font-medium text-gray-700">{sub.name}</span>
+      <span className="flex-1 text-sm font-medium text-slate-300">{sub.name}</span>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={() => onEdit(sub)} className="p-1.5 rounded-lg hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-all">
+        <button onClick={() => onEdit(sub)} className="p-1.5 rounded-lg hover:bg-blue-500/15 text-slate-500 hover:text-blue-400 transition-all">
           <Edit3 className="w-3.5 h-3.5" />
         </button>
-        <button onClick={() => onDelete(sub)} className="p-1.5 rounded-lg hover:bg-rose-100 text-gray-400 hover:text-rose-600 transition-all">
+        <button onClick={() => onDelete(sub)} className="p-1.5 rounded-lg hover:bg-rose-500/15 text-slate-500 hover:text-rose-400 transition-all">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -225,14 +225,14 @@ function ParentGroupCard({ group, onEditParent, onDeleteParent, onAddSub, onEdit
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+      className="rounded-2xl border border-slate-700/50 bg-slate-800/60 hover:border-cyan-400/30 transition-all overflow-hidden"
     >
       {/* parent header */}
       <div className="flex items-center gap-3 px-5 py-4">
-        <button onClick={() => setExpanded(!expanded)} className="p-1 rounded-lg hover:bg-gray-100 transition-all">
+        <button onClick={() => setExpanded(!expanded)} className="p-1 rounded-lg hover:bg-slate-700/50 transition-all">
           {expanded
-            ? <ChevronDown className="w-4 h-4 text-gray-500" />
-            : <ChevronRight className="w-4 h-4 text-gray-500" />}
+            ? <ChevronDown className="w-4 h-4 text-slate-400" />
+            : <ChevronRight className="w-4 h-4 text-slate-400" />}
         </button>
 
         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: group.color + '20' }}>
@@ -240,21 +240,21 @@ function ParentGroupCard({ group, onEditParent, onDeleteParent, onAddSub, onEdit
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 text-sm">{group.name}</h3>
-          <p className="text-xs text-gray-400">{subs.length} subcategor{subs.length === 1 ? 'y' : 'ies'}</p>
+          <h3 className="font-bold text-white text-sm">{group.name}</h3>
+          <p className="text-xs text-slate-500">{subs.length} subcategor{subs.length === 1 ? 'y' : 'ies'}</p>
         </div>
 
         <div className="flex items-center gap-1">
           <button onClick={() => { setAddingChild(true); setExpanded(true); }}
-            className="p-2 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 transition-all" title="Add subcategory">
+            className="p-2 rounded-lg hover:bg-emerald-500/15 text-slate-400 hover:text-emerald-400 transition-all" title="Add subcategory">
             <Plus className="w-4 h-4" />
           </button>
           <button onClick={() => onEditParent(group)}
-            className="p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all" title="Edit group">
+            className="p-2 rounded-lg hover:bg-blue-500/15 text-slate-400 hover:text-blue-400 transition-all" title="Edit group">
             <Edit3 className="w-4 h-4" />
           </button>
           <button onClick={() => onDeleteParent(group)}
-            className="p-2 rounded-lg hover:bg-rose-50 text-gray-400 hover:text-rose-600 transition-all" title="Delete group">
+            className="p-2 rounded-lg hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-all" title="Delete group">
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -269,7 +269,7 @@ function ParentGroupCard({ group, onEditParent, onDeleteParent, onAddSub, onEdit
             exit={{ height: 0, opacity: 0, overflow: 'hidden' }}
             transition={{ duration: 0.2 }}
           >
-            <div className="border-t border-gray-50 px-4 py-2 space-y-0.5">
+            <div className="border-t border-slate-700/50 px-4 py-2 space-y-0.5">
               <AnimatePresence>
                 {subs.map((sub) =>
                   editingSub?._id === sub._id ? (
@@ -295,7 +295,7 @@ function ParentGroupCard({ group, onEditParent, onDeleteParent, onAddSub, onEdit
               </AnimatePresence>
 
               {subs.length === 0 && !addingChild && (
-                <p className="text-xs text-gray-400 text-center py-4">No subcategories yet</p>
+                <p className="text-xs text-slate-500 text-center py-4">No subcategories yet</p>
               )}
 
               {addingChild && (
@@ -450,33 +450,33 @@ export default function ExpenseCategoryPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 px-4 py-8 sm:py-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-8 sm:py-20">
       <div className="max-w-4xl mx-auto">
 
         {/* ── header ────────────────────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white flex items-center gap-3">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
                   <Layers className="w-5 h-5 text-white" />
                 </div>
                 Expense Categories
               </h1>
-              <p className="text-gray-500 mt-2 text-sm sm:text-base max-w-lg">
+              <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-lg">
                 Organize expenses into groups and subcategories for better tracking and insights.
               </p>
             </div>
 
             {/* stats */}
             <div className="flex items-center gap-3 text-sm">
-              <div className="px-4 py-2 rounded-xl bg-white border border-gray-100 shadow-sm">
-                <span className="font-bold text-gray-900">{tree.length}</span>
-                <span className="text-gray-400 ml-1.5">groups</span>
+              <div className="px-4 py-2 rounded-xl bg-slate-800/60 border border-slate-700">
+                <span className="font-bold text-white">{tree.length}</span>
+                <span className="text-slate-500 ml-1.5">groups</span>
               </div>
-              <div className="px-4 py-2 rounded-xl bg-white border border-gray-100 shadow-sm">
-                <span className="font-bold text-gray-900">{totalSubs}</span>
-                <span className="text-gray-400 ml-1.5">subcategories</span>
+              <div className="px-4 py-2 rounded-xl bg-slate-800/60 border border-slate-700">
+                <span className="font-bold text-white">{totalSubs}</span>
+                <span className="text-slate-500 ml-1.5">subcategories</span>
               </div>
             </div>
           </div>
@@ -487,16 +487,16 @@ export default function ExpenseCategoryPage() {
           className="flex flex-wrap items-center gap-3 mb-6">
           {/* search */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search categories…"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all placeholder-slate-500"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -514,7 +514,7 @@ export default function ExpenseCategoryPage() {
           <button
             onClick={handleSeed}
             disabled={seeding}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-400 border border-slate-600 rounded-xl hover:bg-slate-700/50 disabled:opacity-50 transition-all"
           >
             {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             Seed Defaults
@@ -531,9 +531,9 @@ export default function ExpenseCategoryPage() {
               transition={{ duration: 0.25 }}
               className="mb-6"
             >
-              <div className="bg-white rounded-2xl border border-blue-200 shadow-sm p-5">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-500" /> Create New Group
+              <div className="bg-slate-800/60 rounded-2xl border border-blue-500/30 p-5">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Create New Group
                 </p>
                 <InlineForm
                   onSave={handleAddGroup}
@@ -557,9 +557,9 @@ export default function ExpenseCategoryPage() {
               transition={{ duration: 0.25 }}
               className="mb-6"
             >
-              <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-5">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <Edit3 className="w-3.5 h-3.5 text-amber-500" /> Edit Group — {editingGroup.icon} {editingGroup.name}
+              <div className="bg-slate-800/60 rounded-2xl border border-amber-500/30 p-5">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <Edit3 className="w-3.5 h-3.5 text-amber-400" /> Edit Group — {editingGroup.icon} {editingGroup.name}
                 </p>
                 <InlineForm
                   initial={editingGroup}
@@ -577,20 +577,20 @@ export default function ExpenseCategoryPage() {
         {/* ── category tree ────────────────────────────────────────── */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="flex items-center gap-3 text-gray-500">
+            <div className="flex items-center gap-3 text-slate-500">
               <Loader2 className="w-5 h-5 animate-spin" />
               <span className="text-sm font-medium">Loading categories…</span>
             </div>
           </div>
         ) : filteredTree.length === 0 && orphans.length === 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-            <div className="w-20 h-20 mx-auto mb-5 bg-gray-100 rounded-3xl flex items-center justify-center">
-              <FolderOpen className="w-8 h-8 text-gray-400" />
+            <div className="w-20 h-20 mx-auto mb-5 bg-slate-800/60 rounded-3xl flex items-center justify-center">
+              <FolderOpen className="w-8 h-8 text-slate-500" />
             </div>
-            <h3 className="text-lg font-bold text-gray-700 mb-2">
+            <h3 className="text-lg font-bold text-white mb-2">
               {search ? 'No matching categories' : 'No categories yet'}
             </h3>
-            <p className="text-sm text-gray-400 mb-6 max-w-sm mx-auto">
+            <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
               {search
                 ? 'Try a different search term.'
                 : 'Get started by creating a group or seeding the default categories.'}
@@ -622,21 +622,21 @@ export default function ExpenseCategoryPage() {
             {/* orphans */}
             {orphans.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-amber-200 bg-amber-50/50 p-5">
+                className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" />
-                  <h3 className="text-sm font-bold text-amber-800">Uncategorized ({orphans.length})</h3>
+                  <AlertTriangle className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-sm font-bold text-amber-300">Uncategorized ({orphans.length})</h3>
                 </div>
-                <p className="text-xs text-amber-600 mb-4">
+                <p className="text-xs text-amber-400 mb-4">
                   These subcategories lost their parent group. You can delete them or recreate their parent.
                 </p>
                 <div className="space-y-1">
                   {orphans.map((o) => (
-                    <div key={o._id} className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/70">
+                    <div key={o._id} className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-700/50">
                       <span className="text-base">{o.icon || '💰'}</span>
-                      <span className="flex-1 text-sm font-medium text-gray-700">{o.name}</span>
+                      <span className="flex-1 text-sm font-medium text-slate-300">{o.name}</span>
                       <button onClick={() => setDeleteTarget(o)}
-                        className="p-1.5 rounded-lg hover:bg-rose-100 text-gray-400 hover:text-rose-600 transition-all">
+                        className="p-1.5 rounded-lg hover:bg-rose-500/15 text-slate-500 hover:text-rose-400 transition-all">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -650,11 +650,11 @@ export default function ExpenseCategoryPage() {
         {/* ── tips ──────────────────────────────────────────────────── */}
         {!loading && (tree.length > 0 || orphans.length > 0) && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-            className="mt-8 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-            <h3 className="text-sm font-bold text-blue-900 mb-2.5 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-600" /> Tips
+            className="mt-8 p-5 bg-blue-500/10 rounded-2xl border border-blue-500/30">
+            <h3 className="text-sm font-bold text-blue-300 mb-2.5 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-blue-400" /> Tips
             </h3>
-            <ul className="text-xs text-blue-700 space-y-1.5">
+            <ul className="text-xs text-blue-400 space-y-1.5">
               <li>• Click the <ChevronRight className="w-3 h-3 inline" /> arrow to expand a group and see subcategories</li>
               <li>• Use the <Plus className="w-3 h-3 inline" /> button on each group to add subcategories inline</li>
               <li>• Hover over a subcategory to reveal edit and delete actions</li>

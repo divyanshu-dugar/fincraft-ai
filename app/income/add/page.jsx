@@ -106,25 +106,25 @@ export default function AddIncome() {
   const isAmountSet = amount && Number(amount) > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-green-50/10 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
       {/* ── sticky header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors group"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          <div className="h-5 w-px bg-gray-200" />
+          <div className="h-5 w-px bg-slate-700" />
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <IndianRupee className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-gray-900 leading-none">Add Income</h1>
-              <p className="text-xs text-gray-400 leading-none mt-0.5">Track your earnings</p>
+              <h1 className="text-base font-bold text-white leading-none">Add Income</h1>
+              <p className="text-xs text-slate-400 leading-none mt-0.5">Track your earnings</p>
             </div>
           </div>
         </div>
@@ -135,19 +135,19 @@ export default function AddIncome() {
 
           {/* form error banner */}
           {errors.form && (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 font-medium">
+            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-400 font-medium">
               {errors.form}
             </div>
           )}
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
-          <div className="bg-white rounded-2xl border border-gray-200/70 shadow-sm p-6">
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
               Amount <span className="text-rose-400">*</span>
             </label>
 
-            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-gray-100 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
-              <span className="text-4xl font-black text-gray-300 select-none">$</span>
+            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
+              <span className="text-4xl font-black text-slate-600 select-none">$</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -157,12 +157,12 @@ export default function AddIncome() {
                 placeholder="0"
                 min="0"
                 step="1"
-                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-gray-200 ${errors.amount ? 'text-rose-500' : 'text-gray-900'}`}
+                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-400' : 'text-white'}`}
                 style={{ minWidth: 0 }}
               />
               {isAmountSet && (
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-emerald-400" />
                 </div>
               )}
             </div>
@@ -170,7 +170,7 @@ export default function AddIncome() {
             {errors.amount && <p className="text-xs text-rose-500 font-semibold -mt-3 mb-4">{errors.amount}</p>}
 
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quick select</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick select</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_AMOUNTS.map((v) => (
                   <button
@@ -179,8 +179,8 @@ export default function AddIncome() {
                     onClick={() => { setAmount(v.toString()); clearError('amount'); }}
                     className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-150 ${
                       Number(amount) === v
-                        ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                        ? 'bg-slate-200 text-slate-900 border-slate-200 shadow-md'
+                        : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
                     ${v.toLocaleString('en-US')}
@@ -191,11 +191,11 @@ export default function AddIncome() {
           </div>
 
           {/* ── details card ──────────────────────────────────────────────── */}
-          <div className="bg-white rounded-2xl border border-gray-200/70 shadow-sm divide-y divide-gray-100">
+          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
 
             {/* category */}
             <div className="px-6 py-5">
-              <label className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
                 Category <span className="text-rose-400">*</span>
               </label>
@@ -212,7 +212,7 @@ export default function AddIncome() {
 
             {/* date */}
             <div className="px-6 py-5">
-              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
                 <CalendarDays className="w-3.5 h-3.5" />
                 Date <span className="text-rose-400">*</span>
               </label>
@@ -221,8 +221,8 @@ export default function AddIncome() {
                 type="date"
                 value={date}
                 onChange={(e) => { setDate(e.target.value); clearError('date'); }}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-gray-800 outline-none transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 ${
-                  errors.date ? 'border-rose-300 ring-2 ring-rose-100' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-slate-200 bg-slate-700/50 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-500 ${
+                  errors.date ? 'border-rose-500/50 ring-2 ring-rose-500/20' : 'border-slate-600'
                 }`}
               />
               {errors.date && <p className="text-xs text-rose-500 font-semibold mt-2">{errors.date}</p>}
@@ -230,10 +230,10 @@ export default function AddIncome() {
 
             {/* note */}
             <div className="px-6 py-5">
-              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
                 <NotebookPen className="w-3.5 h-3.5" />
                 Note
-                <span className="ml-auto font-normal normal-case tracking-normal text-gray-300">{note.length}/500</span>
+                <span className="ml-auto font-normal normal-case tracking-normal text-slate-600">{note.length}/500</span>
               </label>
               <textarea
                 id="note"
@@ -241,7 +241,7 @@ export default function AddIncome() {
                 onChange={(e) => setNote(e.target.value.slice(0, 500))}
                 rows={3}
                 placeholder="What was this income for?"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-800 placeholder:text-gray-300 outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 transition-all resize-none"
+                className="w-full px-4 py-3 border border-slate-600 rounded-xl text-sm font-medium text-slate-200 bg-slate-700/50 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none"
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function AddIncome() {
               type="button"
               onClick={() => router.back()}
               disabled={loading}
-              className="flex-1 px-6 py-3.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-40"
+              className="flex-1 px-6 py-3.5 rounded-xl border border-slate-600 bg-slate-800 text-sm font-bold text-slate-300 hover:bg-slate-700 hover:border-slate-500 transition-all disabled:opacity-40"
             >
               Cancel
             </button>
@@ -276,12 +276,12 @@ export default function AddIncome() {
           </div>
 
           {/* tips */}
-          <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-green-50/40 p-5">
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
             <div className="flex items-center gap-2 mb-3">
-              <Lightbulb className="w-4 h-4 text-emerald-500" />
-              <h3 className="text-sm font-bold text-emerald-800">Tips for better income tracking</h3>
+              <Lightbulb className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-bold text-emerald-300">Tips for better income tracking</h3>
             </div>
-            <ul className="space-y-1.5 text-xs text-emerald-700">
+            <ul className="space-y-1.5 text-xs text-emerald-400">
               {[
                 'Categorise each income source for accurate analytics',
                 'Add a note to remember the context later',

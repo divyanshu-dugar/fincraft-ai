@@ -26,8 +26,8 @@ export default function IncomeDistribution({
   const COLORS = chartData.map(({ colorClass }) => colorClass || '#10B981');
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+    <div className="bg-slate-800/60 rounded-lg border border-cyan-400/20 p-6 mb-8">
+      <h2 className="text-xl font-bold text-white mb-6">
         Income Distribution by Category
       </h2>
 
@@ -82,13 +82,13 @@ export default function IncomeDistribution({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: colorClass || '#10B981' }}
               ></div>
-                <span className="font-medium text-gray-700">{name}</span>
+                <span className="font-medium text-slate-300">{name}</span>
               </div>
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-900 w-24 text-right">
+                <span className="text-sm font-medium text-white w-24 text-right">
                   {formatCurrency(entry.totalAmount)}
                 </span>
-                <span className="text-sm text-gray-500 w-12 text-right">
+                <span className="text-sm text-slate-400 w-12 text-right">
                   ({percentage.toFixed(1)}%)
                 </span>
               </div>

@@ -28,16 +28,16 @@ export default function IncomeTable({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl text-center py-20 border border-gray-200/60"
+        className="bg-slate-800/60 rounded-3xl text-center py-20 border border-cyan-400/20"
       >
         <div className="max-w-md mx-auto">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center">
-            <TrendingUp className="w-8 h-8 text-green-600" />
+          <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/15 rounded-2xl flex items-center justify-center">
+            <TrendingUp className="w-8 h-8 text-emerald-400" />
           </div>
-          <h3 className="text-3xl font-bold text-gray-900 mb-3">
+          <h3 className="text-3xl font-bold text-white mb-3">
             No income yet
           </h3>
-          <p className="text-gray-500 text-lg mb-8">
+          <p className="text-slate-400 text-lg mb-8">
             Start tracking your earnings journey by adding your first income record.
           </p>
 
@@ -76,7 +76,7 @@ export default function IncomeTable({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200/70 overflow-hidden"
+      className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden"
     >
       <div>
         <AnimatePresence>
@@ -91,7 +91,7 @@ export default function IncomeTable({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: dateIndex * 0.1 }}
-                className="border-b border-gray-100/80 last:border-b-0"
+                className="border-b border-slate-700/50 last:border-b-0"
               >
                 <div className="relative overflow-hidden bg-gradient-to-r from-emerald-900 via-green-900 to-teal-900 px-5 md:px-8 py-5 border-b border-emerald-700/70">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(16,185,129,0.2),transparent_40%)]" />
@@ -130,7 +130,7 @@ export default function IncomeTable({
                         {["Category", "Amount", "Note", "Actions"].map((header) => (
                           <th
                             key={header}
-                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-emerald-900 tracking-[0.14em] border-b-2 border-emerald-200"
+                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-emerald-300 tracking-[0.14em] border-b-2 border-emerald-700/50"
                           >
                             <div className="flex items-center gap-2">
                               {header}
@@ -158,10 +158,10 @@ export default function IncomeTable({
                               transition={{
                                 delay: dateIndex * 0.1 + incomeIndex * 0.05,
                               }}
-                              className="group border-b border-gray-100 last:border-b-0 odd:bg-white even:bg-emerald-50/35 hover:bg-emerald-50/55 transition-colors"
+                              className="group border-b border-slate-700/30 last:border-b-0 odd:bg-slate-800/80 even:bg-slate-800/40 hover:bg-slate-700/50 transition-colors"
                             >
                               <td className="px-4 lg:px-6 py-4">
-                                <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-900 bg-white border border-emerald-200">
+                                <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30">
                                   <span
                                     className="w-2.5 h-2.5 rounded-full"
                                     style={{ backgroundColor: categoryColor }}
@@ -172,10 +172,10 @@ export default function IncomeTable({
 
                               <td className="px-4 lg:px-6 py-4">
                                 <div className="flex flex-col">
-                                  <span className="text-base font-semibold text-gray-900">
+                                  <span className="text-base font-semibold text-white">
                                     {formatCurrency(income.amount)}
                                   </span>
-                                  <span className="text-xs text-gray-500 mt-0.5">
+                                  <span className="text-xs text-slate-400 mt-0.5">
                                     {formatIncomeTime(income.date)}
                                   </span>
                                 </div>
@@ -184,13 +184,13 @@ export default function IncomeTable({
                               <td className="px-4 lg:px-6 py-4">
                                 {income.note ? (
                                   <p
-                                    className="text-sm text-gray-700 leading-relaxed line-clamp-2 break-words"
+                                    className="text-sm text-slate-300 leading-relaxed line-clamp-2 break-words"
                                     title={income.note}
                                   >
                                     {income.note}
                                   </p>
                                 ) : (
-                                  <span className="text-sm italic text-gray-400">
+                                  <span className="text-sm italic text-slate-500">
                                     No note added
                                   </span>
                                 )}
@@ -202,7 +202,7 @@ export default function IncomeTable({
                                     whileHover={{ scale: 1.06, y: -1 }}
                                     whileTap={{ scale: 0.94 }}
                                     onClick={() => router.push(`/income/edit/${income._id}`)}
-                                    className="relative p-2 bg-white text-green-600 rounded-lg border border-green-200 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-all duration-200 shadow-sm group/btn"
+                                    className="relative p-2 bg-slate-700/50 text-emerald-400 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/15 hover:border-emerald-500/50 transition-all duration-200 group/btn"
                                     aria-label="Edit income"
                                   >
                                     <Pencil size={16} />
@@ -215,7 +215,7 @@ export default function IncomeTable({
                                     whileHover={{ scale: 1.06, y: -1 }}
                                     whileTap={{ scale: 0.94 }}
                                     onClick={() => deleteIncome(income._id)}
-                                    className="relative p-2 bg-white text-red-600 rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 shadow-sm group/btn"
+                                    className="relative p-2 bg-slate-700/50 text-rose-400 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-500/50 transition-all duration-200 group/btn"
                                     aria-label="Delete income"
                                   >
                                     <Trash2 size={16} />
@@ -248,10 +248,10 @@ export default function IncomeTable({
                           transition={{
                             delay: dateIndex * 0.1 + incomeIndex * 0.05,
                           }}
-                          className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+                          className="bg-slate-800/80 rounded-xl border border-slate-700 p-4"
                         >
                           <div className="flex items-start justify-between gap-3">
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200">
+                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30">
                               <span
                                 className="w-2.5 h-2.5 rounded-full"
                                 style={{ backgroundColor: categoryColor }}
@@ -259,16 +259,16 @@ export default function IncomeTable({
                               {categoryName}
                             </span>
                             <div className="text-right">
-                              <div className="text-base font-semibold text-gray-900">
+                              <div className="text-base font-semibold text-white">
                                 {formatCurrency(income.amount)}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-slate-400">
                                 {formatIncomeTime(income.date)}
                               </div>
                             </div>
                           </div>
 
-                          <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+                          <p className="mt-3 text-sm text-slate-300 leading-relaxed">
                             {income.note || "No note added"}
                           </p>
 
@@ -279,7 +279,7 @@ export default function IncomeTable({
                               onClick={() =>
                                 router.push(`/income/edit/${income._id}`)
                               }
-                              className="px-3 py-2 text-sm font-medium bg-green-50 text-green-700 rounded-lg border border-green-200"
+                              className="px-3 py-2 text-sm font-medium bg-emerald-500/15 text-emerald-400 rounded-lg border border-emerald-500/30"
                             >
                               Edit
                             </motion.button>
@@ -287,7 +287,7 @@ export default function IncomeTable({
                               whileHover={{ scale: 1.04 }}
                               whileTap={{ scale: 0.94 }}
                               onClick={() => deleteIncome(income._id)}
-                              className="px-3 py-2 text-sm font-medium bg-red-50 text-red-700 rounded-lg border border-red-200"
+                              className="px-3 py-2 text-sm font-medium bg-rose-500/15 text-rose-400 rounded-lg border border-rose-500/30"
                             >
                               Delete
                             </motion.button>
@@ -308,10 +308,10 @@ export default function IncomeTable({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-gradient-to-r from-gray-50 to-green-50/30 px-5 md:px-8 py-5 border-t border-gray-200/60"
+        className="bg-slate-800/80 px-5 md:px-8 py-5 border-t border-slate-700/60"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-slate-400">
             Total <span className="font-semibold">{incomes.length}</span>{" "}
             income records across{" "}
             <span className="font-semibold">{sortedDateKeys.length}</span> days

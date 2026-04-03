@@ -87,35 +87,35 @@ function categoryColor(categories, categoryId) {
 // ─── skeleton pieces ─────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
+    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 shadow-sm animate-pulse">
       <div className="flex justify-between mb-4">
-        <div className="w-10 h-10 bg-gray-200 rounded-xl" />
-        <div className="w-16 h-5 bg-gray-100 rounded-full" />
+        <div className="w-10 h-10 bg-slate-700 rounded-xl" />
+        <div className="w-16 h-5 bg-slate-700/50 rounded-full" />
       </div>
-      <div className="h-7 bg-gray-200 rounded w-32 mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-20 mb-1" />
-      <div className="h-3 bg-gray-100 rounded w-24" />
+      <div className="h-7 bg-slate-700 rounded w-32 mb-2" />
+      <div className="h-3 bg-slate-700/50 rounded w-20 mb-1" />
+      <div className="h-3 bg-slate-700/50 rounded w-24" />
     </div>
   );
 }
 
 function ChartSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
-      <div className="h-5 bg-gray-200 rounded w-48 mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-72 mb-8" />
-      <div className="h-[340px] bg-gradient-to-b from-gray-100 to-gray-50 rounded-xl" />
+    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 shadow-sm animate-pulse">
+      <div className="h-5 bg-slate-700 rounded w-48 mb-2" />
+      <div className="h-3 bg-slate-700/50 rounded w-72 mb-8" />
+      <div className="h-[340px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl" />
     </div>
   );
 }
 
 // ─── KPI card ─────────────────────────────────────────────────────────────────
 const TONES = {
-  emerald: { bg: "from-white to-emerald-50/40", border: "border-emerald-100/60", icon: "bg-emerald-100 text-emerald-600" },
-  green:   { bg: "from-white to-green-50/40",   border: "border-green-100/60",   icon: "bg-green-100 text-green-600"    },
-  purple:  { bg: "from-white to-purple-50/40",  border: "border-purple-100/60",  icon: "bg-purple-100 text-purple-600"  },
-  amber:   { bg: "from-white to-amber-50/40",   border: "border-amber-100/60",   icon: "bg-amber-100 text-amber-600"    },
-  rose:    { bg: "from-white to-rose-50/40",    border: "border-rose-100/60",    icon: "bg-rose-100 text-rose-600"      },
+  emerald: { bg: "from-slate-800/80 to-emerald-500/10", border: "border-emerald-500/20", icon: "bg-emerald-500/20 text-emerald-400" },
+  green:   { bg: "from-slate-800/80 to-green-500/10",   border: "border-green-500/20",   icon: "bg-green-500/20 text-green-400"    },
+  purple:  { bg: "from-slate-800/80 to-purple-500/10",  border: "border-purple-500/20",  icon: "bg-purple-500/20 text-purple-400"  },
+  amber:   { bg: "from-slate-800/80 to-amber-500/10",   border: "border-amber-500/20",   icon: "bg-amber-500/20 text-amber-400"    },
+  rose:    { bg: "from-slate-800/80 to-rose-500/10",    border: "border-rose-500/20",    icon: "bg-rose-500/20 text-rose-400"      },
 };
 
 function KPICard({ icon: Icon, label, value, sub, tone = "emerald", badge }) {
@@ -128,15 +128,15 @@ function KPICard({ icon: Icon, label, value, sub, tone = "emerald", badge }) {
         </div>
         {badge !== undefined && (
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-            badge > 0 ? "bg-rose-100 text-rose-700" : "bg-emerald-100 text-emerald-700"
+            badge > 0 ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/15 text-emerald-400"
           }`}>
             {badge > 0 ? `${badge} spike${badge > 1 ? "s" : ""}` : "All clear"}
           </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-900 leading-tight truncate">{value}</p>
-      <p className="text-sm text-gray-600 mt-1">{label}</p>
-      {sub ? <p className="text-xs text-gray-400 mt-1">{sub}</p> : null}
+      <p className="text-2xl font-bold text-white leading-tight truncate">{value}</p>
+      <p className="text-sm text-slate-400 mt-1">{label}</p>
+      {sub ? <p className="text-xs text-slate-500 mt-1">{sub}</p> : null}
     </div>
   );
 }
@@ -147,39 +147,39 @@ function AnomalyAlert({ anomalies }) {
   if (!anomalies?.length) return null;
   const shown = expanded ? anomalies : anomalies.slice(0, 3);
   return (
-    <div className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 p-5 shadow-sm">
+    <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 shadow-sm">
       <div className="flex items-start gap-3">
-        <div className="p-2 bg-amber-100 rounded-xl mt-0.5 flex-shrink-0">
-          <AlertTriangle className="w-4 h-4 text-amber-600" />
+        <div className="p-2 bg-amber-500/15 rounded-xl mt-0.5 flex-shrink-0">
+          <AlertTriangle className="w-4 h-4 text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <p className="font-bold text-amber-900 text-sm">
+            <p className="font-bold text-amber-300 text-sm">
               {anomalies.length} unusual income spike{anomalies.length > 1 ? "s" : ""} detected in this period
             </p>
             {anomalies.length > 3 && (
-              <button onClick={() => setExpanded((p) => !p)} className="text-xs font-semibold text-amber-700 hover:underline flex-shrink-0">
+              <button onClick={() => setExpanded((p) => !p)} className="text-xs font-semibold text-amber-400 hover:underline flex-shrink-0">
                 {expanded ? "Show less" : `+${anomalies.length - 3} more`}
               </button>
             )}
           </div>
-          <p className="text-xs text-amber-600 mt-1 mb-3">
+          <p className="text-xs text-amber-400 mt-1 mb-3">
             These categories earned significantly more than their trailing 3-month average.
           </p>
           <div className="space-y-2">
             {shown.map((row, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white/80 rounded-xl px-4 py-2.5 text-sm shadow-sm border border-amber-100/50">
+              <div key={i} className="flex items-center gap-3 bg-slate-800/80 rounded-xl px-4 py-2.5 text-sm shadow-sm border border-amber-500/20">
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${row.anomaly?.severity === "high" ? "bg-amber-500" : "bg-yellow-500"}`} />
-                <span className="font-semibold text-gray-800 truncate">
+                <span className="font-semibold text-slate-200 truncate">
                   {row.categoryIcon || ""} {row.category}
                 </span>
-                <span className="text-gray-400 text-xs flex-shrink-0">{fmtMonth(row.month)}</span>
+                <span className="text-slate-400 text-xs flex-shrink-0">{fmtMonth(row.month)}</span>
                 {row.anomaly?.reason && (
-                  <span className="text-gray-400 text-xs hidden md:block truncate flex-1">{row.anomaly.reason}</span>
+                  <span className="text-slate-400 text-xs hidden md:block truncate flex-1">{row.anomaly.reason}</span>
                 )}
-                <span className="ml-auto font-bold text-emerald-700 flex-shrink-0">{money(row.amount)}</span>
+                <span className="ml-auto font-bold text-emerald-400 flex-shrink-0">{money(row.amount)}</span>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                  row.anomaly?.severity === "high" ? "bg-amber-100 text-amber-700" : "bg-yellow-100 text-yellow-700"
+                  row.anomaly?.severity === "high" ? "bg-amber-500/15 text-amber-400" : "bg-yellow-500/15 text-yellow-400"
                 }`}>
                   {row.anomaly?.severity}
                 </span>
@@ -198,23 +198,23 @@ function ChartTooltip({ active, payload, label }) {
   const sorted = [...payload].filter((p) => (p.value || 0) > 0).sort((a, b) => (b.value || 0) - (a.value || 0));
   const total = sorted.reduce((s, p) => s + (p.value || 0), 0);
   return (
-    <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-2xl p-4 min-w-[200px] max-w-[260px]">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{fmtMonth(label)}</p>
+    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[200px] max-w-[260px]">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{fmtMonth(label)}</p>
       <div className="space-y-1.5">
         {sorted.map((item) => (
           <div key={item.dataKey} className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color || item.fill || item.stroke }} />
-              <span className="text-sm text-gray-600 truncate">{item.dataKey}</span>
+              <span className="text-sm text-slate-300 truncate">{item.dataKey}</span>
             </div>
-            <span className="text-sm font-bold text-gray-900 whitespace-nowrap">{money(item.value)}</span>
+            <span className="text-sm font-bold text-white whitespace-nowrap">{money(item.value)}</span>
           </div>
         ))}
       </div>
       {sorted.length > 1 && (
-        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total</span>
-          <span className="text-sm font-bold text-gray-900">{money(total)}</span>
+        <div className="mt-3 pt-3 border-t border-slate-700 flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total</span>
+          <span className="text-sm font-bold text-white">{money(total)}</span>
         </div>
       )}
     </div>
@@ -223,7 +223,7 @@ function ChartTooltip({ active, payload, label }) {
 
 // ─── sort icon ────────────────────────────────────────────────────────────────
 function SortIcon({ col, sortKey, sortDir }) {
-  if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-300" />;
+  if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-slate-600" />;
   return sortDir === "asc"
     ? <ChevronUp   className="w-3.5 h-3.5 text-emerald-500" />
     : <ChevronDown className="w-3.5 h-3.5 text-emerald-500" />;
@@ -405,20 +405,20 @@ export default function IncomeAnalyticsPage() {
 
   // ─── render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-green-50/10 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
 
       {/* ── sticky page header ────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg shadow-emerald-500/20 flex-shrink-0">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-emerald-700 to-green-600 bg-clip-text text-transparent leading-none">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white via-emerald-300 to-green-400 bg-clip-text text-transparent leading-none">
                 Income Analytics
               </h1>
-              <p className="text-xs text-gray-500 leading-none mt-0.5 truncate">
+              <p className="text-xs text-slate-400 leading-none mt-0.5 truncate">
                 {fmtMonth(range.startMonth)} → {fmtMonth(range.endMonth)}
                 &nbsp;·&nbsp;{activeCategories.length} categor{activeCategories.length === 1 ? "y" : "ies"}
                 {isRefreshing ? " · Refreshing…" : ""}
@@ -429,7 +429,7 @@ export default function IncomeAnalyticsPage() {
           <button
             onClick={exportCSV}
             disabled={!hasData || isFirstLoad}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:border-emerald-300 hover:text-emerald-700 hover:bg-emerald-50 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-600 bg-slate-800/60 text-sm font-semibold text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -440,12 +440,12 @@ export default function IncomeAnalyticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
 
         {/* ── controls ─────────────────────────────────────────────────────── */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/70 p-6 shadow-sm">
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-5">
-            <Filter className="w-4 h-4 text-gray-400" />
-            <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest">Filters & Date range</h2>
+            <Filter className="w-4 h-4 text-slate-500" />
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Filters & Date range</h2>
             {selectedCategoryIds.length > 0 && (
-              <span className="ml-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+              <span className="ml-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold">
                 {selectedCategoryIds.length} selected
               </span>
             )}
@@ -454,27 +454,27 @@ export default function IncomeAnalyticsPage() {
           {/* range row */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-5">
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Quick range</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Quick range</p>
               <div className="flex gap-2">
                 {PRESETS.map((p) => (
                   <button key={p.label} onClick={() => applyPreset(p.months)}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50 transition-all">
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 hover:border-emerald-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all">
                     {p.label}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Start month</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Start month</p>
               <input type="month" value={range.startMonth} max={range.endMonth}
                 onChange={(e) => setRange((p) => ({ ...p, startMonth: e.target.value }))}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all" />
+                className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 [color-scheme:dark] transition-all" />
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">End month</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">End month</p>
               <input type="month" value={range.endMonth} min={range.startMonth}
                 onChange={(e) => setRange((p) => ({ ...p, endMonth: e.target.value }))}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all" />
+                className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 [color-scheme:dark] transition-all" />
             </div>
             <div className="flex items-end">
               <button onClick={fetchAnalytics} disabled={loading}
@@ -486,21 +486,21 @@ export default function IncomeAnalyticsPage() {
           </div>
 
           {/* category filter chips */}
-          <div className="border-t border-gray-100 pt-5">
+          <div className="border-t border-slate-700/50 pt-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Tags className="w-4 h-4 text-gray-400" />
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Categories</p>
-                <span className="text-xs text-gray-400">
+                <Tags className="w-4 h-4 text-slate-500" />
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Categories</p>
+                <span className="text-xs text-slate-400">
                   {selectedCategoryIds.length ? `${selectedCategoryIds.length} of ${availableCategories.length}` : "All"}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <button onClick={() => setSelectedCategoryIds(availableCategories.map((c) => c._id))}
-                  className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 hover:underline">Select all</button>
-                <span className="text-gray-300 select-none">|</span>
+                  className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 hover:underline">Select all</button>
+                <span className="text-slate-600 select-none">|</span>
                 <button onClick={() => setSelectedCategoryIds([])}
-                  className="text-xs font-semibold text-gray-400 hover:text-gray-700 hover:underline">Clear</button>
+                  className="text-xs font-semibold text-slate-400 hover:text-slate-200 hover:underline">Clear</button>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -510,7 +510,7 @@ export default function IncomeAnalyticsPage() {
                 return (
                   <button key={cat._id} onClick={() => toggleCategory(cat._id)}
                     className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all ${
-                      isActive ? "border-transparent text-white shadow-md" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                      isActive ? "border-transparent text-white shadow-md" : "border-slate-600 bg-slate-700/50 text-slate-400 hover:border-slate-500 hover:bg-slate-700"
                     }`}
                     style={isActive ? { backgroundColor: color } : undefined}>
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? "white" : color }} />
@@ -519,7 +519,7 @@ export default function IncomeAnalyticsPage() {
                 );
               })}
               {availableCategories.length === 0 && (
-                <p className="text-sm text-gray-400 italic">No income categories found. Create some first.</p>
+                <p className="text-sm text-slate-500 italic">No income categories found. Create some first.</p>
               )}
             </div>
           </div>
@@ -527,12 +527,12 @@ export default function IncomeAnalyticsPage() {
 
         {/* ── error banner ─────────────────────────────────────────────────── */}
         {error && !loading && (
-          <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
+          <div className="flex items-start gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-5 shadow-sm">
             <AlertTriangle className="w-5 h-5 text-rose-500 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-bold text-rose-800 text-sm">Failed to load analytics</p>
-              <p className="text-sm text-rose-600 mt-0.5">{error}</p>
-              <button onClick={fetchAnalytics} className="mt-3 text-xs font-bold text-rose-700 underline hover:text-rose-900">Try again</button>
+              <p className="font-bold text-rose-300 text-sm">Failed to load analytics</p>
+              <p className="text-sm text-rose-400 mt-0.5">{error}</p>
+              <button onClick={fetchAnalytics} className="mt-3 text-xs font-bold text-rose-400 underline hover:text-rose-300">Try again</button>
             </div>
           </div>
         )}
@@ -568,18 +568,18 @@ export default function IncomeAnalyticsPage() {
         {isFirstLoad ? (
           <><ChartSkeleton /><ChartSkeleton /></>
         ) : !hasData && !error ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+          <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 shadow-sm p-16 text-center">
+            <div className="w-16 h-16 bg-emerald-500/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
               <BarChart3 className="w-8 h-8 text-emerald-400" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">No income data in this range</h3>
-            <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
+            <h3 className="text-lg font-bold text-white mb-2">No income data in this range</h3>
+            <p className="text-sm text-slate-400 max-w-sm mx-auto mb-6">
               No income was recorded in the selected period. Try adjusting the date range or removing category filters.
             </p>
             <div className="flex justify-center gap-3 flex-wrap">
               {PRESETS.map((p) => (
                 <button key={p.label} onClick={() => applyPreset(p.months)}
-                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50 transition-all">
+                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-600 bg-slate-700/50 text-slate-300 hover:border-emerald-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all">
                   Try last {p.label}
                 </button>
               ))}
@@ -590,17 +590,17 @@ export default function IncomeAnalyticsPage() {
             <AnomalyAlert anomalies={data.anomalies} />
 
             {/* charts card */}
-            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/70 p-6 shadow-sm transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 shadow-sm transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
               <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Income by category</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">Month-on-month breakdown
+                  <h2 className="text-lg font-bold text-white">Income by category</h2>
+                  <p className="text-sm text-slate-400 mt-0.5">Month-on-month breakdown
                     {anomalyMonths.size > 0 && (
                       <span className="ml-2 text-amber-500 font-semibold">— dashed lines mark anomaly months</span>
                     )}
                   </p>
                 </div>
-                <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5 flex-shrink-0">
+                <div className="flex items-center bg-slate-700 rounded-xl p-1 gap-0.5 flex-shrink-0">
                   {[
                     { key: "bar",  icon: BarChart3,     label: "Bar"  },
                     { key: "line", icon: LineChartIcon, label: "Line" },
@@ -608,7 +608,7 @@ export default function IncomeAnalyticsPage() {
                   ].map((v) => (
                     <button key={v.key} onClick={() => setChartView(v.key)}
                       className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
-                        chartView === v.key ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+                        chartView === v.key ? "bg-slate-600 shadow-sm text-white" : "text-slate-400 hover:text-slate-200"
                       }`}>
                       <v.icon className="w-3.5 h-3.5" />{v.label}
                     </button>
@@ -620,7 +620,7 @@ export default function IncomeAnalyticsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   {chartView === "bar" ? (
                     <BarChart data={data.chart.groupedBars} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis {...xAxisProps} />
                       <YAxis {...yAxisProps} />
                       <Tooltip content={<ChartTooltip />} />
@@ -636,7 +636,7 @@ export default function IncomeAnalyticsPage() {
                     </BarChart>
                   ) : chartView === "line" ? (
                     <LineChart data={lineChartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis {...xAxisProps} />
                       <YAxis {...yAxisProps} />
                       <Tooltip content={<ChartTooltip />} />
@@ -664,7 +664,7 @@ export default function IncomeAnalyticsPage() {
                           );
                         })}
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis {...xAxisProps} />
                       <YAxis {...yAxisProps} />
                       <Tooltip content={<ChartTooltip />} />
@@ -688,25 +688,25 @@ export default function IncomeAnalyticsPage() {
             </div>
 
             {/* detailed table */}
-            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
-              <div className="px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-4 flex-wrap">
+            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 shadow-sm overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+              <div className="px-6 py-5 border-b border-slate-700/50 flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Detailed breakdown</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <h2 className="text-lg font-bold text-white">Detailed breakdown</h2>
+                  <p className="text-sm text-slate-400 mt-0.5">
                     {filteredTableRows.length} record{filteredTableRows.length !== 1 ? "s" : ""}
                     &nbsp;· click any column header to sort
                   </p>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-gray-400">
+                <div className="flex items-center gap-4 text-xs text-slate-400">
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" />Spike</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />Normal</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-500" />Normal</span>
                   <span className="flex items-center gap-1.5"><span className="w-16 h-1 bg-gradient-to-r from-emerald-400 to-emerald-200 rounded-full" />Relative size</span>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-gradient-to-r from-slate-50 to-gray-50/50 border-b border-gray-100">
+                  <thead className="bg-slate-800/80 border-b border-slate-700">
                     <tr>
                       {[
                         { key: "month",         label: "Month"     },
@@ -718,7 +718,7 @@ export default function IncomeAnalyticsPage() {
                         { key: null,            label: "Anomaly"   },
                       ].map(({ key, label }) => (
                         <th key={label} onClick={() => key && handleSort(key)}
-                          className={`px-5 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap ${key ? "cursor-pointer hover:text-gray-800 select-none" : ""}`}>
+                          className={`px-5 py-3.5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap ${key ? "cursor-pointer hover:text-slate-200 select-none" : ""}`}>
                           <span className="flex items-center gap-1">
                             {label}
                             {key && <SortIcon col={key} sortKey={sortKey} sortDir={sortDir} />}
@@ -727,7 +727,7 @@ export default function IncomeAnalyticsPage() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-slate-700/30">
                     {visibleRows.map((row) => {
                       const color    = row.categoryColor || categoryColor(data.categories, row.categoryId);
                       const isSpike  = row.anomaly?.isSpike;
@@ -736,18 +736,18 @@ export default function IncomeAnalyticsPage() {
                       const isDown   = row.changePct < -0.5;
                       return (
                         <tr key={`${row.month}_${row.categoryId}`}
-                          className={`transition-colors hover:bg-emerald-50/30 ${isSpike ? "bg-amber-50/30" : ""}`}>
-                          <td className="px-5 py-3.5 font-semibold text-gray-700 whitespace-nowrap">{fmtMonth(row.month)}</td>
+                          className={`transition-colors hover:bg-slate-700/30 ${isSpike ? "bg-amber-500/10" : ""}`}>
+                          <td className="px-5 py-3.5 font-semibold text-slate-300 whitespace-nowrap">{fmtMonth(row.month)}</td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-2 min-w-0">
                               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                              <span className="font-medium text-gray-800">{row.categoryIcon || ""} {row.category}</span>
+                              <span className="font-medium text-slate-200">{row.categoryIcon || ""} {row.category}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-bold text-gray-900 whitespace-nowrap">{money(row.amount)}</td>
+                          <td className="px-5 py-3.5 font-bold text-white whitespace-nowrap">{money(row.amount)}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <span className={`inline-flex items-center gap-1 font-semibold ${
-                              isUp ? "text-emerald-600" : isDown ? "text-rose-600" : "text-gray-400"
+                              isUp ? "text-emerald-400" : isDown ? "text-rose-400" : "text-slate-500"
                             }`}>
                               {isUp   ? <ArrowUpRight   className="w-3.5 h-3.5" /> :
                                isDown ? <ArrowDownRight className="w-3.5 h-3.5" /> :
@@ -755,9 +755,9 @@ export default function IncomeAnalyticsPage() {
                               {pct(row.changePct)}
                             </span>
                           </td>
-                          <td className="px-5 py-3.5 text-gray-500 whitespace-nowrap">{money(row.movingAverage)}</td>
+                          <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">{money(row.movingAverage)}</td>
                           <td className="px-5 py-3.5 w-32">
-                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden w-24">
+                            <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden w-24">
                               <div className="h-1.5 rounded-full transition-all duration-700"
                                 style={{ width: `${barWidth}%`, backgroundColor: color }} />
                             </div>
@@ -765,14 +765,14 @@ export default function IncomeAnalyticsPage() {
                           <td className="px-5 py-3.5">
                             {isSpike ? (
                               <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
-                                row.anomaly.severity === "high" ? "bg-amber-100 text-amber-700" : "bg-yellow-100 text-yellow-700"
+                                row.anomaly.severity === "high" ? "bg-amber-500/15 text-amber-400" : "bg-yellow-500/15 text-yellow-400"
                               }`}>
                                 <span className={`w-1.5 h-1.5 rounded-full ${row.anomaly.severity === "high" ? "bg-amber-500" : "bg-yellow-500"}`} />
                                 Spike · {row.anomaly.severity}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />Normal
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-700/50 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />Normal
                               </span>
                             )}
                           </td>
@@ -782,8 +782,8 @@ export default function IncomeAnalyticsPage() {
                     {filteredTableRows.length === 0 && (
                       <tr>
                         <td colSpan={7} className="px-5 py-12 text-center">
-                          <p className="text-gray-400 font-medium">No records match the current filters.</p>
-                          <button onClick={() => setSelectedCategoryIds([])} className="mt-2 text-sm text-emerald-600 hover:underline">
+                          <p className="text-slate-400 font-medium">No records match the current filters.</p>
+                          <button onClick={() => setSelectedCategoryIds([])} className="mt-2 text-sm text-emerald-400 hover:underline">
                             Clear category filters
                           </button>
                         </td>
@@ -791,12 +791,12 @@ export default function IncomeAnalyticsPage() {
                     )}
                   </tbody>
                   {filteredTableRows.length > 0 && (
-                    <tfoot className="bg-gradient-to-r from-slate-50 to-gray-50/50 border-t border-gray-200">
+                    <tfoot className="bg-slate-800/80 border-t border-slate-700">
                       <tr>
-                        <td colSpan={2} className="px-5 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <td colSpan={2} className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
                           Total ({filteredTableRows.length} rows)
                         </td>
-                        <td className="px-5 py-3.5 font-bold text-gray-900">
+                        <td className="px-5 py-3.5 font-bold text-white">
                           {money(filteredTableRows.reduce((s, r) => s + r.amount, 0))}
                         </td>
                         <td colSpan={4} />
@@ -807,9 +807,9 @@ export default function IncomeAnalyticsPage() {
               </div>
 
               {sortedTableRows.length > 20 && (
-                <div className="px-6 py-4 border-t border-gray-100 text-center bg-slate-50/50">
-                  <button onClick={() => setShowAllRows((p) => !p)}
-                    className="text-sm font-semibold text-emerald-600 hover:text-emerald-800 hover:underline">
+              <div className="px-6 py-4 border-t border-slate-700 text-center bg-slate-800/40">
+                <button onClick={() => setShowAllRows((p) => !p)}
+                  className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 hover:underline">
                     {showAllRows
                       ? "Show fewer rows"
                       : `Show all ${sortedTableRows.length} rows (${sortedTableRows.length - 20} more)`}
