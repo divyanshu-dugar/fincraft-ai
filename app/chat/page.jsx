@@ -15,25 +15,105 @@ import {
   BarChart3,
   TrendingUp,
   DollarSign,
-  PiggyBank,
   Target,
   Menu,
   X,
-  ChevronRight,
+  ChevronDown,
+  Wallet,
+  Lightbulb,
 } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const AI_API = `${API}/api`;
 
-// ─── suggested prompts ────────────────────────────────────────────────────────
-const SUGGESTED_PROMPTS = [
-  { icon: DollarSign,   text: "How much did I spend this month?" },
-  { icon: TrendingUp,   text: "Show my income vs expenses for the last 3 months" },
-  { icon: BarChart3,    text: "What are my top expense categories this quarter?" },
-  { icon: PiggyBank,    text: "Am I over budget anywhere right now?" },
-  { icon: Target,       text: "Summarize my savings goal progress" },
-  { icon: MessageSquare,text: "Find my recent restaurant or coffee expenses" },
+// ─── categorized question prompts ────────────────────────────────────────────
+const QUESTION_CATEGORIES = [
+  {
+    id: "expenses",
+    label: "Expenses",
+    icon: Wallet,
+    color: "rose",
+    accent: "from-rose-500/20 to-orange-500/10 border-rose-500/30",
+    iconColor: "text-rose-400",
+    chipColor: "bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500/25",
+    questions: [
+      "How much did I spend this month?",
+      "How much did I spend on momos last month?",
+      "How many times did I order Swiggy in 2026?",
+      "What did I spend $500 on last month?",
+      "What were my top 5 biggest purchases this month?",
+      "Show my food and dining expenses for March",
+      "Do I overspend on weekends?",
+      "Which day of the week do I spend the most?",
+    ],
+  },
+  {
+    id: "trends",
+    label: "Trends & Analysis",
+    icon: TrendingUp,
+    color: "blue",
+    accent: "from-blue-500/20 to-indigo-500/10 border-blue-500/30",
+    iconColor: "text-blue-400",
+    chipColor: "bg-blue-500/15 text-blue-300 border-blue-500/30 hover:bg-blue-500/25",
+    questions: [
+      "Break down my spending by category for last month",
+      "Is my grocery spending going up or down?",
+      "Compare my Q1 vs Q2 spending",
+      "Which month was my highest spending in 2026?",
+      "What are my recurring monthly expenses?",
+      "What subscriptions am I paying regularly?",
+      "Where is most of my money going?",
+    ],
+  },
+  {
+    id: "income",
+    label: "Income & Cashflow",
+    icon: DollarSign,
+    color: "emerald",
+    accent: "from-emerald-500/20 to-green-500/10 border-emerald-500/30",
+    iconColor: "text-emerald-400",
+    chipColor: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25",
+    questions: [
+      "How much did I earn last month?",
+      "What's my savings rate this month?",
+      "How much did I save in Q1 2026?",
+      "Did I earn more than I spent in March?",
+      "What's my income breakdown by category?",
+      "Show my income vs expenses for the last 3 months",
+    ],
+  },
+  {
+    id: "budgets",
+    label: "Budgets",
+    icon: BarChart3,
+    color: "amber",
+    accent: "from-amber-500/20 to-yellow-500/10 border-amber-500/30",
+    iconColor: "text-amber-400",
+    chipColor: "bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25",
+    questions: [
+      "Am I over budget anywhere right now?",
+      "Which budget am I closest to blowing?",
+      "How much is left in my Food budget?",
+      "Show me all my active budgets",
+    ],
+  },
+  {
+    id: "goals",
+    label: "Savings Goals",
+    icon: Target,
+    color: "purple",
+    accent: "from-purple-500/20 to-violet-500/10 border-purple-500/30",
+    iconColor: "text-purple-400",
+    chipColor: "bg-purple-500/15 text-purple-300 border-purple-500/30 hover:bg-purple-500/25",
+    questions: [
+      "Show me all my savings goals",
+      "Am I on track to hit my vacation fund by July?",
+      "How much more do I need to save for my MacBook?",
+      "How much do I need to save per day to meet my emergency fund goal?",
+      "Which of my goals is furthest from completion?",
+    ],
+  },
 ];
 
 // ─── simple markdown renderer ─────────────────────────────────────────────────
@@ -294,25 +374,73 @@ function Sidebar({ sessions, activeSessionId, onSelect, onDelete, onNew, loading
   );
 }
 
+// ─── question category accordion ──────────────────────────────────────────────
+function QuestionCategory({ cat, onPrompt, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const Icon = cat.icon;
+  return (
+    <div className={`rounded-2xl border bg-gradient-to-br ${cat.accent} overflow-hidden transition-all`}>
+      {/* Header row */}
+      <button
+        onClick={() => setOpen((p) => !p)}
+        className="w-full flex items-center gap-3 px-4 py-3 text-left"
+      >
+        <span className={`w-7 h-7 rounded-lg bg-slate-800/60 flex items-center justify-center flex-shrink-0`}>
+          <Icon className={`w-4 h-4 ${cat.iconColor}`} />
+        </span>
+        <span className="flex-1 text-sm font-bold text-white">{cat.label}</span>
+        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {/* Question chips */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 flex flex-wrap gap-2">
+              {cat.questions.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => onPrompt(q)}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all text-left ${cat.chipColor}`}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ─── empty welcome state ──────────────────────────────────────────────────────
 function WelcomeState({ onPrompt }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
+    <div className="flex-1 flex flex-col items-center px-4 py-8 max-w-2xl mx-auto w-full">
+      {/* Hero */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="mb-6"
+        className="mb-4"
       >
-        <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
-          <Sparkles className="w-10 h-10 text-white" />
+        <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
+          <Sparkles className="w-8 h-8 text-white" />
         </div>
       </motion.div>
       <motion.h2
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-2xl font-bold text-white mb-2"
+        className="text-2xl font-bold text-white mb-1 text-center"
       >
         How can I help you today?
       </motion.h2>
@@ -320,28 +448,31 @@ function WelcomeState({ onPrompt }) {
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="text-sm text-slate-400 mb-8 max-w-sm"
+        className="text-sm text-slate-400 mb-6 text-center max-w-sm"
       >
-        I'm your personal finance AI. Ask me anything about your spending, income, budgets, or savings goals.
+        Ask me anything about your spending, income, budgets, or savings goals.
       </motion.p>
 
+      {/* Category accordions */}
       <motion.div
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl"
+        className="w-full space-y-2"
       >
-        {SUGGESTED_PROMPTS.map(({ icon: Icon, text }) => (
-          <button
-            key={text}
-            onClick={() => onPrompt(text)}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-800/60 text-left text-sm text-slate-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300 transition-all shadow-sm hover:shadow-md group"
+        <div className="flex items-center gap-2 mb-3">
+          <Lightbulb className="w-3.5 h-3.5 text-slate-500" />
+          <p className="text-xs text-slate-500 font-medium">Click a category to browse questions, then tap any to ask it</p>
+        </div>
+        {QUESTION_CATEGORIES.map((cat, i) => (
+          <motion.div
+            key={cat.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 + i * 0.05 }}
           >
-            <span className="flex-shrink-0 w-7 h-7 bg-slate-700 group-hover:bg-emerald-500/20 rounded-lg flex items-center justify-center transition-colors">
-              <Icon className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 transition-colors" />
-            </span>
-            <span className="line-clamp-2 leading-snug">{text}</span>
-          </button>
+            <QuestionCategory cat={cat} onPrompt={onPrompt} defaultOpen={i === 0} />
+          </motion.div>
         ))}
       </motion.div>
     </div>
