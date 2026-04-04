@@ -27,9 +27,11 @@ import {
   ChevronsUpDown,
   Download,
   Filter,
+  GitCompare,
   LineChart as LineChartIcon,
   Minus,
   RefreshCw,
+  Search,
   Tags,
   TrendingUp,
   Zap,
@@ -227,6 +229,152 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
+// ─── month-on-month per-category card ────────────────────────────────────────
+function CategoryMoMCard({ category, rows, months, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const color = rows[0]?.categoryColor || COLORS[0];
+
+  // pre-index rows by month for O(1) lookup
+  const byMonth = useMemo(() => {
+    const m = {};
+    for (const r of rows) m[r.month] = r;
+    return m;
+  }, [rows]);
+
+  const totalSpend = rows.reduce((s, r) => s + r.amount, 0);
+  const bestMonth  = rows.reduce((best, r) => (r.amount > (best?.amount ?? -1) ? r : best), null);
+  const spikeCount = rows.filter((r) => r.anomaly?.isSpike).length;
+
+  return (
+    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/50 overflow-hidden">
+      {/* ── category header (always visible) ── */}
+      <button
+        onClick={() => setOpen((p) => !p)}
+        className="w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-700/30 transition-colors text-left group"
+      >
+        {/* color dot + name */}
+        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            {category.parentName && (
+              <span className="text-xs text-slate-500 font-medium">
+                {category.parentIcon} {category.parentName} ›
+              </span>
+            )}
+            <span className="text-sm font-bold text-white">
+              {category.categoryIcon} {category.categoryName}
+            </span>
+            {spikeCount > 0 && (
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400">
+                {spikeCount} spike{spikeCount > 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* summary chips */}
+        <div className="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-slate-400">
+          <span className="font-bold text-white">{money(totalSpend)}</span>
+          <span>total</span>
+          {bestMonth && (
+            <>
+              <span className="text-slate-600">·</span>
+              <span>peak: <span className="font-semibold text-slate-300">{fmtMonth(bestMonth.month)}</span></span>
+            </>
+          )}
+        </div>
+
+        {/* chevron */}
+        <ChevronDown
+          className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {/* ── months grid (expandable) ── */}
+      {open && (
+        <div className="border-t border-slate-700/50 px-5 py-4">
+          {/* month column headers */}
+          <div
+            className="grid gap-2 mb-2"
+            style={{ gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))` }}
+          >
+            {months.map((m) => (
+              <div key={m} className="text-center">
+                <span className="inline-block px-2 py-1 rounded-lg bg-slate-700/60 text-xs font-bold text-slate-300">
+                  {fmtMonth(m)}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* amount row */}
+          <div
+            className="grid gap-2 mb-1.5"
+            style={{ gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))` }}
+          >
+            {months.map((m) => {
+              const row = byMonth[m];
+              const isSpike = row?.anomaly?.isSpike;
+              return (
+                <div
+                  key={m}
+                  className={`rounded-xl px-2 py-2.5 text-center ${
+                    isSpike ? "bg-rose-500/10 ring-1 ring-rose-500/30" : "bg-slate-700/30"
+                  }`}
+                >
+                  <p className="text-sm font-bold text-white truncate">
+                    {row ? money(row.amount) : <span className="text-slate-600">—</span>}
+                  </p>
+                  {/* change pct badge */}
+                  {row && row.changePct !== null ? (() => {
+                    const isUp   = row.changePct > 0.5;
+                    const isDown = row.changePct < -0.5;
+                    return (
+                      <span className={`inline-flex items-center justify-center gap-0.5 mt-1 text-[11px] font-bold ${
+                        isUp ? "text-rose-400" : isDown ? "text-emerald-400" : "text-slate-500"
+                      }`}>
+                        {isUp   ? <ArrowUpRight   className="w-3 h-3" /> :
+                         isDown ? <ArrowDownRight className="w-3 h-3" /> :
+                                  <Minus          className="w-3 h-3" />}
+                        {pct(row.changePct)}
+                      </span>
+                    );
+                  })() : (
+                    <span className="inline-flex items-center justify-center mt-1 text-[11px] font-medium text-slate-600">
+                      first month
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* mini bar row */}
+          <div
+            className="grid gap-2"
+            style={{ gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))` }}
+          >
+            {months.map((m) => {
+              const row = byMonth[m];
+              const pctWidth = row ? Math.min((row.amount / (totalSpend || 1)) * months.length * 100, 100) : 0;
+              return (
+                <div key={m} className="flex items-center justify-center px-1">
+                  <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-1 rounded-full"
+                      style={{ width: `${pctWidth}%`, backgroundColor: color }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── sort icon ────────────────────────────────────────────────────────────────
 function SortIcon({ col, sortKey, sortDir }) {
   if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-300" />;
@@ -247,6 +395,9 @@ export default function ExpenseAnalyticsPage() {
   const [sortKey,             setSortKey]             = useState("amount");
   const [sortDir,             setSortDir]             = useState("desc");
   const [showAllRows,         setShowAllRows]         = useState(false);
+  const [momSectionOpen,      setMomSectionOpen]      = useState(true);
+  const [categorySearch,      setCategorySearch]      = useState("");
+  const [collapsedGroups,     setCollapsedGroups]     = useState({});
   const [loading,             setLoading]             = useState(false);
   const [error,               setError]               = useState("");
   const [data, setData] = useState({
@@ -323,6 +474,33 @@ export default function ExpenseAnalyticsPage() {
   }, [data.chart.trendLines, data.months, selectedCategoryIds, categoryIdSet]);
 
   const anomalyMonths = useMemo(() => new Set(data.anomalies.map((r) => r.month)), [data.anomalies]);
+
+  // group filtered table rows by category for the MoM comparison grid
+  const categoryMoMGroups = useMemo(() => {
+    const map = new Map();
+    for (const row of filteredTableRows) {
+      if (!map.has(row.categoryId)) {
+        map.set(row.categoryId, {
+          category: {
+            categoryId: row.categoryId,
+            categoryName: row.category,
+            categoryIcon: row.categoryIcon,
+            categoryColor: row.categoryColor,
+            parentName: row.parentName,
+            parentIcon: row.parentIcon,
+          },
+          rows: [],
+        });
+      }
+      map.get(row.categoryId).rows.push(row);
+    }
+    // sort categories by total spend desc
+    return Array.from(map.values()).sort(
+      (a, b) =>
+        b.rows.reduce((s, r) => s + r.amount, 0) -
+        a.rows.reduce((s, r) => s + r.amount, 0)
+    );
+  }, [filteredTableRows]);
 
   const hasData = filteredTableRows.length > 0;
 
@@ -405,6 +583,30 @@ export default function ExpenseAnalyticsPage() {
 
   const toggleCategory = (id) =>
     setSelectedCategoryIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+
+  const toggleGroup = (groupName) =>
+    setCollapsedGroups((prev) => ({ ...prev, [groupName]: !prev[groupName] }));
+
+  // ── grouped + searched categories ───────────────────────────────────────────
+  const filteredCategories = useMemo(() => {
+    const q = categorySearch.trim().toLowerCase();
+    if (!q) return availableCategories;
+    return availableCategories.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.parentName && c.parentName.toLowerCase().includes(q))
+    );
+  }, [availableCategories, categorySearch]);
+
+  const groupedCategories = useMemo(() => {
+    const map = new Map();
+    for (const cat of filteredCategories) {
+      const key = cat.parentName || cat.name;
+      if (!map.has(key)) map.set(key, { parentName: key, parentIcon: cat.parentIcon || cat.icon || "", items: [] });
+      map.get(key).items.push(cat);
+    }
+    return Array.from(map.values());
+  }, [filteredCategories]);
 
   const handleSort = (key) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -544,6 +746,7 @@ export default function ExpenseAnalyticsPage() {
           </div>
 
           <div className="border-t border-slate-700/50 pt-5">
+            {/* header row */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Tags className="w-4 h-4 text-slate-400" />
@@ -554,7 +757,7 @@ export default function ExpenseAnalyticsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setSelectedCategoryIds(availableCategories.map((c) => c._id))}
+                  onClick={() => setSelectedCategoryIds(filteredCategories.map((c) => c._id))}
                   className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
                 >
                   Select all
@@ -569,29 +772,111 @@ export default function ExpenseAnalyticsPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {availableCategories.map((cat) => {
-                const isActive = selectedCategoryIds.includes(cat._id);
-                const color = cat.color || "#9CA3AF";
-                const label = cat.parentName ? `${cat.parentIcon || ''} ${cat.parentName} › ${cat.name}` : `${cat.icon || ''} ${cat.name}`;
-                return (
-                  <button
-                    key={cat._id}
-                    onClick={() => toggleCategory(cat._id)}
-                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all ${
-                      isActive ? "border-transparent text-white shadow-md" : "border-slate-600 bg-slate-700/50 text-slate-300 hover:border-slate-500"
-                    }`}
-                    style={isActive ? { backgroundColor: color } : undefined}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? "white" : color }} />
-                    {label}
-                  </button>
-                );
-              })}
-              {availableCategories.length === 0 && (
-                <p className="text-sm text-slate-400 italic">No expense categories found. Create some first.</p>
+            {/* search */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+              <input
+                type="text"
+                value={categorySearch}
+                onChange={(e) => setCategorySearch(e.target.value)}
+                placeholder="Search categories…"
+                className="w-full pl-8 pr-4 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm text-slate-200 placeholder-slate-500 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+              />
+              {categorySearch && (
+                <button
+                  onClick={() => setCategorySearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs font-bold"
+                >
+                  ✕
+                </button>
               )}
             </div>
+
+            {/* grouped category list */}
+            {availableCategories.length === 0 ? (
+              <p className="text-sm text-slate-400 italic">No expense categories found. Create some first.</p>
+            ) : groupedCategories.length === 0 ? (
+              <p className="text-sm text-slate-400 italic">No categories match your search.</p>
+            ) : (
+              <div className="space-y-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                {groupedCategories.map((group) => {
+                  const isCollapsed = collapsedGroups[group.parentName];
+                  const groupSelected = group.items.filter((c) => selectedCategoryIds.includes(c._id)).length;
+                  const allSelected = groupSelected === group.items.length;
+                  const someSelected = groupSelected > 0 && !allSelected;
+                  return (
+                    <div key={group.parentName} className="rounded-xl border border-slate-700/60 bg-slate-900/40 overflow-hidden">
+                      {/* group header */}
+                      <div className="flex items-center justify-between px-3 py-2 bg-slate-800/60">
+                        <button
+                          onClick={() => toggleGroup(group.parentName)}
+                          className="flex items-center gap-2 flex-1 min-w-0 text-left"
+                        >
+                          {group.parentIcon && <span className="text-sm flex-shrink-0">{group.parentIcon}</span>}
+                          <span className="text-xs font-bold text-slate-300 truncate">{group.parentName}</span>
+                          <span className="text-xs text-slate-500 flex-shrink-0">
+                            ({group.items.length})
+                          </span>
+                          {someSelected && (
+                            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold flex-shrink-0">
+                              {groupSelected}
+                            </span>
+                          )}
+                          {allSelected && (
+                            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold flex-shrink-0">
+                              All
+                            </span>
+                          )}
+                          <ChevronDown className={`w-3.5 h-3.5 text-slate-500 flex-shrink-0 ml-auto transition-transform duration-200 ${isCollapsed ? "" : "rotate-180"}`} />
+                        </button>
+                        {/* toggle whole group */}
+                        <button
+                          onClick={() => {
+                            const groupIds = group.items.map((c) => c._id);
+                            if (allSelected) {
+                              setSelectedCategoryIds((prev) => prev.filter((id) => !groupIds.includes(id)));
+                            } else {
+                              setSelectedCategoryIds((prev) => Array.from(new Set([...prev, ...groupIds])));
+                            }
+                          }}
+                          className={`ml-3 text-xs font-semibold flex-shrink-0 transition-colors ${
+                            allSelected ? "text-slate-500 hover:text-slate-300" : "text-blue-400 hover:text-blue-300"
+                          }`}
+                        >
+                          {allSelected ? "Deselect" : "Select all"}
+                        </button>
+                      </div>
+
+                      {/* category pills */}
+                      {!isCollapsed && (
+                        <div className="flex flex-wrap gap-1.5 p-3">
+                          {group.items.map((cat) => {
+                            const isActive = selectedCategoryIds.includes(cat._id);
+                            const color = cat.color || "#9CA3AF";
+                            return (
+                              <button
+                                key={cat._id}
+                                onClick={() => toggleCategory(cat._id)}
+                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all ${
+                                  isActive
+                                    ? "border-transparent text-white shadow-sm"
+                                    : "border-slate-600 bg-slate-700/50 text-slate-300 hover:border-slate-400 hover:text-white"
+                                }`}
+                                style={isActive ? { backgroundColor: color } : undefined}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: isActive ? "white" : color }} />
+                                {cat.icon && <span>{cat.icon}</span>}
+                                <span>{cat.name}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -822,6 +1107,78 @@ export default function ExpenseAnalyticsPage() {
               </div>
             </div>
 
+            {/* ── month-on-month category comparison ─────────────────────── */}
+            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+              {/* section header */}
+              <button
+                onClick={() => setMomSectionOpen((p) => !p)}
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 hover:bg-slate-700/20 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 flex-shrink-0">
+                    <GitCompare className="w-4 h-4" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <h2 className="text-lg font-bold text-white leading-tight">Month-on-Month Category Comparison</h2>
+                    <p className="text-sm text-slate-400 mt-0.5 leading-tight">
+                      Each category's spend across months — see exactly where costs are rising or falling
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="hidden sm:inline text-xs font-semibold text-slate-500">
+                    {categoryMoMGroups.length} categor{categoryMoMGroups.length !== 1 ? "ies" : "y"} · {data.months.length} month{data.months.length !== 1 ? "s" : ""}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${momSectionOpen ? "rotate-180" : ""}`} />
+                </div>
+              </button>
+
+              {momSectionOpen && (
+                <div className="border-t border-slate-700/50 px-6 py-5">
+                  {/* legend hint */}
+                  <div className="flex flex-wrap gap-x-5 gap-y-1.5 mb-5 text-xs text-slate-500">
+                    <span className="flex items-center gap-1.5">
+                      <ArrowUpRight className="w-3.5 h-3.5 text-rose-400" />
+                      <span className="text-rose-400 font-semibold">Red %</span> — spending rose vs prior month
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <ArrowDownRight className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-400 font-semibold">Green %</span> — spending fell vs prior month
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm bg-rose-500/20 ring-1 ring-rose-500/40" />
+                      Highlighted cell = anomaly spike
+                    </span>
+                    <span className="flex items-center gap-1.5 text-slate-600">
+                      "first month" = no prior month to compare
+                    </span>
+                  </div>
+
+                  {/* warning when too many months for side-by-side */}
+                  {data.months.length > 8 && (
+                    <p className="mb-4 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl">
+                      Tip: showing {data.months.length} months side-by-side can be cramped. Scroll horizontally or reduce the date range to 6 months for the best view.
+                    </p>
+                  )}
+
+                  <div className="space-y-2.5">
+                    {categoryMoMGroups.map((group, i) => (
+                      <CategoryMoMCard
+                        key={group.category.categoryId}
+                        category={group.category}
+                        rows={group.rows}
+                        months={data.months}
+                        defaultOpen={i === 0}
+                      />
+                    ))}
+                    {categoryMoMGroups.length === 0 && (
+                      <p className="text-sm text-slate-400 text-center py-6">No data available for the selected filters.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* ── detailed table ─────────────────────────────────────────── */}
             <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
               {/* table header */}
@@ -872,8 +1229,9 @@ export default function ExpenseAnalyticsPage() {
                       const color    = row.categoryColor || categoryColor(data.categories, row.categoryId);
                       const isSpike  = row.anomaly?.isSpike;
                       const barWidth = Math.min((row.amount / maxAmount) * 100, 100);
-                      const isUp     = row.changePct > 0.5;
-                      const isDown   = row.changePct < -0.5;
+                      const hasChange = row.changePct !== null;
+                      const isUp     = hasChange && row.changePct > 0.5;
+                      const isDown   = hasChange && row.changePct < -0.5;
                       return (
                         <tr
                           key={`${row.month}_${row.categoryId}`}
@@ -906,14 +1264,18 @@ export default function ExpenseAnalyticsPage() {
 
                           {/* change % */}
                           <td className="px-5 py-3.5 whitespace-nowrap">
-                            <span className={`inline-flex items-center gap-1 font-semibold ${
-                              isUp ? "text-rose-600" : isDown ? "text-emerald-600" : "text-slate-500"
-                            }`}>
-                              {isUp   ? <ArrowUpRight   className="w-3.5 h-3.5" /> :
-                               isDown ? <ArrowDownRight className="w-3.5 h-3.5" /> :
-                                        <Minus          className="w-3.5 h-3.5" />}
-                              {pct(row.changePct)}
-                            </span>
+                            {!hasChange ? (
+                              <span className="text-xs text-slate-600 font-medium">first month</span>
+                            ) : (
+                              <span className={`inline-flex items-center gap-1 font-semibold ${
+                                isUp ? "text-rose-600" : isDown ? "text-emerald-600" : "text-slate-500"
+                              }`}>
+                                {isUp   ? <ArrowUpRight   className="w-3.5 h-3.5" /> :
+                                 isDown ? <ArrowDownRight className="w-3.5 h-3.5" /> :
+                                          <Minus          className="w-3.5 h-3.5" />}
+                                {pct(row.changePct)}
+                              </span>
+                            )}
                           </td>
 
                           {/* moving average */}
