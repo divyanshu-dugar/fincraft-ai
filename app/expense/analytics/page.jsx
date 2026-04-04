@@ -835,7 +835,7 @@ export default function ExpenseAnalyticsPage() {
                 </div>
                 <div className="flex items-center gap-4 text-xs text-slate-400">
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-400" />Spike</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />Normal</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-500" />Normal</span>
                   <span className="flex items-center gap-1.5"><span className="w-16 h-1 bg-gradient-to-r from-blue-400 to-blue-200 rounded-full" />Relative size</span>
                 </div>
               </div>
