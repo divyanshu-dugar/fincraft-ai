@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, Upload, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Upload, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
 
 import { getToken } from "@/lib/authenticate";
 
@@ -96,6 +96,26 @@ const ExpenseList = () => {
     fetchExpenses();
     fetchStats();
   }, [selectedCategory, dateRange]);
+
+  // Process any overdue recurring expenses on first mount (fire-and-forget)
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses/process`, {
+      method: 'POST',
+      headers: { Authorization: `jwt ${token}` },
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data && data.created > 0) {
+          // New entries were generated — refresh the list
+          fetchExpenses();
+          fetchStats();
+        }
+      })
+      .catch(() => {/* silent */});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * ================================
@@ -343,6 +363,16 @@ const ExpenseList = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => router.push("/expense/recurring")}
+                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
+              >
+                <Repeat size={20} />
+                Recurring
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/expense/analytics")}
                 className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200"
               >
@@ -436,6 +466,17 @@ const ExpenseList = () => {
         }}
       />
 
+      {/* Sticky total bar */}
+      {expenses.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-700/60 px-6 py-3 flex items-center justify-between shadow-2xl">
+          <span className="text-sm text-slate-400 font-medium">
+            {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+            <span className="ml-2 text-slate-500">· {expenses.length} expense{expenses.length !== 1 ? "s" : ""}</span>
+          </span>
+          <span className="text-lg font-black text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
+        </div>
+      )}
+
       {/* Floating month nav arrows */}
       <motion.button
         whileHover={{ scale: 1.1 }}
@@ -466,7 +507,7 @@ const ExpenseList = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => router.push("/expense/add")}
-        className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center hover:shadow-blue-500/60 transition-shadow duration-200"
+        className="fixed bottom-20 right-8 z-50 w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center hover:shadow-blue-500/60 transition-shadow duration-200"
         aria-label="Add expense"
       >
         <Plus size={26} strokeWidth={2.5} />

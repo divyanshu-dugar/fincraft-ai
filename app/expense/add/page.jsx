@@ -13,6 +13,7 @@ import {
   Loader2,
   NotebookPen,
   Plus,
+  Repeat,
   Sparkles,
 } from 'lucide-react';
 
@@ -38,6 +39,11 @@ export default function AddExpense() {
   const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // ── recurring state ──────────────────────────────────────────────────────
+  const [isRecurring,  setIsRecurring]  = useState(false);
+  const [frequency,    setFrequency]    = useState('monthly');
+  const [recurEndDate, setRecurEndDate] = useState('');
 
   // ── fetch category tree ──────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
@@ -112,15 +118,38 @@ export default function AddExpense() {
     try {
       const token = getToken();
       const categoryId = category.subcategoryId || category.parentId;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-        body: JSON.stringify({ date: toApiLocalDateTime(date), category: categoryId, amount: Number(amount), note }),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.message || 'Failed to add expense');
+
+      if (isRecurring) {
+        // Create a recurring expense rule
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+          body: JSON.stringify({
+            category: categoryId,
+            amount: Number(amount),
+            note,
+            frequency,
+            startDate: toApiLocalDateTime(date),
+            endDate: recurEndDate ? toApiLocalDateTime(recurEndDate) : null,
+          }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.error || 'Failed to create recurring expense');
+        }
+      } else {
+        // Create a one-off expense
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+          body: JSON.stringify({ date: toApiLocalDateTime(date), category: categoryId, amount: Number(amount), note }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.message || 'Failed to add expense');
+        }
       }
+
       setSuccess(true);
       setTimeout(() => router.push('/expense/list'), 900);
     } catch (err) {
@@ -279,6 +308,68 @@ export default function AddExpense() {
             </div>
           </div>
 
+          {/* ── recurring card ───────────────────────────────────────────── */}
+          <div className="bg-slate-800/60 rounded-2xl border border-slate-700 divide-y divide-slate-700/50">
+            {/* toggle row */}
+            <div className="px-6 py-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Repeat className="w-4 h-4 text-violet-400" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Recurring</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRecurring((v) => !v)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${
+                  isRecurring ? 'bg-violet-600' : 'bg-slate-600'
+                }`}
+                aria-pressed={isRecurring}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                    isRecurring ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* frequency + end date */}
+            {isRecurring && (
+              <div className="px-6 py-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Frequency</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['daily', 'weekly', 'monthly', 'yearly'].map((f) => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setFrequency(f)}
+                        className={`py-2 rounded-xl text-xs font-bold capitalize border transition-all duration-150 ${
+                          frequency === f
+                            ? 'bg-violet-600 border-violet-600 text-white shadow-md'
+                            : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                    End Date <span className="font-normal normal-case tracking-normal text-slate-600">(optional)</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={recurEndDate}
+                    onChange={(e) => setRecurEndDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 bg-slate-700/50"
+                  />
+                </div>
+                <p className="text-xs text-violet-300/70">An expense entry will be auto-created every {frequency === 'daily' ? 'day' : frequency === 'weekly' ? 'week' : frequency === 'monthly' ? 'month' : 'year'} starting from the date above.</p>
+              </div>
+            )}
+          </div>
+
           {/* ── actions ───────────────────────────────────────────────────── */}
           <div className="flex gap-3 pt-1">
             <button
@@ -303,7 +394,7 @@ export default function AddExpense() {
               ) : loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
               ) : (
-                <><Plus className="w-4 h-4" /> Add Expense</>
+                <><Plus className="w-4 h-4" /> {isRecurring ? 'Set as Recurring' : 'Add Expense'}</>
               )}
             </button>
           </div>
