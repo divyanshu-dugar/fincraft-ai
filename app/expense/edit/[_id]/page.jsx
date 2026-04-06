@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
 import { CategoryPicker } from '@/components/categories/CategoryPicker';
 import {
@@ -23,6 +23,15 @@ const toApiLocalDateTime = (dateString) => (dateString ? `${dateString}T00:00:00
 const EditExpense = () => {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+
+  const returnUrl = (() => {
+    const m = searchParams.get('month');
+    const y = searchParams.get('year');
+    return m !== null && y !== null
+      ? `/expense/list?month=${m}&year=${y}`
+      : '/expense/list';
+  })();
 
   const [categoryTree, setCategoryTree] = useState([]);
   const [category, setCategory] = useState(null);
@@ -170,7 +179,7 @@ const EditExpense = () => {
         throw new Error(d.message || 'Failed to update expense');
       }
       setSuccess(true);
-      setTimeout(() => router.push('/expense/list'), 900);
+      setTimeout(() => router.push(returnUrl), 900);
     } catch (err) {
       setErrors((p) => ({ ...p, form: err.message }));
     } finally {
@@ -188,7 +197,7 @@ const EditExpense = () => {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) throw new Error('Failed to delete expense');
-      router.push('/expense/list');
+      router.push(returnUrl);
     } catch (err) {
       setErrors((p) => ({ ...p, form: err.message }));
       setConfirmDelete(false);

@@ -36,6 +36,8 @@ export default function ExpenseTable({
   deleteExpense,
   formatCurrency = (v) => `$${v.toFixed(2)}`,
   formatDate,
+  currentMonth,
+  currentYear,
 }) {
   /* ============================================================
      Utility Helpers
@@ -268,7 +270,7 @@ export default function ExpenseTable({
                                     whileHover={{ scale: 1.06, y: -1 }}
                                     whileTap={{ scale: 0.94 }}
                                     onClick={() =>
-                                      router.push(`/expense/edit/${expense._id}`)
+                                      router.push(`/expense/edit/${expense._id}?month=${currentMonth}&year=${currentYear}`)
                                     }
                                     className="relative p-2 bg-slate-700/50 text-blue-400 rounded-lg border border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-400/60 hover:text-blue-300 transition-all duration-200 shadow-sm group/btn"
                                     aria-label="Edit expense"
@@ -345,7 +347,7 @@ export default function ExpenseTable({
                               whileHover={{ scale: 1.04 }}
                               whileTap={{ scale: 0.94 }}
                               onClick={() =>
-                                router.push(`/expense/edit/${expense._id}`)
+                                router.push(`/expense/edit/${expense._id}?month=${currentMonth}&year=${currentYear}`)
                               }
                               className="px-3 py-2 text-sm font-medium bg-blue-500/15 text-blue-400 rounded-lg border border-blue-500/30"
                             >

@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, Upload } from "lucide-react";
 
@@ -54,6 +54,8 @@ const ExpenseList = () => {
    * UTC is enforced to avoid timezone-related date shifting issues
    * between frontend and backend.
    */
+  const searchParams = useSearchParams();
+
   const todayUTC = new Date(
     Date.UTC(
       new Date().getUTCFullYear(),
@@ -62,14 +64,23 @@ const ExpenseList = () => {
     )
   );
 
-  const [currentMonth, setCurrentMonth] = useState(todayUTC.getUTCMonth());
-  const [currentYear, setCurrentYear] = useState(todayUTC.getUTCFullYear());
+  const initMonth = searchParams.get("month") !== null
+    ? parseInt(searchParams.get("month"), 10)
+    : todayUTC.getUTCMonth();
+  const initYear = searchParams.get("year") !== null
+    ? parseInt(searchParams.get("year"), 10)
+    : todayUTC.getUTCFullYear();
+
+  const [currentMonth, setCurrentMonth] = useState(initMonth);
+  const [currentYear, setCurrentYear] = useState(initYear);
 
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.UTC(currentYear, currentMonth, 1))
+    startDate: new Date(Date.UTC(initYear, initMonth, 1))
       .toISOString()
       .split("T")[0],
-    endDate: todayUTC.toISOString().split("T")[0],
+    endDate: new Date(Date.UTC(initYear, initMonth + 1, 0))
+      .toISOString()
+      .split("T")[0],
   });
 
   const router = useRouter();
@@ -355,6 +366,8 @@ const ExpenseList = () => {
           deleteExpense={deleteExpense}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
+          currentMonth={currentMonth}
+          currentYear={currentYear}
         />
 
         <motion.div
