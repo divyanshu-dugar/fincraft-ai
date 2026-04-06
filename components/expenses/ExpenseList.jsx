@@ -16,13 +16,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { getToken } from "@/lib/authenticate";
 
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseTable from "./ExpenseTable";
-import ExpenseSummary from "./ExpenseSummary";
+
 import LoadingSpinner from "./LoadingSpinner";
 import ImportExpensesModal from "./ImportExpensesModel";
 
@@ -308,7 +308,8 @@ const ExpenseList = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl shadow-2xl p-8 mb-10"
         >
-          <div className="relative z-10">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div>
             <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-2xl mb-4">
               Expense Tracker
             </h1>
@@ -348,6 +349,14 @@ const ExpenseList = () => {
                 📊 View Analytics
               </motion.button>
             </div>
+            </div>
+            {expenses.length > 0 && (
+              <div className="shrink-0 self-start bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 text-center min-w-[160px]">
+                <p className="text-blue-200 text-sm font-medium mb-1">Total This Period</p>
+                <p className="text-3xl font-black text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</p>
+                <p className="text-blue-200 text-xs mt-1">{expenses.length} expense{expenses.length !== 1 ? 's' : ''}</p>
+              </div>
+            )}
           </div>
         </motion.header>
 
@@ -415,10 +424,7 @@ const ExpenseList = () => {
           </motion.button>
         </motion.div>
 
-        {/* Summary */}
-        {expenses.length > 0 && (
-          <ExpenseSummary expenses={expenses} formatCurrency={formatCurrency} />
-        )}
+
       </div>
 
       <ImportExpensesModal
@@ -429,6 +435,42 @@ const ExpenseList = () => {
           fetchStats(); // Refresh stats
         }}
       />
+
+      {/* Floating month nav arrows */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => changeMonth(-1)}
+        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
+        aria-label="Previous month"
+      >
+        <ChevronLeft size={22} strokeWidth={2.5} />
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => changeMonth(1)}
+        disabled={
+          currentYear === todayUTC.getUTCFullYear() &&
+          currentMonth === todayUTC.getUTCMonth()
+        }
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        aria-label="Next month"
+      >
+        <ChevronRight size={22} strokeWidth={2.5} />
+      </motion.button>
+
+      {/* Floating Add Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => router.push("/expense/add")}
+        className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center hover:shadow-blue-500/60 transition-shadow duration-200"
+        aria-label="Add expense"
+      >
+        <Plus size={26} strokeWidth={2.5} />
+      </motion.button>
     </div>
   );
 };

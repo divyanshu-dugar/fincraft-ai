@@ -46,6 +46,16 @@ export default function ExpenseFilters({
   const [dropdownPos, setDropdownPos] = useState({ left: 0, top: 0, width: 0 });
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  // Pending date state — only committed to parent on "Apply"
+  const [pendingStart, setPendingStart] = useState(dateRange.startDate);
+  const [pendingEnd, setPendingEnd] = useState(dateRange.endDate);
+
+  // Sync pending values when parent changes dateRange externally (e.g. month nav)
+  useEffect(() => {
+    setPendingStart(dateRange.startDate);
+    setPendingEnd(dateRange.endDate);
+  }, [dateRange.startDate, dateRange.endDate]);
+
   useEffect(() => {
     if (dropdownOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -70,10 +80,12 @@ export default function ExpenseFilters({
 
         {/* Resets category and date range filters to default values */}
         <button
-          onClick={() =>
-            setDateRange({ startDate: "", endDate: "" }) ||
-            setSelectedCategory("all")
-          }
+          onClick={() => {
+            setPendingStart("");
+            setPendingEnd("");
+            setDateRange({ startDate: "", endDate: "" });
+            setSelectedCategory("all");
+          }}
           className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
         >
           Reset Filters
@@ -184,10 +196,8 @@ export default function ExpenseFilters({
 
           <input
             type="date"
-            value={dateRange.startDate}
-            onChange={(e) =>
-              setDateRange({ ...dateRange, startDate: e.target.value })
-            }
+            value={pendingStart}
+            onChange={(e) => setPendingStart(e.target.value)}
             className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 shadow-sm hover:border-blue-400/60 focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 [color-scheme:dark] outline-none transition-all duration-200"
           />
         </div>
@@ -204,15 +214,23 @@ export default function ExpenseFilters({
 
           <input
             type="date"
-            value={dateRange.endDate}
-            onChange={(e) =>
-              setDateRange({ ...dateRange, endDate: e.target.value })
-            }
+            value={pendingEnd}
+            onChange={(e) => setPendingEnd(e.target.value)}
             className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 shadow-sm hover:border-pink-400/60 focus:ring-2 focus:ring-pink-400/40 focus:border-pink-400 [color-scheme:dark] outline-none transition-all duration-200"
           />
         </div>
       </div>
 
+      {/* Apply date range button */}
+      <div className="flex justify-end mt-5">
+        <button
+          onClick={() => setDateRange({ startDate: pendingStart, endDate: pendingEnd })}
+          disabled={pendingStart === dateRange.startDate && pendingEnd === dateRange.endDate}
+          className="px-5 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Apply Date Range
+        </button>
+      </div>
     </div>
   );
 }
