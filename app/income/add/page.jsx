@@ -13,6 +13,7 @@ import {
   Loader2,
   NotebookPen,
   Plus,
+  Repeat,
   Sparkles,
 } from 'lucide-react';
 
@@ -34,6 +35,11 @@ export default function AddIncome() {
   const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // ── recurring state ──────────────────────────────────────────────────────
+  const [isRecurring,  setIsRecurring]  = useState(false);
+  const [frequency,    setFrequency]    = useState('monthly');
+  const [recurEndDate, setRecurEndDate] = useState('');
 
   // ── fetch categories ──────────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
@@ -85,15 +91,36 @@ export default function AddIncome() {
     setLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-        body: JSON.stringify({ date, category: category._id, amount: Number(amount), note }),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.message || 'Failed to add income');
+
+      if (isRecurring) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+          body: JSON.stringify({
+            category: category._id,
+            amount: Number(amount),
+            note,
+            frequency,
+            startDate: date,
+            endDate: recurEndDate || null,
+          }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.error || 'Failed to create recurring income');
+        }
+      } else {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
+          body: JSON.stringify({ date, category: category._id, amount: Number(amount), note }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.message || 'Failed to add income');
+        }
       }
+
       setSuccess(true);
       setTimeout(() => router.push('/income/list'), 900);
     } catch (err) {
@@ -246,6 +273,68 @@ export default function AddIncome() {
             </div>
           </div>
 
+          {/* ── recurring card ───────────────────────────────────────────── */}
+          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
+            {/* toggle row */}
+            <div className="px-6 py-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Repeat className="w-4 h-4 text-emerald-400" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Recurring</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRecurring((v) => !v)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${
+                  isRecurring ? 'bg-emerald-600' : 'bg-slate-600'
+                }`}
+                aria-pressed={isRecurring}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                    isRecurring ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* frequency + end date */}
+            {isRecurring && (
+              <div className="px-6 py-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Frequency</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['daily', 'weekly', 'monthly', 'yearly'].map((f) => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setFrequency(f)}
+                        className={`py-2 rounded-xl text-xs font-bold capitalize border transition-all duration-150 ${
+                          frequency === f
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-md'
+                            : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                    End Date <span className="font-normal normal-case tracking-normal text-slate-600">(optional)</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={recurEndDate}
+                    onChange={(e) => setRecurEndDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 bg-slate-700/50"
+                  />
+                </div>
+                <p className="text-xs text-emerald-300/70">An income entry will be auto-created every {frequency === 'daily' ? 'day' : frequency === 'weekly' ? 'week' : frequency === 'monthly' ? 'month' : 'year'} starting from the date above.</p>
+              </div>
+            )}
+          </div>
+
           {/* ── actions ───────────────────────────────────────────────────── */}
           <div className="flex gap-3 pt-1">
             <button
@@ -270,7 +359,7 @@ export default function AddIncome() {
               ) : loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
               ) : (
-                <><Plus className="w-4 h-4" /> Add Income</>
+                <><Plus className="w-4 h-4" /> {isRecurring ? 'Set as Recurring' : 'Add Income'}</>
               )}
             </button>
           </div>

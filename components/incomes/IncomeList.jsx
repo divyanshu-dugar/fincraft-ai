@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Repeat } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
@@ -43,6 +43,25 @@ const IncomeList = () => {
     fetchIncomes();
     fetchStats();
   }, [selectedCategory, dateRange]);
+
+  // Process any overdue recurring incomes on first mount (fire-and-forget)
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes/process`, {
+      method: 'POST',
+      headers: { Authorization: `jwt ${token}` },
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data && data.created > 0) {
+          fetchIncomes();
+          fetchStats();
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 🟣 Fetch user-specific categories
   const fetchCategories = async () => {
@@ -235,6 +254,15 @@ const IncomeList = () => {
               >
                 <Plus size={20} />
                 Add New Income
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push("/income/recurring")}
+                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
+              >
+                <Repeat size={20} />
+                Recurring
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}

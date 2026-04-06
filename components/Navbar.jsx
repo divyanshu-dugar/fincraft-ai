@@ -7,8 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
 import {
   Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles,
-  LayoutDashboard, Home, TrendingUp, TrendingDown, Wallet, Target,
-  List, Plus, Tag, BarChart2, Settings,
+  LayoutDashboard, Home, TrendingUp, TrendingDown, List, Tag,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -91,42 +90,25 @@ export default function Navbar() {
   const authenticatedMenuItems = [
     {
       name: 'Ledgerify',
-      isMegaMenu: true,
       items: [
-        {
-          title: 'Income Tracker',
-          icon: TrendingUp,
-          items: [
-            { name: 'Income List', href: '/income/list', icon: List },
-            { name: 'Add Income', href: '/income/add', icon: Plus },
-            { name: 'Add Category', href: '/income/category', icon: Tag },
-            { name: 'Analytics', href: '/income/analytics', icon: BarChart2 },
-          ],
-        },
-        {
-          title: 'Expenses Tracker',
-          icon: TrendingDown,
-          items: [
-            { name: 'Expense List', href: '/expense/list', icon: List },
-            { name: 'Add Expense', href: '/expense/add', icon: Plus },
-            { name: 'Manage Category', href: '/expense/category', icon: Settings },
-            { name: 'Analytics', href: '/expense/analytics', icon: BarChart2 },
-          ],
-        },
+        { name: 'Manage Expenses',      href: '/expense/list',    icon: TrendingDown },
+        { name: 'Manage Income',        href: '/income/list',     icon: TrendingUp },
+        { name: 'Expense Categories',   href: '/expense/category', icon: Tag },
+        { name: 'Income Categories',    href: '/income/category',  icon: Tag },
       ],
     },
     {
       name: 'Budgetify',
       items: [
         { name: 'Budget List', href: '/budget/list', icon: List },
-        { name: 'Add Budget', href: '/budget/add', icon: Plus },
-        { name: 'Analytics', href: '/budget/analytics', icon: BarChart2 },
+        { name: 'Add Budget', href: '/budget/add', icon: List },
+        { name: 'Analytics', href: '/budget/analytics', icon: List },
       ],
     },
     {
       name: 'Goalify',
       items: [
-        { name: 'Savings Goal List', href: '/goal/list', icon: Target },
+        { name: 'Savings Goal List', href: '/goal/list', icon: List },
       ],
     },
   ];
