@@ -270,9 +270,12 @@ export default function BudgetList() {
         {/* ── alert banner ── */}
         {alerts.length > 0 && (
           <div className="bg-slate-800/60 rounded-2xl border border-amber-500/30 shadow-sm overflow-hidden">
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setAlertsOpen((o) => !o)}
-              className="w-full flex items-center justify-between px-6 py-4 hover:bg-amber-500/10 transition-colors"
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setAlertsOpen((o) => !o)}
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-amber-500/10 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center">
@@ -291,7 +294,7 @@ export default function BudgetList() {
                 </button>
                 {alertsOpen ? <ChevronDown className="w-4 h-4 text-amber-400" /> : <ChevronRight className="w-4 h-4 text-amber-400" />}
               </div>
-            </button>
+            </div>
 
             {alertsOpen && (
               <div className="divide-y divide-amber-500/20 border-t border-amber-500/20">

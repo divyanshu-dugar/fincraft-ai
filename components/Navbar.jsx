@@ -9,6 +9,7 @@ import {
   Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles,
   LayoutDashboard, Home, TrendingUp, TrendingDown, List, Tag,
 } from 'lucide-react';
+import BudgetAlertsBell from '@/components/BudgetAlertsBell';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -276,6 +277,9 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
             ))}
+
+            {/* Budget Alerts Bell */}
+            {authenticated && <BudgetAlertsBell />}
 
             {/* Auth Buttons */}
             {authenticated ? (

@@ -148,6 +148,8 @@ export default function AddExpense() {
           const d = await res.json().catch(() => ({}));
           throw new Error(d.message || 'Failed to add expense');
         }
+        // Notify BudgetAlertsBell to re-check immediately
+        window.dispatchEvent(new CustomEvent('expense-added'));
       }
 
       setSuccess(true);

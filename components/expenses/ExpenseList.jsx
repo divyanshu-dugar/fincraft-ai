@@ -273,6 +273,7 @@ const ExpenseList = () => {
       if (response.ok) {
         setExpenses((prev) => prev.filter((e) => e._id !== id));
         fetchStats();
+        window.dispatchEvent(new CustomEvent('expense-added')); // re-check budget alerts
       }
     } catch (error) {
       console.error("Error deleting expense:", error);

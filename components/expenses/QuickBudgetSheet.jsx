@@ -10,9 +10,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Loader2, Wallet } from 'lucide-react';
+import { X, Check, Loader2, Wallet, ChevronRight } from 'lucide-react';
 import { getToken } from '@/lib/authenticate';
-import { CategoryPicker } from '@/components/categories/CategoryPicker';
 
 const API   = process.env.NEXT_PUBLIC_API_URL;
 const SCHEME = 'jwt';
@@ -29,7 +28,137 @@ const QUICK_AMOUNTS = {
   yearly:  [5000, 10000, 25000, 50000],
 };
 
-// ── date helpers ─────────────────────────────────────────────────────────────
+// ── Inline category selector ─────────────────────────────────────────────────
+// Renders directly in the flow (no dropdowns) so overflow-y-auto never clips it.
+
+function InlineCategoryPicker({ tree = [], value, onChange, error }) {
+  const [selectedParent, setSelectedParent] = useState(null);
+
+  // Keep selectedParent in sync when value is cleared externally
+  useEffect(() => {
+    if (!value) setSelectedParent(null);
+  }, [value]);
+
+  function pickParent(parent) {
+    setSelectedParent(parent);
+    // If the parent has no subcategories, select it directly
+    if (!parent.subcategories?.length) {
+      onChange({ parentId: parent._id, parentName: parent.name, parentIcon: parent.icon, subcategoryId: null, subcategoryName: null });
+    } else {
+      // Clear subcategory selection when switching parent
+      if (value?.parentId !== parent._id) {
+        onChange(null);
+      }
+    }
+  }
+
+  function pickSub(sub) {
+    onChange({
+      parentId: selectedParent._id,
+      parentName: selectedParent.name,
+      parentIcon: selectedParent.icon,
+      subcategoryId: sub._id,
+      subcategoryName: sub.name,
+      subcategoryIcon: sub.icon,
+    });
+  }
+
+  const activeSubs = selectedParent?.subcategories || [];
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-slate-300 mb-2">
+        Category <span className="text-red-400">*</span>
+      </label>
+
+      {/* Parent chips */}
+      <div className="flex flex-wrap gap-2 mb-2">
+        {tree.map((parent) => {
+          const isActive = selectedParent?._id === parent._id;
+          return (
+            <button
+              key={parent._id}
+              type="button"
+              onClick={() => pickParent(parent)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 ${
+                isActive
+                  ? 'bg-indigo-500/25 border-indigo-400/70 text-indigo-200'
+                  : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:border-slate-500 hover:text-slate-200'
+              }`}
+            >
+              <span>{parent.icon || '📁'}</span>
+              {parent.name}
+              {parent.subcategories?.length > 0 && (
+                <ChevronRight size={11} className={`transition-transform duration-150 ${isActive ? 'rotate-90' : ''}`} />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Subcategory chips — shown inline below selected parent */}
+      <AnimatePresence>
+        {selectedParent && activeSubs.length > 0 && (
+          <motion.div
+            key={selectedParent._id}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.18 }}
+            className="overflow-hidden"
+          >
+            <div className="pl-2 border-l-2 border-indigo-500/40 mt-1 mb-2">
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                {selectedParent.name} › sub-category
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {activeSubs.map((sub) => {
+                  const isSelected = value?.subcategoryId === sub._id;
+                  return (
+                    <button
+                      key={sub._id}
+                      type="button"
+                      onClick={() => pickSub(sub)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 ${
+                        isSelected
+                          ? 'bg-indigo-600/30 border-indigo-400 text-white'
+                          : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:border-indigo-400/50 hover:text-slate-200'
+                      }`}
+                    >
+                      <span>{sub.icon || '💰'}</span>
+                      {sub.name}
+                      {isSelected && <Check size={11} className="text-indigo-300" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Selected value summary */}
+      {value && (
+        <div className="flex items-center gap-2 mt-1 px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
+          <Check size={13} className="text-indigo-400 shrink-0" />
+          <span className="text-xs text-indigo-200 font-medium">
+            {value.parentName}{value.subcategoryName ? ` › ${value.subcategoryName}` : ''}
+          </span>
+          <button
+            type="button"
+            onClick={() => { onChange(null); setSelectedParent(null); }}
+            className="ml-auto text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            <X size={13} />
+          </button>
+        </div>
+      )}
+
+      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+    </div>
+  );
+}
+
 
 function todayLocal() {
   const d = new Date();
@@ -277,21 +406,13 @@ export default function QuickBudgetSheet({
                   </div>
                 </div>
 
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
-                    Category <span className="text-red-400">*</span>
-                  </label>
-                  <div className={`rounded-xl border overflow-hidden ${errors.category ? 'border-red-500/60' : 'border-slate-700/60'}`}>
-                    <CategoryPicker
-                      tree={categoryTree}
-                      value={categoryValue}
-                      onChange={(val) => { setCategoryValue(val); clearErr('category'); }}
-                      onAddCategory={onAddCategory}
-                    />
-                  </div>
-                  {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
-                </div>
+                {/* Category — inline two-step selector */}
+                <InlineCategoryPicker
+                  tree={categoryTree}
+                  value={categoryValue}
+                  onChange={(val) => { setCategoryValue(val); clearErr('category'); }}
+                  error={errors.category}
+                />
 
                 {/* Amount */}
                 <div>
