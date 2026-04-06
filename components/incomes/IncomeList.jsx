@@ -290,39 +290,51 @@ const IncomeList = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 items-center bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 px-5 py-4 mb-5"
+          className="relative overflow-hidden rounded-2xl border border-emerald-400/20 mb-5"
         >
-          <div />
-          <div className="text-center">
-            {!isCustomRange ? (
-              <h2 className="text-xl font-bold text-white">
-                {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
-              </h2>
-            ) : (
-              <h2 className="text-base font-semibold text-slate-300">
-                {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-                {dateRange.startDate && dateRange.endDate && " – "}
-                {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-              </h2>
-            )}
-            <p className="text-slate-400 text-sm mt-0.5">
-              <span className="text-white font-semibold">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
-              <span className="ml-2">· {incomes.length} income{incomes.length !== 1 ? "s" : ""}</span>
-            </p>
-          </div>
-          <div className="flex justify-end">
-          <button
-            onClick={() => setShowFilters((prev) => !prev)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200 ${
-              showFilters
-                ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
-                : "bg-slate-700/60 border-slate-600/60 text-slate-400 hover:border-slate-500 hover:text-slate-200"
-            }`}
-          >
-            <SlidersHorizontal size={15} />
-            Filters
-            <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
-          </button>
+          <div className="bg-gradient-to-r from-slate-900 via-emerald-900/60 to-teal-900/60 px-5 py-4">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(16,185,129,0.25),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(20,184,166,0.2),transparent_45%)]" />
+            <div className="relative flex items-center gap-3">
+
+              {/* Spacer to balance Filters on the right */}
+              <div className="shrink-0 w-[80px]" />
+
+              {/* Center: big month + total + count */}
+              <div className="flex-1 text-center">
+                {!isCustomRange ? (
+                  <h2 className="text-2xl font-black text-white tracking-tight">
+                    {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+                  </h2>
+                ) : (
+                  <h2 className="text-lg font-bold text-emerald-100">
+                    {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                    {dateRange.startDate && dateRange.endDate && " – "}
+                    {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                  </h2>
+                )}
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <span className="text-base font-bold text-white">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
+                  <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
+                    {incomes.length} income{incomes.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filters — shrinks to content */}
+              <button
+                onClick={() => setShowFilters((prev) => !prev)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm ${
+                  showFilters
+                    ? "bg-emerald-500/30 border-emerald-400/60 text-emerald-200"
+                    : "bg-white/10 border-white/20 text-emerald-100 hover:bg-white/20 hover:text-white"
+                }`}
+              >
+                <SlidersHorizontal size={13} />
+                Filters
+                <ChevronDown size={12} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+              </button>
+
+            </div>
           </div>
         </motion.div>
 

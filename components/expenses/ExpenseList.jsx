@@ -16,7 +16,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown, Wallet } from "lucide-react";
+
+import QuickBudgetSheet from "./QuickBudgetSheet";
 
 import { getToken } from "@/lib/authenticate";
 
@@ -45,6 +47,7 @@ const ExpenseList = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
 
   /**
    * ================================
@@ -394,39 +397,57 @@ const ExpenseList = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 items-center bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 px-5 py-4 mb-5"
+          className="relative overflow-hidden rounded-2xl border border-blue-400/20 mb-5"
         >
-          <div />
-          <div className="text-center">
-            {!isCustomRange ? (
-              <h2 className="text-xl font-bold text-white">
-                {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
-              </h2>
-            ) : (
-              <h2 className="text-base font-semibold text-slate-300">
-                {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-                {dateRange.startDate && dateRange.endDate && " – "}
-                {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
-              </h2>
-            )}
-            <p className="text-slate-400 text-sm mt-0.5">
-              <span className="text-white font-semibold">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
-              <span className="ml-2">· {expenses.length} expense{expenses.length !== 1 ? "s" : ""}</span>
-            </p>
-          </div>
-          <div className="flex justify-end">
-          <button
-            onClick={() => setShowFilters((prev) => !prev)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200 ${
-              showFilters
-                ? "bg-blue-500/20 border-blue-400/60 text-blue-300"
-                : "bg-slate-700/60 border-slate-600/60 text-slate-400 hover:border-slate-500 hover:text-slate-200"
-            }`}
-          >
-            <SlidersHorizontal size={15} />
-            Filters
-            <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
-          </button>
+          <div className="bg-gradient-to-r from-slate-900 via-blue-900/70 to-indigo-900/70 px-5 py-4">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(99,102,241,0.3),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(56,189,248,0.2),transparent_45%)]" />
+            <div className="relative flex items-center gap-3">
+
+              {/* Set Budget — shrinks to content */}
+              <button
+                onClick={() => setBudgetSheetOpen(true)}
+                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-blue-100 hover:bg-white/20 hover:text-white transition-all backdrop-blur-sm"
+              >
+                <Wallet size={13} />
+                Set Budget
+              </button>
+
+              {/* Center: big month + total + count */}
+              <div className="flex-1 text-center">
+                {!isCustomRange ? (
+                  <h2 className="text-2xl font-black text-white tracking-tight">
+                    {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+                  </h2>
+                ) : (
+                  <h2 className="text-lg font-bold text-blue-100">
+                    {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                    {dateRange.startDate && dateRange.endDate && " – "}
+                    {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                  </h2>
+                )}
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <span className="text-base font-bold text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
+                  <span className="inline-flex items-center rounded-full bg-white/15 text-blue-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
+                    {expenses.length} expense{expenses.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filters — shrinks to content */}
+              <button
+                onClick={() => setShowFilters((prev) => !prev)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm ${
+                  showFilters
+                    ? "bg-blue-500/30 border-blue-400/60 text-blue-200"
+                    : "bg-white/10 border-white/20 text-blue-100 hover:bg-white/20 hover:text-white"
+                }`}
+              >
+                <SlidersHorizontal size={13} />
+                Filters
+                <ChevronDown size={12} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+              </button>
+
+            </div>
           </div>
         </motion.div>
 
@@ -468,6 +489,30 @@ const ExpenseList = () => {
 
 
       </div>
+
+      <QuickBudgetSheet
+        open={budgetSheetOpen}
+        onClose={() => setBudgetSheetOpen(false)}
+        categoryTree={categoryTree}
+        onAddCategory={async (parentId, catName, color) => {
+          const token = getToken();
+          const body = parentId ? { name: catName, parentCategory: parentId } : { name: catName, isParent: true };
+          if (color) body.color = color;
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `${AUTH_SCHEME} ${token}` },
+            body: JSON.stringify(body),
+          });
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}));
+            throw new Error(d.error || 'Failed to create category');
+          }
+          fetchCategories();
+        }}
+        prefillAmount={expenses.reduce((s, e) => s + e.amount, 0)}
+        prefillStartDate={dateRange.startDate}
+        prefillEndDate={dateRange.endDate}
+      />
 
       <ImportExpensesModal
         isOpen={importModalOpen}

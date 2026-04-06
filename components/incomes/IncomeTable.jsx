@@ -93,23 +93,23 @@ export default function IncomeTable({
                 transition={{ delay: dateIndex * 0.1 }}
                 className="border-b border-slate-700/50 last:border-b-0"
               >
-                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-900 via-green-900 to-teal-900 px-5 md:px-8 py-5 border-b border-emerald-700/70">
+                <div className="relative overflow-hidden bg-gradient-to-r from-emerald-900 via-green-900 to-teal-900 px-4 md:px-6 py-3 border-b border-emerald-700/70">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(16,185,129,0.2),transparent_40%)]" />
-                  <div className="relative flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-xl md:text-2xl font-bold text-white">
+                  <div className="relative flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm md:text-base font-semibold text-white">
                         {group.label}
                       </h2>
-                      <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-xs font-semibold px-2.5 py-1 border border-white/25 backdrop-blur-sm">
+                      <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-[11px] font-semibold px-2 py-0.5 border border-white/25 backdrop-blur-sm">
                         {dailyIncomes.length} item{dailyIncomes.length > 1 ? "s" : ""}
                       </span>
                     </div>
 
-                    <div className="text-right px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 backdrop-blur-sm">
-                      <div className="text-[11px] font-semibold text-emerald-100 uppercase tracking-[0.18em]">
+                    <div className="text-right px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
+                      <div className="text-[10px] font-semibold text-emerald-100 uppercase tracking-[0.15em]">
                         Daily Total
                       </div>
-                      <div className="text-xl md:text-2xl font-bold text-white mt-0.5">
+                      <div className="text-sm md:text-base font-bold text-white mt-0.5">
                         {formatCurrency(dailyTotal)}
                       </div>
                     </div>
@@ -126,11 +126,11 @@ export default function IncomeTable({
                     </colgroup>
 
                     <thead>
-                      <tr className="bg-gradient-to-r from-emerald-100 via-green-50 to-teal-50 text-left">
+                      <tr className="bg-slate-800/60 text-left">
                         {["Category", "Amount", "Note", "Actions"].map((header) => (
                           <th
                             key={header}
-                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-emerald-300 tracking-[0.14em] border-b-2 border-emerald-700/50"
+                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-emerald-400 tracking-[0.14em] border-b-2 border-emerald-700/50"
                           >
                             <div className="flex items-center gap-2">
                               {header}
