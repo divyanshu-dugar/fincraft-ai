@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
@@ -326,6 +326,31 @@ const IncomeList = () => {
           <IncomeSummary incomes={incomes} formatCurrency={formatCurrency} />
         )}
       </div>
+
+      {/* Floating month nav arrows */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => changeMonth(-1)}
+        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
+        aria-label="Previous month"
+      >
+        <ChevronLeft size={22} strokeWidth={2.5} />
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => changeMonth(1)}
+        disabled={
+          currentYear === todayUTC.getUTCFullYear() &&
+          currentMonth === todayUTC.getUTCMonth()
+        }
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        aria-label="Next month"
+      >
+        <ChevronRight size={22} strokeWidth={2.5} />
+      </motion.button>
     </div>
   );
 };

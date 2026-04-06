@@ -54,7 +54,7 @@ export function IncomeCategoryPicker({
   );
 
   async function handleAdd(e) {
-    e.preventDefault();
+    if (e?.preventDefault) e.preventDefault();
     const name = newName.trim();
     if (!name) return;
     setAddLoad(true);
@@ -73,16 +73,18 @@ export function IncomeCategoryPicker({
   return (
     <div className="relative" ref={ref}>
       {/* Trigger */}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all outline-none ${
+      <div
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
           error
             ? 'border-rose-300 ring-2 ring-rose-100 bg-rose-50'
             : open
             ? 'border-blue-400 ring-2 ring-blue-100 bg-white'
             : 'border-gray-200 bg-white hover:border-gray-300'
         }`}
+        onClick={() => setOpen((o) => !o)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen((o) => !o); } }}
       >
         {value ? (
           <>
@@ -107,7 +109,7 @@ export function IncomeCategoryPicker({
             <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
           </>
         )}
-      </button>
+      </div>
 
       {/* Dropdown */}
       {open && (
@@ -165,17 +167,19 @@ export function IncomeCategoryPicker({
           {onAddCategory && (
             <div className="border-t border-gray-100 p-3">
               {adding ? (
-                <form onSubmit={handleAdd} className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd(); } if (e.key === 'Escape') { setAdding(false); setNewName(''); setAddErr(''); } }}
                     placeholder="Category name"
                     autoFocus
                     className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
                   />
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleAdd}
                     disabled={!newName.trim() || addLoading}
                     className="p-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 transition-all"
                   >
@@ -188,7 +192,7 @@ export function IncomeCategoryPicker({
                   >
                     <X className="w-4 h-4" />
                   </button>
-                </form>
+                </div>
               ) : (
                 <button
                   type="button"
