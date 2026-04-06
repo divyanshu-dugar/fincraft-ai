@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
@@ -32,6 +32,8 @@ const IncomeList = () => {
   // Pagination
   const [currentMonth, setCurrentMonth] = useState(todayUTC.getUTCMonth());
   const [currentYear, setCurrentYear] = useState(todayUTC.getUTCFullYear());
+  const [isCustomRange, setIsCustomRange] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const router = useRouter();
 
@@ -201,6 +203,7 @@ const IncomeList = () => {
     const lastDayUTC = new Date(Date.UTC(newYear, newMonth + 1, 0));
 
     // Update date range state
+    setIsCustomRange(false);
     setDateRange({
       startDate: firstDayUTC.toISOString().split("T")[0],
       endDate: lastDayUTC.toISOString().split("T")[0],
@@ -222,10 +225,6 @@ const IncomeList = () => {
             <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-2xl mb-4">
               Income Tracker
             </h1>
-            <p className="text-xl md:text-2xl text-green-100/90 max-w-2xl mb-8 leading-relaxed">
-              Monitor your earnings and financial growth. Track, analyze, and
-              optimize your income streams with intelligent insights.
-            </p>
 
             <div className="flex flex-wrap gap-4">
               <motion.button
@@ -257,14 +256,72 @@ const IncomeList = () => {
         </motion.header>
 
         {/* Filters */}
-        <IncomeFilters
-          categories={categories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          router={router}
-        />
+
+        {/* Month / Range Header Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 items-center bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 px-5 py-4 mb-5"
+        >
+          <div />
+          <div className="text-center">
+            {!isCustomRange ? (
+              <h2 className="text-xl font-bold text-white">
+                {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+              </h2>
+            ) : (
+              <h2 className="text-base font-semibold text-slate-300">
+                {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                {dateRange.startDate && dateRange.endDate && " – "}
+                {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+              </h2>
+            )}
+            <p className="text-slate-400 text-sm mt-0.5">
+              <span className="text-white font-semibold">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
+              <span className="ml-2">· {incomes.length} income{incomes.length !== 1 ? "s" : ""}</span>
+            </p>
+          </div>
+          <div className="flex justify-end">
+          <button
+            onClick={() => setShowFilters((prev) => !prev)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200 ${
+              showFilters
+                ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
+                : "bg-slate-700/60 border-slate-600/60 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+            }`}
+          >
+            <SlidersHorizontal size={15} />
+            Filters
+            <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+          </button>
+          </div>
+        </motion.div>
+
+        {/* Collapsible Filters */}
+        {showFilters && (
+          <IncomeFilters
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            router={router}
+            onCustomRangeApply={() => setIsCustomRange(true)}
+            onCustomRangeReset={() => {
+              setIsCustomRange(false);
+              const t = new Date();
+              const m = t.getUTCMonth();
+              const y = t.getUTCFullYear();
+              setCurrentMonth(m);
+              setCurrentYear(y);
+              setDateRange({
+                startDate: new Date(Date.UTC(y, m, 1)).toISOString().split("T")[0],
+                endDate: new Date(Date.UTC(y, m + 1, 0)).toISOString().split("T")[0],
+              });
+            }}
+          />
+        )}
 
         {/* Enhanced Table with proper props */}
         <IncomeTable
@@ -274,52 +331,6 @@ const IncomeList = () => {
           formatCurrency={formatCurrency}
           formatDate={formatDate}
         />
-
-        {/* Enhanced Pagination Controls */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-between items-center mt-8 p-6 bg-slate-800/60 rounded-2xl border border-cyan-400/20"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05, x: -2 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => changeMonth(-1)}
-            className="px-6 py-3 bg-slate-700 text-slate-300 font-semibold rounded-xl transition-all duration-200 hover:bg-slate-600 flex items-center gap-2 cursor-pointer"
-          >
-            ← Previous Month
-          </motion.button>
-
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString(
-                "default",
-                {
-                  month: "long",
-                  year: "numeric",
-                  timeZone: "UTC",
-                }
-              )}
-            </p>
-            <p className="text-sm text-slate-400 mt-1">
-              {incomes.length} income records this period
-            </p>
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05, x: 2 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => changeMonth(1)}
-            disabled={
-              currentYear === todayUTC.getUTCFullYear() &&
-              currentMonth === todayUTC.getUTCMonth()
-            }
-            className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-          >
-            Next Month →
-          </motion.button>
-        </motion.div>
 
         {/* Summary */}
         {incomes.length > 0 && (

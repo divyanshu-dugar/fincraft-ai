@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, Upload, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
+import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown } from "lucide-react";
 
 import { getToken } from "@/lib/authenticate";
 
@@ -86,6 +86,8 @@ const ExpenseList = () => {
     startDate: urlStartDate || new Date(Date.UTC(initYear, initMonth, 1)).toISOString().split("T")[0],
     endDate: urlEndDate || new Date(Date.UTC(initYear, initMonth + 1, 0)).toISOString().split("T")[0],
   });
+  const [isCustomRange, setIsCustomRange] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const router = useRouter();
 
@@ -315,6 +317,7 @@ const ExpenseList = () => {
     const firstDay = new Date(Date.UTC(newYear, newMonth, 1));
     const lastDay = new Date(Date.UTC(newYear, newMonth + 1, 0));
 
+    setIsCustomRange(false);
     setDateRange({
       startDate: firstDay.toISOString().split("T")[0],
       endDate: lastDay.toISOString().split("T")[0],
@@ -337,15 +340,10 @@ const ExpenseList = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl shadow-2xl p-8 mb-10"
         >
-          <div className="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div>
+          <div className="relative z-10">
             <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-2xl mb-4">
               Expense Tracker
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100/90 max-w-2xl mb-8 leading-relaxed">
-              Take control of your financial journey. Track, analyze, and
-              optimize your spending with intelligent insights.
-            </p>
 
             <div className="flex flex-wrap gap-4">
               <motion.button
@@ -388,25 +386,74 @@ const ExpenseList = () => {
                 📊 View Analytics
               </motion.button>
             </div>
-            </div>
-            {expenses.length > 0 && (
-              <div className="shrink-0 self-start bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 text-center min-w-[160px]">
-                <p className="text-blue-200 text-sm font-medium mb-1">Total This Period</p>
-                <p className="text-3xl font-black text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</p>
-                <p className="text-blue-200 text-xs mt-1">{expenses.length} expense{expenses.length !== 1 ? 's' : ''}</p>
-              </div>
-            )}
           </div>
         </motion.header>
 
-        <ExpenseFilters
-          categories={categoryTree}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          router={router}
-        />
+        {/* Month / Range Header Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 items-center bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 px-5 py-4 mb-5"
+        >
+          <div />
+          <div className="text-center">
+            {!isCustomRange ? (
+              <h2 className="text-xl font-bold text-white">
+                {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+              </h2>
+            ) : (
+              <h2 className="text-base font-semibold text-slate-300">
+                {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                {dateRange.startDate && dateRange.endDate && " – "}
+                {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+              </h2>
+            )}
+            <p className="text-slate-400 text-sm mt-0.5">
+              <span className="text-white font-semibold">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
+              <span className="ml-2">· {expenses.length} expense{expenses.length !== 1 ? "s" : ""}</span>
+            </p>
+          </div>
+          <div className="flex justify-end">
+          <button
+            onClick={() => setShowFilters((prev) => !prev)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200 ${
+              showFilters
+                ? "bg-blue-500/20 border-blue-400/60 text-blue-300"
+                : "bg-slate-700/60 border-slate-600/60 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+            }`}
+          >
+            <SlidersHorizontal size={15} />
+            Filters
+            <ChevronDown size={14} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+          </button>
+          </div>
+        </motion.div>
+
+        {/* Collapsible Filters */}
+        {showFilters && (
+          <ExpenseFilters
+            categories={categoryTree}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            router={router}
+            onCustomRangeApply={() => setIsCustomRange(true)}
+            onCustomRangeReset={() => {
+              setIsCustomRange(false);
+              const t = new Date();
+              const m = t.getUTCMonth();
+              const y = t.getUTCFullYear();
+              setCurrentMonth(m);
+              setCurrentYear(y);
+              setDateRange({
+                startDate: new Date(Date.UTC(y, m, 1)).toISOString().split("T")[0],
+                endDate: new Date(Date.UTC(y, m + 1, 0)).toISOString().split("T")[0],
+              });
+            }}
+          />
+        )}
 
         <ExpenseTable
           expenses={expenses}
@@ -418,50 +465,6 @@ const ExpenseList = () => {
           currentYear={currentYear}
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-between items-center mt-8 p-6 bg-slate-800/60 rounded-2xl border border-cyan-400/20"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05, x: -2 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => changeMonth(-1)}
-            className="px-6 py-3 bg-slate-700 text-slate-300 font-semibold rounded-xl transition-all duration-200 flex items-center gap-2 cursor-pointer hover:bg-slate-600"
-          >
-            ← Previous Month
-          </motion.button>
-
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString(
-                "default",
-                {
-                  month: "long",
-                  year: "numeric",
-                  timeZone: "UTC",
-                }
-              )}
-            </p>
-            <p className="text-sm text-slate-400 mt-1">
-              {expenses.length} expenses this period
-            </p>
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05, x: 2 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => changeMonth(1)}
-            disabled={
-              currentYear === todayUTC.getUTCFullYear() &&
-              currentMonth === todayUTC.getUTCMonth()
-            }
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-          >
-            Next Month →
-          </motion.button>
-        </motion.div>
 
 
       </div>

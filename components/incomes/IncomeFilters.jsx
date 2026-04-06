@@ -8,6 +8,8 @@ export default function IncomeFilters({
   setSelectedCategory,
   dateRange,
   setDateRange,
+  onCustomRangeApply,
+  onCustomRangeReset,
 }) {
   return (
     <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 mb-10 transition-all duration-300">
@@ -19,10 +21,10 @@ export default function IncomeFilters({
         </h2>
 
         <button
-          onClick={() =>
-            setDateRange({ startDate: "", endDate: "" }) ||
-            setSelectedCategory("all")
-          }
+          onClick={() => {
+            setSelectedCategory("all");
+            onCustomRangeReset?.();
+          }}
           className="text-sm text-slate-400 hover:text-cyan-400 transition-colors"
         >
           Reset Filters
@@ -60,9 +62,10 @@ export default function IncomeFilters({
           <input
             type="date"
             value={dateRange.startDate}
-            onChange={(e) =>
-              setDateRange({ ...dateRange, startDate: e.target.value })
-            }
+            onChange={(e) => {
+              setDateRange({ ...dateRange, startDate: e.target.value });
+              onCustomRangeApply?.();
+            }}
             className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
           />
         </div>
@@ -76,9 +79,10 @@ export default function IncomeFilters({
           <input
             type="date"
             value={dateRange.endDate}
-            onChange={(e) =>
-              setDateRange({ ...dateRange, endDate: e.target.value })
-            }
+            onChange={(e) => {
+              setDateRange({ ...dateRange, endDate: e.target.value });
+              onCustomRangeApply?.();
+            }}
             className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-teal-400 focus:border-transparent outline-none transition-all duration-200"
           />
         </div>

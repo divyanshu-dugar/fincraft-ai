@@ -39,6 +39,8 @@ export default function ExpenseFilters({
   setSelectedCategory,
   dateRange,
   setDateRange,
+  onCustomRangeApply,
+  onCustomRangeReset,
 }) {
   // For portal dropdown: track button position
   const buttonRef = useRef(null);
@@ -113,10 +115,8 @@ export default function ExpenseFilters({
         {/* Resets category and date range filters to default values */}
         <button
           onClick={() => {
-            setPendingStart("");
-            setPendingEnd("");
-            setDateRange({ startDate: "", endDate: "" });
             setSelectedCategory("all");
+            onCustomRangeReset?.();
           }}
           className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
         >
@@ -261,7 +261,10 @@ export default function ExpenseFilters({
       {/* Apply date range button */}
       <div className="flex justify-end mt-5">
         <button
-          onClick={() => setDateRange({ startDate: pendingStart, endDate: pendingEnd })}
+          onClick={() => {
+            setDateRange({ startDate: pendingStart, endDate: pendingEnd });
+            onCustomRangeApply?.();
+          }}
           disabled={pendingStart === dateRange.startDate && pendingEnd === dateRange.endDate}
           className="px-5 py-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
         >
