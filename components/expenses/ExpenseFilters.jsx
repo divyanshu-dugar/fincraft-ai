@@ -192,7 +192,7 @@ export default function ExpenseFilters({
                     >
                       {selectedCategory === `parent:${parent._id}` && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
                       {selectedCategory !== `parent:${parent._id}` && <span className="w-4 flex-shrink-0" />}
-                      <span>{parent.icon}</span>
+                      <span>{parent.icon || '📁'}</span>
                       <span>{parent.name}</span>
                     </button>
 
@@ -209,7 +209,7 @@ export default function ExpenseFilters({
                       >
                         {selectedCategory === sub._id && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
                         {selectedCategory !== sub._id && <span className="w-4 flex-shrink-0" />}
-                        <span>{sub.icon}</span>
+                        <span>{sub.icon || '💰'}</span>
                         <span>{sub.name}</span>
                       </button>
                     ))}

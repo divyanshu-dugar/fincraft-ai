@@ -121,7 +121,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
         <span className={`flex items-center gap-2 flex-1 min-w-0 text-sm font-medium ${label ? 'text-gray-900' : 'text-gray-400'}`}>
           {label ? (
             <>
-              <span className="text-base leading-none">{value?.subcategoryIcon || value?.parentIcon}</span>
+              <span className="text-base leading-none">{value?.subcategoryIcon || value?.parentIcon || '💰'}</span>
               <span className="truncate">
                 <span className="text-gray-500">{value.parentName}</span>
                 {value.subcategoryName && (
@@ -176,7 +176,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
                     onClick={() => sub ? selectSub(parent, sub) : selectParentAsLeaf(parent)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-left transition-colors group"
                   >
-                    <span className="text-base leading-none">{sub ? sub.icon : parent.icon}</span>
+                    <span className="text-base leading-none">{sub ? (sub.icon || '💰') : (parent.icon || '📁')}</span>
                     <span className="flex-1 min-w-0">
                       {sub ? (
                         <>
@@ -217,7 +217,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
                         style={{ backgroundColor: `${parent.color}20` }}
                       >
-                        {parent.icon}
+                        {parent.icon || '📁'}
                       </span>
                       <span className={`flex-1 text-sm font-medium truncate ${isActive ? 'text-blue-700' : 'text-gray-700'}`}>
                         {parent.name}
@@ -253,7 +253,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
                           isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                         }`}
                       >
-                        <span className="text-sm leading-none flex-shrink-0">{sub.icon}</span>
+                        <span className="text-sm leading-none flex-shrink-0">{sub.icon || '💰'}</span>
                         <span className={`flex-1 text-sm truncate ${isSelected ? 'font-bold text-blue-700' : 'font-medium text-gray-700'}`}>
                           {sub.name}
                         </span>
@@ -263,7 +263,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
                   })
                 ) : activeParent ? (
                   <div className="flex flex-col items-center justify-center h-full py-8 px-4 text-center">
-                    <span className="text-2xl mb-2">{activeParent.icon}</span>
+                    <span className="text-2xl mb-2">{activeParent.icon || '📁'}</span>
                     <p className="text-xs text-gray-400">No sub-categories yet</p>
                   </div>
                 ) : (
