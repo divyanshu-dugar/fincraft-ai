@@ -114,15 +114,15 @@ export default function Dashboard() {
         }
 
         const now = new Date();
-        const y = now.getFullYear();
-        const m = now.getMonth();
-        const d = now.getDate();
+        const y = now.getUTCFullYear();
+        const m = now.getUTCMonth();
+        const d = now.getUTCDate();
 
-        // Helper: format a local date as YYYY-MM-DD
+        // Helper: format a UTC date as YYYY-MM-DD
         const fmt = (dt) => {
-          const yy = dt.getFullYear();
-          const mm = String(dt.getMonth() + 1).padStart(2, '0');
-          const dd = String(dt.getDate()).padStart(2, '0');
+          const yy = dt.getUTCFullYear();
+          const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getUTCDate()).padStart(2, '0');
           return `${yy}-${mm}-${dd}`;
         };
 
@@ -131,27 +131,27 @@ export default function Dashboard() {
         switch (timeRange) {
           case "weekly": {
             // Current week: Monday → today
-            const day = now.getDay(); // 0=Sun
+            const day = now.getUTCDay(); // 0=Sun
             const diff = day === 0 ? 6 : day - 1; // days since Monday
-            start = new Date(y, m, d - diff);
-            end = now;
+            start = new Date(Date.UTC(y, m, d - diff));
+            end = new Date(Date.UTC(y, m, d));
             break;
           }
           case "monthly": {
-            // Current calendar month: 1st → today
-            start = new Date(y, m, 1);
-            end = now;
+            // Full current calendar month: 1st → last day
+            start = new Date(Date.UTC(y, m, 1));
+            end = new Date(Date.UTC(y, m + 1, 0)); // last day of month
             break;
           }
           case "yearly": {
-            // Current calendar year: Jan 1 → today
-            start = new Date(y, 0, 1);
-            end = now;
+            // Current calendar year: Jan 1 → Dec 31
+            start = new Date(Date.UTC(y, 0, 1));
+            end = new Date(Date.UTC(y, 11, 31));
             break;
           }
           default: {
-            start = new Date(y, m, 1);
-            end = now;
+            start = new Date(Date.UTC(y, m, 1));
+            end = new Date(Date.UTC(y, m + 1, 0));
           }
         }
 

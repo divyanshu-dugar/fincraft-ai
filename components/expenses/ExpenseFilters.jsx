@@ -18,8 +18,7 @@
  */
 
 import { Calendar, ChevronDown, Filter, Tag, Check } from "lucide-react";
-import { Listbox, Transition } from "@headlessui/react";
-import { Fragment, useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 /**
@@ -43,6 +42,7 @@ export default function ExpenseFilters({
 }) {
   // For portal dropdown: track button position
   const buttonRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [dropdownPos, setDropdownPos] = useState({ left: 0, top: 0, width: 0 });
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -56,16 +56,48 @@ export default function ExpenseFilters({
     setPendingEnd(dateRange.endDate);
   }, [dateRange.startDate, dateRange.endDate]);
 
-  useEffect(() => {
-    if (dropdownOpen && buttonRef.current) {
+  const openDropdown = () => {
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPos({
         left: rect.left + window.scrollX,
-        top: rect.bottom + window.scrollY,
+        top: rect.bottom + window.scrollY + 4,
         width: rect.width,
       });
     }
+    setDropdownOpen(true);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClick = (e) => {
+      if (
+        buttonRef.current?.contains(e.target) ||
+        dropdownRef.current?.contains(e.target)
+      ) return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, [dropdownOpen]);
+
+  // Compute display label from current selectedCategory
+  const selectedLabel = (() => {
+    if (selectedCategory === "all") return "All Categories";
+    if (selectedCategory.startsWith("parent:")) {
+      const parentId = selectedCategory.slice(7);
+      const parent = categories?.find((p) => p._id === parentId);
+      return parent ? `${parent.icon || ""} ${parent.name}`.trim() : "Category";
+    }
+    for (const parent of categories || []) {
+      const sub = parent.subcategories?.find((s) => s._id === selectedCategory);
+      if (sub) {
+        return `${parent.icon || ""} ${parent.name} › ${sub.icon || ""} ${sub.name}`.trim();
+      }
+    }
+    return "Select Category";
+  })();
 
   return (
     <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 shadow-sm rounded-2xl p-6 mb-10 transition-all duration-300 hover:shadow-md">
@@ -107,81 +139,86 @@ export default function ExpenseFilters({
             Category
           </label>
 
-          <Listbox value={selectedCategory} onChange={setSelectedCategory}>
-            {({ open }) => {
-              useEffect(() => { setDropdownOpen(open); }, [open]);
-              return (
-                <div className="relative">
-                  <Listbox.Button ref={buttonRef} className="w-full pl-4 pr-11 py-2.5 text-left text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 shadow-sm hover:border-purple-400/60 focus:ring-2 focus:ring-purple-400/40 focus:border-purple-400 outline-none transition-all duration-200 cursor-pointer flex items-center">
-                    <span>
-                      {selectedCategory === "all"
-                        ? "All Categories"
-                        : categories?.find((c) => c._id === selectedCategory)?.name || "Select Category"}
-                    </span>
-                      <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400">
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-                    </span>
-                  </Listbox.Button>
-                  {open && typeof window !== "undefined" && createPortal(
-                    <div style={{ position: 'absolute', left: dropdownPos.left, top: dropdownPos.top, width: dropdownPos.width, zIndex: 1000 }}>
-                      <Transition
-                        as={Fragment}
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
+          {/* Custom hierarchical dropdown */}
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              onClick={() => dropdownOpen ? setDropdownOpen(false) : openDropdown()}
+              className="w-full pl-4 pr-11 py-2.5 text-left text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 shadow-sm hover:border-purple-400/60 focus:ring-2 focus:ring-purple-400/40 focus:border-purple-400 outline-none transition-all duration-200 cursor-pointer flex items-center"
+            >
+              <span className="flex-1 truncate">{selectedLabel}</span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400">
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
+              </span>
+            </button>
+
+            {dropdownOpen && typeof window !== "undefined" && createPortal(
+              <div
+                ref={dropdownRef}
+                style={{
+                  position: "absolute",
+                  left: dropdownPos.left,
+                  top: dropdownPos.top,
+                  width: Math.max(dropdownPos.width, 260),
+                  zIndex: 1000,
+                }}
+                className="max-h-72 overflow-y-auto rounded-xl bg-slate-800 border border-slate-700 py-2 shadow-xl"
+              >
+                {/* All Categories option */}
+                <button
+                  onClick={() => { setSelectedCategory("all"); setDropdownOpen(false); }}
+                  className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left rounded-lg mx-0 transition-colors ${
+                    selectedCategory === "all"
+                      ? "text-purple-300 bg-purple-500/15 font-semibold"
+                      : "text-slate-200 hover:bg-slate-700/60"
+                  }`}
+                >
+                  {selectedCategory === "all" && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
+                  {selectedCategory !== "all" && <span className="w-4 flex-shrink-0" />}
+                  All Categories
+                </button>
+
+                {/* Parent categories with subcategories */}
+                {categories?.map((parent) => (
+                  <div key={parent._id}>
+                    {/* Parent row — selects entire parent group */}
+                    <button
+                      onClick={() => { setSelectedCategory(`parent:${parent._id}`); setDropdownOpen(false); }}
+                      className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left transition-colors ${
+                        selectedCategory === `parent:${parent._id}`
+                          ? "text-purple-300 bg-purple-500/15 font-bold"
+                          : "text-slate-300 hover:bg-slate-700/60 font-semibold"
+                      }`}
+                    >
+                      {selectedCategory === `parent:${parent._id}` && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
+                      {selectedCategory !== `parent:${parent._id}` && <span className="w-4 flex-shrink-0" />}
+                      <span>{parent.icon}</span>
+                      <span>{parent.name}</span>
+                    </button>
+
+                    {/* Subcategory rows — indented */}
+                    {parent.subcategories?.map((sub) => (
+                      <button
+                        key={sub._id}
+                        onClick={() => { setSelectedCategory(sub._id); setDropdownOpen(false); }}
+                        className={`w-full flex items-center gap-2 pl-10 pr-4 py-2 text-sm text-left transition-colors ${
+                          selectedCategory === sub._id
+                            ? "text-purple-300 bg-purple-500/15 font-semibold"
+                            : "text-slate-400 hover:bg-slate-700/60 hover:text-slate-200"
+                        }`}
                       >
-                        <Listbox.Options className="max-h-60 overflow-auto rounded-xl bg-slate-800 border border-slate-700 py-2 shadow-xl focus:outline-none text-base">
-                          <Listbox.Option
-                            key="all"
-                            value="all"
-                            className={({ active }) =>
-                              `cursor-pointer select-none relative py-2.5 pl-10 pr-4 rounded-lg mx-1 ${
-                                active ? "bg-purple-500/15 text-purple-300" : "text-slate-200"
-                              }`
-                            }
-                          >
-                            {({ selected }) => (
-                              <>
-                                <span className={`block truncate ${selected ? "font-semibold" : "font-normal"}`}>All Categories</span>
-                                {selected ? (
-                                  <span className="absolute inset-y-0 left-2 flex items-center text-purple-400">
-                                    <Check className="w-4 h-4" />
-                                  </span>
-                                ) : null}
-                              </>
-                            )}
-                          </Listbox.Option>
-                          {categories?.map((category) => (
-                            <Listbox.Option
-                              key={category._id || category.name}
-                              value={category._id}
-                              className={({ active }) =>
-                                `cursor-pointer select-none relative py-2.5 pl-10 pr-4 rounded-lg mx-1 ${
-                                  active ? "bg-purple-500/15 text-purple-300" : "text-slate-200"
-                                }`
-                              }
-                            >
-                              {({ selected }) => (
-                                <>
-                                  <span className={`block truncate ${selected ? "font-semibold" : "font-normal"}`}>{category.name}</span>
-                                  {selected ? (
-                                    <span className="absolute inset-y-0 left-2 flex items-center text-purple-400">
-                                      <Check className="w-4 h-4" />
-                                    </span>
-                                  ) : null}
-                                </>
-                              )}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox.Options>
-                      </Transition>
-                    </div>,
-                    document.body
-                  )}
-                </div>
-              );
-            }}
-          </Listbox>
+                        {selectedCategory === sub._id && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
+                        {selectedCategory !== sub._id && <span className="w-4 flex-shrink-0" />}
+                        <span>{sub.icon}</span>
+                        <span>{sub.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>,
+              document.body
+            )}
+          </div>
         </div>
 
         {/* ========================================================

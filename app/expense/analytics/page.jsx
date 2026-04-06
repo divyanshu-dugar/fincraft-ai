@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Area,
   AreaChart,
@@ -26,6 +27,7 @@ import {
   ChevronUp,
   ChevronsUpDown,
   Download,
+  ExternalLink,
   Filter,
   GitCompare,
   LineChart as LineChartIcon,
@@ -231,8 +233,9 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 // ─── month-on-month per-category card ────────────────────────────────────────
-function CategoryMoMCard({ category, rows, months, defaultOpen = false }) {
+function CategoryMoMCard({ category, rows, months, defaultOpen = false, range }) {
   const [open, setOpen] = useState(defaultOpen);
+  const router = useRouter();
   const color = rows[0]?.categoryColor || COLORS[0];
 
   // pre-index rows by month for O(1) lookup
@@ -249,47 +252,67 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false }) {
   return (
     <div className="rounded-2xl border border-slate-700/60 bg-slate-800/50 overflow-hidden">
       {/* ── category header (always visible) ── */}
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-700/30 transition-colors text-left group"
-      >
-        {/* color dot + name */}
-        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            {category.parentName && (
-              <span className="text-xs text-slate-500 font-medium">
-                {category.parentIcon} {category.parentName} ›
+      <div className="flex items-center hover:bg-slate-700/30 transition-colors group">
+        <button
+          onClick={() => setOpen((p) => !p)}
+          className="flex-1 flex items-center gap-4 px-5 py-4 text-left min-w-0"
+        >
+          {/* color dot + name */}
+          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              {category.parentName && (
+                <span className="text-xs text-slate-500 font-medium">
+                  {category.parentIcon} {category.parentName} ›
+                </span>
+              )}
+              <span className="text-sm font-bold text-white">
+                {category.categoryIcon} {category.categoryName}
               </span>
-            )}
-            <span className="text-sm font-bold text-white">
-              {category.categoryIcon} {category.categoryName}
-            </span>
-            {spikeCount > 0 && (
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400">
-                {spikeCount} spike{spikeCount > 1 ? "s" : ""}
-              </span>
+              {spikeCount > 0 && (
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400">
+                  {spikeCount} spike{spikeCount > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* summary chips */}
+          <div className="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-slate-400">
+            <span className="font-bold text-white">{money(totalSpend)}</span>
+            <span>total</span>
+            {bestMonth && (
+              <>
+                <span className="text-slate-600">·</span>
+                <span>peak: <span className="font-semibold text-slate-300">{fmtMonth(bestMonth.month)}</span></span>
+              </>
             )}
           </div>
-        </div>
 
-        {/* summary chips */}
-        <div className="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-slate-400">
-          <span className="font-bold text-white">{money(totalSpend)}</span>
-          <span>total</span>
-          {bestMonth && (
-            <>
-              <span className="text-slate-600">·</span>
-              <span>peak: <span className="font-semibold text-slate-300">{fmtMonth(bestMonth.month)}</span></span>
-            </>
-          )}
-        </div>
+          {/* chevron */}
+          <ChevronDown
+            className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
 
-        {/* chevron */}
-        <ChevronDown
-          className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+        {/* view-in-list button — sibling of expand button to avoid nested <button> */}
+        {range && (
+          <button
+            onClick={() => {
+              const startDate = `${range.startMonth}-01`;
+              const [ey, em] = range.endMonth.split("-").map(Number);
+              const endDate = new Date(Date.UTC(ey, em, 0)).toISOString().split("T")[0];
+              router.push(
+                `/expense/list?category=${category.categoryId}&startDate=${startDate}&endDate=${endDate}`
+              );
+            }}
+            className="flex-shrink-0 p-1.5 mr-3 rounded-lg text-slate-500 hover:text-cyan-400 hover:bg-cyan-400/10 transition-colors"
+            title="View expenses in list"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
 
       {/* ── months grid (expandable) ── */}
       {open && (
@@ -390,6 +413,7 @@ function yTickFmt(v) { return v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
 // ─── page ─────────────────────────────────────────────────────────────────────
 export default function ExpenseAnalyticsPage() {
   const [range,               setRange]               = useState(defaultRange);
+  const [activePreset,        setActivePreset]        = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [chartView,           setChartView]           = useState("bar"); // "bar" | "line" | "area"
@@ -574,9 +598,9 @@ export default function ExpenseAnalyticsPage() {
   useEffect(() => { fetchAnalytics();  }, [fetchAnalytics]);
 
   // ── handlers ──────────────────────────────────────────────────────────────────
-  const applyPreset = (months) => {
+  const applyPreset = (preset) => {
     const now = new Date();
-    if (months === null) {
+    if (preset.months === null) {
       // Year-to-date: Jan 1 of this year → current month
       setRange({
         startMonth: `${now.getFullYear()}-01`,
@@ -584,10 +608,11 @@ export default function ExpenseAnalyticsPage() {
       });
     } else {
       setRange({
-        startMonth: toMonthInput(new Date(now.getFullYear(), now.getMonth() - (months - 1), 1)),
+        startMonth: toMonthInput(new Date(now.getFullYear(), now.getMonth() - (preset.months - 1), 1)),
         endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(), 1)),
       });
     }
+    setActivePreset(preset.label);
   };
 
   const toggleCategory = (id) =>
@@ -708,8 +733,12 @@ export default function ExpenseAnalyticsPage() {
                 {PRESETS.map((p) => (
                   <button
                     key={p.label}
-                    onClick={() => applyPreset(p.months)}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all"
+                    onClick={() => applyPreset(p)}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                      activePreset === p.label
+                        ? "border-blue-400 bg-blue-500/20 text-blue-300 shadow-sm shadow-blue-500/20"
+                        : "border-slate-600 bg-slate-700/50 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
+                    }`}
                   >
                     {p.label}
                   </button>
@@ -724,7 +753,7 @@ export default function ExpenseAnalyticsPage() {
                 type="month"
                 value={range.startMonth}
                 max={range.endMonth}
-                onChange={(e) => setRange((p) => ({ ...p, startMonth: e.target.value }))}
+                onChange={(e) => { setRange((p) => ({ ...p, startMonth: e.target.value })); setActivePreset(null); }}
                 className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
               />
             </div>
@@ -736,7 +765,7 @@ export default function ExpenseAnalyticsPage() {
                 type="month"
                 value={range.endMonth}
                 min={range.startMonth}
-                onChange={(e) => setRange((p) => ({ ...p, endMonth: e.target.value }))}
+                onChange={(e) => { setRange((p) => ({ ...p, endMonth: e.target.value })); setActivePreset(null); }}
                 className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
               />
             </div>
@@ -1178,6 +1207,7 @@ export default function ExpenseAnalyticsPage() {
                         rows={group.rows}
                         months={data.months}
                         defaultOpen={i === 0}
+                        range={range}
                       />
                     ))}
                     {categoryMoMGroups.length === 0 && (

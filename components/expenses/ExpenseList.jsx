@@ -13,7 +13,7 @@
  * @project FinCraft AI
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, Upload, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
@@ -40,11 +40,10 @@ const ExpenseList = () => {
    * ================================
    */
   const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categoryTree, setCategoryTree] = useState([]);
+  const categoryTreeRef = useRef([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
   const [importModalOpen, setImportModalOpen] = useState(false);
 
   /**
@@ -64,23 +63,28 @@ const ExpenseList = () => {
     )
   );
 
+  const urlStartDate = searchParams.get("startDate");
+  const urlEndDate = searchParams.get("endDate");
+  const urlCategory = searchParams.get("category");
+
   const initMonth = searchParams.get("month") !== null
     ? parseInt(searchParams.get("month"), 10)
-    : todayUTC.getUTCMonth();
+    : urlStartDate
+      ? parseInt(urlStartDate.split("-")[1], 10) - 1
+      : todayUTC.getUTCMonth();
   const initYear = searchParams.get("year") !== null
     ? parseInt(searchParams.get("year"), 10)
-    : todayUTC.getUTCFullYear();
+    : urlStartDate
+      ? parseInt(urlStartDate.split("-")[0], 10)
+      : todayUTC.getUTCFullYear();
 
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || DEFAULT_CATEGORY);
   const [currentMonth, setCurrentMonth] = useState(initMonth);
   const [currentYear, setCurrentYear] = useState(initYear);
 
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.UTC(initYear, initMonth, 1))
-      .toISOString()
-      .split("T")[0],
-    endDate: new Date(Date.UTC(initYear, initMonth + 1, 0))
-      .toISOString()
-      .split("T")[0],
+    startDate: urlStartDate || new Date(Date.UTC(initYear, initMonth, 1)).toISOString().split("T")[0],
+    endDate: urlEndDate || new Date(Date.UTC(initYear, initMonth + 1, 0)).toISOString().split("T")[0],
   });
 
   const router = useRouter();
@@ -130,7 +134,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories?flat=true`,
+        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -144,7 +148,9 @@ const ExpenseList = () => {
       }
 
       const data = await response.json();
-      setCategories(Array.isArray(data) ? data : []);
+      const tree = data.tree || [];
+      setCategoryTree(tree);
+      categoryTreeRef.current = tree;
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -191,11 +197,14 @@ const ExpenseList = () => {
       const filteredExpenses =
         selectedCategory === DEFAULT_CATEGORY
           ? allExpenses
-          : allExpenses.filter(
-              (expense) =>
-                expense.category?._id === selectedCategory ||
-                expense.category?.name === selectedCategory
-            );
+          : selectedCategory.startsWith("parent:")
+            ? (() => {
+                const parentId = selectedCategory.slice(7);
+                const parent = categoryTreeRef.current.find((p) => p._id === parentId);
+                const subIds = new Set((parent?.subcategories || []).map((s) => s._id));
+                return allExpenses.filter((expense) => subIds.has(expense.category?._id));
+              })()
+            : allExpenses.filter((expense) => expense.category?._id === selectedCategory);
 
       setExpenses(filteredExpenses);
     } catch (error) {
@@ -391,7 +400,7 @@ const ExpenseList = () => {
         </motion.header>
 
         <ExpenseFilters
-          categories={categories}
+          categories={categoryTree}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           dateRange={dateRange}
