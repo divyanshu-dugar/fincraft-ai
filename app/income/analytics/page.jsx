@@ -47,6 +47,7 @@ const PRESETS = [
   { label: "3M",  months: 3  },
   { label: "6M",  months: 6  },
   { label: "12M", months: 12 },
+  { label: "YTD", months: null },
 ];
 
 // ─── utilities ───────────────────────────────────────────────────────────────
@@ -57,8 +58,8 @@ function toMonthInput(date) {
 function defaultRange() {
   const now = new Date();
   return {
-    startMonth: toMonthInput(new Date(now.getFullYear(), now.getMonth() - 5, 1)),
-    endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(),     1)),
+    startMonth: `${now.getFullYear()}-01`,
+    endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(), 1)),
   };
 }
 
@@ -360,10 +361,18 @@ export default function IncomeAnalyticsPage() {
   // ── handlers ─────────────────────────────────────────────────────────────────
   const applyPreset = (months) => {
     const now = new Date();
-    setRange({
-      startMonth: toMonthInput(new Date(now.getFullYear(), now.getMonth() - months + 1, 1)),
-      endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(), 1)),
-    });
+    if (months === null) {
+      // Year-to-date: Jan 1 of this year → current month
+      setRange({
+        startMonth: `${now.getFullYear()}-01`,
+        endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(), 1)),
+      });
+    } else {
+      setRange({
+        startMonth: toMonthInput(new Date(now.getFullYear(), now.getMonth() - months + 1, 1)),
+        endMonth:   toMonthInput(new Date(now.getFullYear(), now.getMonth(), 1)),
+      });
+    }
   };
 
   const toggleCategory = (id) => {
