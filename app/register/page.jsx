@@ -18,7 +18,8 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-  const router = useRouter();
+  const [registered, setRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -39,7 +40,8 @@ export default function Register() {
 
     try {
       await registerUser(user, email, password, password2);
-      router.push("/login");
+      setRegisteredEmail(email);
+      setRegistered(true);
     } catch (err) {
       setWarning(err.message);
     } finally {
@@ -78,6 +80,50 @@ export default function Register() {
     <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+
+      {/* ── Email verification success screen ── */}
+      {registered && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-md mx-auto"
+        >
+          <div className="group relative">
+            <div className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-emerald-400/40" />
+            <div className="relative p-10 text-center space-y-6">
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/40 mx-auto"
+              >
+                <Mail className="w-10 h-10 text-emerald-400" />
+              </motion.div>
+              <div>
+                <h2 className="text-2xl font-black text-white mb-2">Check your inbox!</h2>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  We sent a verification link to<br />
+                  <span className="text-emerald-400 font-semibold">{registeredEmail}</span>
+                </p>
+              </div>
+              <div className="bg-slate-800/60 border border-emerald-400/20 rounded-xl p-4 text-left space-y-2">
+                <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Next steps</p>
+                {["Open the email from Fincraft AI", "Click \"Verify Email Address\"", "Sign in to your account"].map((step, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                    <span className="text-slate-300 text-sm">{step}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-slate-500 text-xs">Didn't receive it? Check your spam folder or{' '}
+                <Link href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">sign in</Link>
+                {' '}to request a new link.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
         <motion.div
           custom={0}
           variants={orbVariants}
@@ -98,7 +144,7 @@ export default function Register() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-md relative z-10"
+        className={`w-full max-w-md relative z-10 ${registered ? 'hidden' : ''}`}
       >
         <motion.div
           variants={containerVariants}

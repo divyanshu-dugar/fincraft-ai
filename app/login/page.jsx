@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { authenticateUser } from "@/lib/authenticate";
+import { authenticateUser, resendVerificationEmail } from "@/lib/authenticate";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
@@ -14,6 +14,8 @@ export default function Login() {
   const [warning, setWarning] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [resendStatus, setResendStatus] = useState(''); // '' | 'sending' | 'sent'
   const router = useRouter();
 
   async function handleSubmit(e) {
@@ -25,9 +27,26 @@ export default function Login() {
       await authenticateUser(user, password);
       router.push("/dashboard");
     } catch (err) {
-      setWarning(err.message);
+      if (err.code === 'EMAIL_NOT_VERIFIED') {
+        setUnverifiedEmail(err.email || '');
+        setWarning('');
+      } else {
+        setWarning(err.message);
+        setUnverifiedEmail('');
+      }
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    if (!unverifiedEmail || resendStatus === 'sending') return;
+    setResendStatus('sending');
+    try {
+      await resendVerificationEmail(unverifiedEmail);
+      setResendStatus('sent');
+    } catch {
+      setResendStatus('');
     }
   }
 
@@ -187,6 +206,37 @@ export default function Login() {
                     Forgot password?
                   </Link>
                 </motion.div>
+
+                {/* Email not verified warning */}
+                {unverifiedEmail && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-amber-500/20 border-2 border-amber-400/50 rounded-xl p-4 backdrop-blur-sm"
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="space-y-2 w-full">
+                        <p className="text-amber-300 text-sm font-bold">Email not verified</p>
+                        <p className="text-amber-200/80 text-sm">
+                          Please verify your email before signing in. Check your inbox or request a new link.
+                        </p>
+                        {resendStatus === 'sent' ? (
+                          <p className="text-emerald-400 text-sm font-semibold">✓ Verification email sent!</p>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleResend}
+                            disabled={resendStatus === 'sending'}
+                            className="text-sm text-amber-400 hover:text-amber-300 font-semibold underline transition-colors disabled:opacity-50"
+                          >
+                            {resendStatus === 'sending' ? 'Sending…' : 'Resend verification email'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Error Message */}
                 {warning && (
