@@ -6,6 +6,7 @@ import { authenticateUser } from "@/lib/authenticate";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -243,6 +244,11 @@ export default function Login() {
                   </motion.div>
                 </motion.button>
               </form>
+
+              {/* Social sign-in */}
+              <motion.div variants={itemVariants} className="mt-6">
+                <SocialAuthButtons accentClass="cyan" />
+              </motion.div>
 
               {/* Divider */}
               <motion.div variants={itemVariants} className="relative my-8">

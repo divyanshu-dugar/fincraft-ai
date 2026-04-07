@@ -7,6 +7,7 @@ import { createDefaultCategories } from "@/lib/utils/defaultCategoriesManager";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Lock, ArrowRight, Eye, EyeOff, CheckCircle, Mail } from "lucide-react";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function Register() {
   const [user, setUser] = useState("");
@@ -280,6 +281,11 @@ export default function Register() {
                   </motion.div>
                 </motion.button>
               </form>
+
+              {/* Social sign-in */}
+              <motion.div variants={itemVariants} className="mt-6">
+                <SocialAuthButtons accentClass="emerald" />
+              </motion.div>
 
               {/* Divider */}
               <motion.div variants={itemVariants} className="relative my-8">
