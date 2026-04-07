@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, BellRing, X, AlertTriangle, TrendingUp, CheckCircle2, Check } from 'lucide-react';
+import { Bell, BellRing, X, AlertTriangle, TrendingUp, CheckCircle2, Check, Trash2 } from 'lucide-react';
 import { getToken } from '@/lib/authenticate';
 
 const API    = process.env.NEXT_PUBLIC_API_URL;
@@ -107,6 +107,18 @@ export default function BudgetAlertsBell() {
   const markAllRead = async () => {
     const unread = alerts.filter((a) => !a.isRead);
     await Promise.all(unread.map((a) => markRead(a._id)));
+  };
+
+  const clearAlerts = async (all = false) => {
+    try {
+      const url = `${API}/budgets/alerts${all ? '?all=1' : ''}`;
+      await fetch(url, { method: 'DELETE', headers: authHeaders() });
+      if (all) {
+        setAlerts([]);
+      } else {
+        setAlerts((prev) => prev.filter((a) => !a.isRead));
+      }
+    } catch { /* silent */ }
   };
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
@@ -251,14 +263,31 @@ export default function BudgetAlertsBell() {
 
             {/* Footer */}
             {alerts.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-slate-700/40 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500">{alerts.length} alert{alerts.length !== 1 ? 's' : ''} total</span>
+              <div className="px-4 py-2.5 border-t border-slate-700/40 flex items-center justify-between gap-2">
                 <button
                   onClick={checkAndFetch}
                   className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors"
                 >
                   Refresh
                 </button>
+                <div className="flex items-center gap-2">
+                  {alerts.some((a) => a.isRead) && (
+                    <button
+                      onClick={() => clearAlerts(false)}
+                      className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors px-2 py-1 rounded-lg hover:bg-amber-400/10"
+                      title="Delete read alerts from database"
+                    >
+                      <Trash2 className="w-3 h-3" /> Clear read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => clearAlerts(true)}
+                    className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-rose-300 transition-colors px-2 py-1 rounded-lg hover:bg-rose-400/10"
+                    title="Delete all alerts from database"
+                  >
+                    <Trash2 className="w-3 h-3" /> Clear all
+                  </button>
+                </div>
               </div>
             )}
           </motion.div>

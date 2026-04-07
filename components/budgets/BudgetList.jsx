@@ -1,19 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertTriangle,
   BadgeCheck,
   BarChart2,
   Bell,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleOff,
   Edit2,
   Flame,
   Loader2,
   Plus,
+  RefreshCw,
   Target,
   Trash2,
   TrendingUp,
@@ -23,6 +24,18 @@ import { getToken } from "@/lib/authenticate";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
+const MONTH_NAMES = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
+];
+
+const STATUS_FILTERS = [
+  { key: "all",      label: "All" },
+  { key: "on_track", label: "On Track",   dot: "bg-emerald-400" },
+  { key: "warning",  label: "Near Limit", dot: "bg-amber-400"   },
+  { key: "exceeded", label: "Exceeded",   dot: "bg-rose-400"    },
+];
+
 const STATUS_CONFIG = {
   on_track:         { label: "On Track",      color: "emerald", dot: "bg-emerald-400" },
   almost_exceeded:  { label: "Near Limit",    color: "amber",   dot: "bg-amber-400"  },
@@ -30,14 +43,6 @@ const STATUS_CONFIG = {
   exceeded:         { label: "Exceeded",      color: "rose",    dot: "bg-rose-400"   },
   inactive:         { label: "Inactive",      color: "gray",    dot: "bg-gray-400"   },
 };
-
-const FILTERS = [
-  { key: "active",           label: "Active"        },
-  { key: "almost_exceeded",  label: "Near Limit"    },
-  { key: "limit_reached",    label: "Limit Reached" },
-  { key: "exceeded",         label: "Exceeded"      },
-  { key: "all",              label: "All"           },
-];
 
 function fmt(amount) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount ?? 0);
@@ -88,86 +93,109 @@ function ProgressBar({ pct }) {
 
 export default function BudgetList() {
   const router = useRouter();
+  const now = new Date();
+
+  const [currentMonth, setCurrentMonth] = useState(now.getMonth());
+  const [currentYear,  setCurrentYear]  = useState(now.getFullYear());
+  const [view,         setView]         = useState("month"); // "month" | "other"
+  const [statusFilter, setStatusFilter] = useState("all");
   const [budgets,      setBudgets]      = useState([]);
-  const [stats,        setStats]        = useState(null);
+  const [monthStats,   setMonthStats]   = useState(null);
   const [alerts,       setAlerts]       = useState([]);
-  const [filter,       setFilter]       = useState("active");
   const [loading,      setLoading]      = useState(true);
   const [alertsOpen,   setAlertsOpen]   = useState(true);
 
+  // ── rollover on mount ─────────────────────────────────────────────────────
   useEffect(() => {
-    setLoading(true);
-    fetchBudgets();
-    fetchStats();
-    fetchAlerts();
-  }, [filter]);
-
-  // ── data fetching ────────────────────────────────────────────────────────
-
-  async function fetchBudgets() {
-    try {
-      const token = getToken();
-      const res = await fetch(`${API}/budgets`, {
+    const token = getToken();
+    if (token) {
+      fetch(`${API}/budgets/rollover`, {
+        method: "POST",
         headers: { Authorization: `jwt ${token}` },
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      const today = new Date();
-
-      let filtered = data;
-      if (filter === "active") {
-        filtered = data.filter((b) => b.isActive && today >= new Date(b.startDate) && today <= new Date(b.endDate));
-      } else if (filter === "exceeded") {
-        filtered = data.filter((b) => {
-          const pct = ((b.currentSpent ?? 0) / b.amount) * 100;
-          return pct > 100 && b.isActive && today >= new Date(b.startDate) && today <= new Date(b.endDate);
-        });
-      } else if (filter === "limit_reached") {
-        filtered = data.filter((b) => {
-          const pct = ((b.currentSpent ?? 0) / b.amount) * 100;
-          return pct === 100 && b.isActive && today >= new Date(b.startDate) && today <= new Date(b.endDate);
-        });
-      } else if (filter === "almost_exceeded") {
-        filtered = data.filter((b) => {
-          const pct = ((b.currentSpent ?? 0) / b.amount) * 100;
-          return pct >= 80 && pct <= 100 && b.isActive && today >= new Date(b.startDate) && today <= new Date(b.endDate);
-        });
-      }
-
-      setBudgets(filtered);
-    } catch {
-      setBudgets([]);
-    } finally {
-      setLoading(false);
+      }).catch(() => {});
     }
-  }
+  }, []);
 
-  async function fetchStats() {
+  // ── alerts ────────────────────────────────────────────────────────────────
+  const fetchAlerts = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch(`${API}/budgets/stats`, {
-        headers: { Authorization: `jwt ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data.overallStats ?? null);
-      }
-    } catch { /* silent */ }
-  }
-
-  async function fetchAlerts() {
-    try {
-      const token = getToken();
-      const res = await fetch(`${API}/budgets/alerts`, {
-        headers: { Authorization: `jwt ${token}` },
-      });
+      const res = await fetch(`${API}/budgets/alerts`, { headers: { Authorization: `jwt ${token}` } });
       if (res.ok) {
         const data = await res.json();
         setAlerts(data.filter((a) => !a.isRead));
       }
     } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
+
+  // ── month view: weekly + monthly budgets with proportional spending ────────
+  const fetchMonthData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = getToken();
+      const start = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-01`;
+      const end   = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).toISOString().split("T")[0];
+      const qs    = new URLSearchParams({ startDate: start, endDate: end });
+      const [budgetsRes, statsRes] = await Promise.all([
+        fetch(`${API}/budgets?${qs}`,       { headers: { Authorization: `jwt ${token}` } }),
+        fetch(`${API}/budgets/stats?${qs}`, { headers: { Authorization: `jwt ${token}` } }),
+      ]);
+      if (budgetsRes.ok) {
+        const data = await budgetsRes.json();
+        // Month view: weekly and monthly period only
+        setBudgets(data.filter((b) => b.period === "monthly" || b.period === "weekly"));
+      }
+      if (statsRes.ok) {
+        const d = await statsRes.json();
+        setMonthStats(d.overallStats ?? null);
+      }
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, [currentMonth, currentYear]);
+
+  // ── other view: yearly budgets (full-period spending) ────────────────────
+  const fetchOtherData = useCallback(async () => {
+    setLoading(true);
+    setMonthStats(null);
+    try {
+      const token = getToken();
+      const res = await fetch(`${API}/budgets`, { headers: { Authorization: `jwt ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setBudgets(data.filter((b) => b.period === "yearly"));
+      }
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    if (view === "month") fetchMonthData();
+    else fetchOtherData();
+  }, [view, fetchMonthData, fetchOtherData]);
+
+  // ── month navigation ──────────────────────────────────────────────────────
+  function changeMonth(dir) {
+    let m = currentMonth + dir;
+    let y = currentYear;
+    if (m < 0)  { m = 11; y--; }
+    if (m > 11) { m = 0;  y++; }
+    setCurrentMonth(m);
+    setCurrentYear(y);
   }
 
+  const isCurrentMonth = currentMonth === now.getMonth() && currentYear === now.getFullYear();
+
+  // ── status sub-filter ─────────────────────────────────────────────────────
+  const filteredBudgets = statusFilter === "all" ? budgets : budgets.filter((b) => {
+    if (statusFilter === "on_track") return b.status === "on_track";
+    if (statusFilter === "warning")  return b.status === "almost_exceeded" || b.status === "limit_reached";
+    if (statusFilter === "exceeded") return b.status === "exceeded";
+    return true;
+  });
+
+  // ── mutations ─────────────────────────────────────────────────────────────
   async function deleteBudget(id) {
     if (!confirm("Delete this budget? This cannot be undone.")) return;
     try {
@@ -178,8 +206,9 @@ export default function BudgetList() {
       });
       if (res.ok) {
         setBudgets((prev) => prev.filter((b) => b._id !== id));
-        fetchStats();
         fetchAlerts();
+        // Refresh stats
+        if (view === "month") fetchMonthData();
       }
     } catch { /* silent */ }
   }
@@ -200,12 +229,19 @@ export default function BudgetList() {
     setAlerts([]);
   }
 
-  // ── render ───────────────────────────────────────────────────────────────
+  // ── header bar pill colour ────────────────────────────────────────────────
+  const monthPct = monthStats?.overallPercentage ?? 0;
+  const pillClass = monthPct > 100
+    ? "bg-rose-500/20 text-rose-300 border-rose-500/30"
+    : monthPct >= 80
+      ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+      : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
 
+  // ── render ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
 
-      {/* ── sticky page header ── */}
+      {/* sticky page header */}
       <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -234,47 +270,135 @@ export default function BudgetList() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
 
-        {/* ── KPI cards ── */}
-        {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: "Total Budget",  value: fmt(stats.totalBudget),   icon: Target,     accent: "indigo" },
-              { label: "Total Spent",   value: fmt(stats.totalSpent),    icon: TrendingUp, accent: "rose"   },
-              { label: "Remaining",     value: fmt(stats.totalRemaining), icon: BadgeCheck, accent: "emerald" },
-              { label: "Exceeded",      value: stats.exceededBudgets ?? 0, icon: Flame,    accent: "amber", unit: "budgets" },
-            ].map(({ label, value, icon: Icon, accent, unit }) => {
-              const accentMap = {
-                indigo:  { pill: "bg-indigo-500/20",  text: "text-indigo-400" },
-                rose:    { pill: "bg-rose-500/20",    text: "text-rose-400"   },
-                emerald: { pill: "bg-emerald-500/20", text: "text-emerald-400" },
-                amber:   { pill: "bg-amber-500/20",   text: "text-amber-400"  },
-              };
-              const { pill, text } = accentMap[accent];
-              return (
-                <div key={label} className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm px-5 py-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</p>
-                    <div className={`w-8 h-8 rounded-xl ${pill} flex items-center justify-center`}>
-                      <Icon className={`w-4 h-4 ${text}`} />
-                    </div>
-                  </div>
-                  <p className="text-xl font-black text-white">{value}{unit ? <span className="text-sm font-semibold text-slate-400 ml-1">{unit}</span> : ''}</p>
-                </div>
-              );
-            })}
+        {/* ── month header bar ─────────────────────────────────────────────── */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-indigo-900/30 to-slate-800/80 border border-indigo-500/20 shadow-sm">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/4 top-0 w-56 h-56 bg-indigo-500/5 rounded-full -translate-y-1/2" />
+            <div className="absolute right-1/4 bottom-0 w-40 h-40 bg-purple-500/5 rounded-full translate-y-1/2" />
           </div>
-        )}
+          <div className="relative flex items-center gap-2 px-4 py-3.5">
 
-        {/* ── alert banner ── */}
+            {/* left arrow — month view only */}
+            {view === "month" ? (
+              <button
+                onClick={() => changeMonth(-1)}
+                className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            ) : <div className="w-7 shrink-0" />}
+
+            {/* center */}
+            <div className="flex-1 flex flex-col items-center min-w-0">
+              {view === "month" ? (
+                <>
+                  <p className="text-lg font-black text-white tracking-tight leading-none">
+                    {MONTH_NAMES[currentMonth]} {currentYear}
+                  </p>
+                  {monthStats && !loading && (
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap justify-center">
+                      <span className="text-xs text-slate-400 font-medium">
+                        {fmt(monthStats.totalBudget)} budgeted
+                      </span>
+                      <span className="text-slate-600">·</span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        {fmt(monthStats.totalSpent)} spent
+                      </span>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${pillClass}`}>
+                        {monthPct.toFixed(0)}% used
+                      </span>
+                    </div>
+                  )}
+                  {loading && (
+                    <p className="text-xs text-slate-500 mt-1">Loading…</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-black text-white tracking-tight leading-none">Yearly Budgets</p>
+                  <p className="text-xs text-slate-500 mt-1">Long-running budgets spanning the full year</p>
+                </>
+              )}
+            </div>
+
+            {/* right side — today + right arrow */}
+            <div className="shrink-0 flex items-center gap-1">
+              {view === "month" && !isCurrentMonth && (
+                <button
+                  onClick={() => { setCurrentMonth(now.getMonth()); setCurrentYear(now.getFullYear()); }}
+                  className="text-xs font-semibold text-indigo-400 px-2 py-1 rounded-lg hover:bg-indigo-500/15 transition-colors"
+                >
+                  Today
+                </button>
+              )}
+              {view === "month" && (
+                <button
+                  onClick={() => changeMonth(1)}
+                  className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+              {view === "other" && <div className="w-7" />}
+            </div>
+          </div>
+        </div>
+
+        {/* ── view switcher + status filters ────────────────────────────────── */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => { setView("month"); setStatusFilter("all"); }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+              view === "month"
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20"
+                : "bg-slate-800/60 text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-200"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => { setView("other"); setStatusFilter("all"); }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+              view === "other"
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20"
+                : "bg-slate-800/60 text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-200"
+            }`}
+          >
+            Yearly
+          </button>
+
+          {/* status sub-filters — monthly view only */}
+          {view === "month" && (
+            <>
+              <div className="w-px h-5 bg-slate-700 mx-1 hidden sm:block" />
+              {STATUS_FILTERS.map(({ key, label, dot }) => (
+                <button
+                  key={key}
+                  onClick={() => setStatusFilter(key)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                    statusFilter === key
+                      ? "bg-slate-700 text-white border-slate-600 shadow-sm"
+                      : "bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200"
+                  }`}
+                >
+                  {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />}
+                  {label}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* ── alert banner ──────────────────────────────────────────────────── */}
         {alerts.length > 0 && (
           <div className="bg-slate-800/60 rounded-2xl border border-amber-500/30 shadow-sm overflow-hidden">
             <div
               role="button"
               tabIndex={0}
               onClick={() => setAlertsOpen((o) => !o)}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setAlertsOpen((o) => !o)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setAlertsOpen((o) => !o)}
               className="w-full flex items-center justify-between px-6 py-4 hover:bg-amber-500/10 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
@@ -292,10 +416,11 @@ export default function BudgetList() {
                 >
                   Dismiss all
                 </button>
-                {alertsOpen ? <ChevronDown className="w-4 h-4 text-amber-400" /> : <ChevronRight className="w-4 h-4 text-amber-400" />}
+                {alertsOpen
+                  ? <ChevronDown className="w-4 h-4 text-amber-400" />
+                  : <ChevronRight className="w-4 h-4 text-amber-400" />}
               </div>
             </div>
-
             {alertsOpen && (
               <div className="divide-y divide-amber-500/20 border-t border-amber-500/20">
                 {alerts.map((alert) => (
@@ -317,36 +442,60 @@ export default function BudgetList() {
           </div>
         )}
 
-        {/* ── filter tabs ── */}
-        <div className="flex gap-2 flex-wrap">
-          {FILTERS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-                filter === key
-                  ? "bg-slate-700 text-white border-slate-600 shadow-md"
-                  : "bg-slate-800/60 text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-200"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* ── KPI cards — month view only ────────────────────────────────────── */}
+        {view === "month" && monthStats && !loading && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Budget",  value: fmt(monthStats.totalBudget),    icon: Target,     accent: "indigo" },
+              { label: "Total Spent",   value: fmt(monthStats.totalSpent),     icon: TrendingUp, accent: "rose"   },
+              { label: "Remaining",     value: fmt(monthStats.totalRemaining),  icon: BadgeCheck, accent: "emerald" },
+              { label: "Exceeded",      value: monthStats.exceededBudgets ?? 0, icon: Flame,      accent: "amber", unit: "budgets" },
+            ].map(({ label, value, icon: Icon, accent, unit }) => {
+              const accentMap = {
+                indigo:  { pill: "bg-indigo-500/20",  text: "text-indigo-400" },
+                rose:    { pill: "bg-rose-500/20",    text: "text-rose-400"   },
+                emerald: { pill: "bg-emerald-500/20", text: "text-emerald-400" },
+                amber:   { pill: "bg-amber-500/20",   text: "text-amber-400"  },
+              };
+              const { pill, text } = accentMap[accent];
+              return (
+                <div key={label} className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+                    <div className={`w-8 h-8 rounded-xl ${pill} flex items-center justify-center`}>
+                      <Icon className={`w-4 h-4 ${text}`} />
+                    </div>
+                  </div>
+                  <p className="text-xl font-black text-white">
+                    {value}{unit ? <span className="text-sm font-semibold text-slate-400 ml-1">{unit}</span> : ""}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-        {/* ── budget cards grid ── */}
+        {/* ── budget cards grid ────────────────────────────────────────────── */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
           </div>
-        ) : budgets.length === 0 ? (
+        ) : filteredBudgets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-slate-800/60 rounded-2xl border border-cyan-400/20">
             <div className="w-16 h-16 rounded-2xl bg-slate-700 flex items-center justify-center mb-4">
               <CircleOff className="w-7 h-7 text-slate-400" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">No budgets found</h3>
+            <h3 className="text-lg font-bold text-white mb-1">
+              {view === "month"
+                ? `No budgets for ${MONTH_NAMES[currentMonth]} ${currentYear}`
+                : "No yearly budgets yet"}
+            </h3>
             <p className="text-sm text-slate-400 mb-6">
-              {filter === "all" ? "Create your first budget to get started." : `No budgets match the "${FILTERS.find((f) => f.key === filter)?.label}" filter.`}
+              {view === "month"
+                ? statusFilter !== "all"
+                  ? "Try the \"All\" filter to see every budget for this month."
+                  : "Add a monthly or weekly budget to track this period."
+                : "Create a yearly budget to track long-term spending."}
             </p>
             <button
               onClick={() => router.push("/budget/add")}
@@ -357,14 +506,15 @@ export default function BudgetList() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {budgets.map((budget) => {
-              const spent      = budget.currentSpent   ?? 0;
-              const pct        = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
-              const remaining  = budget.amount - spent;
-              const status     = pct > 100 ? "exceeded" : pct === 100 ? "limit_reached" : pct >= 80 ? "almost_exceeded" : "on_track";
-              const days       = daysLeft(budget.endDate);
-              const catName    = budget.category?.name ?? "—";
-              const catIcon    = budget.category?.icon ?? "📂";
+            {filteredBudgets.map((budget) => {
+              const spent     = budget.currentSpent ?? 0;
+              // Use API-computed percentage (proportional for month view) when available
+              const pct       = budget.percentage ?? (budget.amount > 0 ? (spent / budget.amount) * 100 : 0);
+              const remaining = budget.remaining  ?? (budget.amount - spent);
+              const status    = budget.status ?? (pct > 100 ? "exceeded" : pct >= 80 ? "almost_exceeded" : "on_track");
+              const days      = daysLeft(budget.endDate);
+              const catName   = budget.category?.name ?? "—";
+              const catIcon   = budget.category?.icon ?? "📂";
 
               return (
                 <div
@@ -378,7 +528,14 @@ export default function BudgetList() {
                         {catIcon}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-base font-bold text-white truncate">{budget.name}</p>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <p className="text-base font-bold text-white truncate">{budget.name}</p>
+                          {budget.isRecurring && (
+                            <span title="Recurring budget" className="flex-shrink-0">
+                              <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-slate-400 truncate">{catName}</p>
                       </div>
                     </div>
@@ -388,8 +545,10 @@ export default function BudgetList() {
                   {/* progress */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-semibold text-slate-400">{Math.round(pct)}% used</span>
-                      <span className="text-xs font-semibold text-slate-400">{fmt(budget.amount)}</span>
+                      <span className="text-xs font-semibold text-slate-400">{Math.min(Math.round(pct), 100)}% used</span>
+                      <span className="text-xs font-semibold text-slate-400">
+                        {fmt(budget.proportionalBudget ?? budget.amount)}
+                      </span>
                     </div>
                     <ProgressBar pct={pct} />
                   </div>
@@ -418,7 +577,7 @@ export default function BudgetList() {
                       <span>{fmtDate(budget.endDate)}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      {days !== null && days <= 7 && (
+                      {days !== null && days <= 7 && days >= 0 && (
                         <span className="text-xs font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full">
                           {days}d left
                         </span>

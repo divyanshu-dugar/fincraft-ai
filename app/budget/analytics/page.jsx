@@ -6,6 +6,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Legend,
   ReferenceLine,
   ResponsiveContainer,
@@ -219,6 +220,75 @@ function SortIcon({ col, sortKey, sortDir }) {
 
 function yTickMoney(v) { return v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`; }
 function yTickPct(v)   { return `${v}%`; }
+
+// ── custom XAxis tick: shows category name — wraps to 2 lines if long ────────
+function CategoryAxisTick({ x, y, payload }) {
+  const name = payload?.value ?? '';
+  const maxChars = 11;
+  let line1 = name, line2 = '';
+  if (name.length > maxChars) {
+    const split = name.lastIndexOf(' ', maxChars);
+    if (split > 0) {
+      line1 = name.slice(0, split);
+      const rest = name.slice(split + 1);
+      line2 = rest.length > maxChars ? rest.slice(0, maxChars - 1) + '…' : rest;
+    } else {
+      line1 = name.slice(0, maxChars);
+      line2 = name.slice(maxChars, maxChars * 2 - 1) + (name.length > maxChars * 2 ? '…' : '');
+    }
+  }
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={14} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight={600}>
+        {line1}
+      </text>
+      {line2 && (
+        <text x={0} y={0} dy={27} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight={600}>
+          {line2}
+        </text>
+      )}
+    </g>
+  );
+}
+
+// ── dollar value label rendered ABOVE each bar ────────────────────────────────
+function BarValueLabel({ x, y, width, value }) {
+  if (!width || width < 18 || !value) return null;
+  const display = value >= 10000 ? `$${(value / 1000).toFixed(0)}k`
+    : value >= 1000  ? `$${(value / 1000).toFixed(1)}k`
+    : `$${value}`;
+  return (
+    <text
+      x={x + width / 2}
+      y={y - 5}
+      textAnchor="middle"
+      fill="#e2e8f0"
+      fontSize={10}
+      fontWeight={700}
+    >
+      {display}
+    </text>
+  );
+}
+
+// ── type label ("BUDGET"/"SPENT") at the bottom-inside of each bar ────────────
+function BarTypeLabel({ x, y, width, height, label, labelFill }) {
+  if (!width || width < 18 || !height || height < 22) return null;
+  return (
+    <text
+      x={x + width / 2}
+      y={y + height - 5}
+      textAnchor="middle"
+      fill={labelFill ?? '#fff'}
+      fillOpacity={0.65}
+      fontSize={8}
+      fontWeight={800}
+      letterSpacing={0.8}
+    >
+      {label}
+    </text>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -581,23 +651,22 @@ export default function BudgetAnalyticsPage() {
                 {isFirstLoad ? (
                   <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl animate-pulse" />
                 ) : (
+                  <>
                   <ResponsiveContainer width="100%" height={320}>
                     <BarChart
                       data={spendingChartData}
-                      margin={{ top: 4, right: 8, left: 0, bottom: 48 }}
+                      margin={{ top: 28, right: 12, left: 0, bottom: 8 }}
                       barCategoryGap="30%"
                       barGap={3}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
+                        tick={<CategoryAxisTick />}
                         axisLine={false}
                         tickLine={false}
-                        angle={-35}
-                        textAnchor="end"
                         interval={0}
-                        height={60}
+                        height={52}
                       />
                       <YAxis
                         tickFormatter={yTickMoney}
@@ -607,15 +676,36 @@ export default function BudgetAnalyticsPage() {
                         width={60}
                       />
                       <Tooltip content={<BudgetBarTooltip />} cursor={{ fill: "#1e293b" }} />
-                      <Legend wrapperStyle={{ paddingTop: "8px", fontSize: "12px", fontWeight: 600 }} />
-                      <Bar dataKey="Budget" name="Budget" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={36} />
-                      <Bar dataKey="Spent"  name="Spent"  radius={[4, 4, 0, 0]} maxBarSize={36}>
+                      <Bar dataKey="Budget" name="Budget" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                        <LabelList content={(props) => <BarValueLabel {...props} />} />
+                        <LabelList content={(props) => <BarTypeLabel {...props} label="BUDGET" labelFill="#c7d2fe" />} />
+                      </Bar>
+                      <Bar dataKey="Spent" name="Spent" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40}>
                         {spendingChartData.map((entry, i) => (
                           <Cell key={i} fill={spendingFill(entry)} />
                         ))}
+                        <LabelList content={(props) => <BarValueLabel {...props} />} />
+                        <LabelList content={(props) => <BarTypeLabel {...props} label="SPENT" labelFill="#f1f5f9" />} />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
+
+                  {/* Custom legend — replaces built-in which can't show Cell colours */}
+                  <div className="flex items-center justify-center gap-5 mt-4 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3.5 h-3 rounded-sm bg-indigo-500" />
+                      <span className="text-xs font-semibold text-slate-400">Budget</span>
+                    </div>
+                    <div className="w-px h-4 bg-slate-700" />
+                    <span className="text-xs text-slate-500 font-medium">Spent:</span>
+                    {([["#10b981", "On track"], ["#f59e0b", "Near limit"], ["#f97316", "At limit"], ["#ef4444", "Exceeded"]]).map(([color, lbl]) => (
+                      <div key={lbl} className="flex items-center gap-1.5">
+                        <div className="w-3.5 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                        <span className="text-[11px] text-slate-500 font-medium">{lbl}</span>
+                      </div>
+                    ))}
+                  </div>
+                  </>
                 )}
               </div>
 

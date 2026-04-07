@@ -9,6 +9,7 @@ import {
   Check,
   CalendarDays,
   Loader2,
+  RefreshCw,
   Sparkles,
   Target,
   Wallet,
@@ -85,6 +86,8 @@ export default function AddBudget() {
   const [name,          setName]          = useState('');
   const [notifications, setNotifications] = useState(true);
   const [threshold,     setThreshold]     = useState(80);
+  const [isRecurring,   setIsRecurring]   = useState(false);
+  const [repeatUntil,   setRepeatUntil]   = useState('');
   const [errors,        setErrors]        = useState({});
   const [loading,       setLoading]       = useState(false);
   const [success,       setSuccess]       = useState(false);
@@ -170,6 +173,8 @@ export default function AddBudget() {
         endDate:   new Date(dateRange.endDate   + 'T23:59:59.999Z').toISOString(),
         notifications,
         alertThreshold: threshold,
+        isRecurring,
+        repeatUntil: isRecurring && repeatUntil ? new Date(repeatUntil + 'T23:59:59.999Z').toISOString() : null,
       };
       const res = await fetch(`${API}/budgets`, {
         method: 'POST',
@@ -446,6 +451,50 @@ export default function AddBudget() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── recurring card ───────────────────────────────────────────── */}
+          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm divide-y divide-slate-700">
+
+            {/* recurring toggle */}
+            <div className="px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${isRecurring ? 'bg-indigo-500/20' : 'bg-slate-700'}`}>
+                  <RefreshCw className={`w-4 h-4 ${isRecurring ? 'text-indigo-400' : 'text-slate-400'}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-200">Repeat Budget</p>
+                  <p className="text-xs text-slate-400">Auto-renew each {period} period</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRecurring((p) => !p)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isRecurring ? 'bg-indigo-600' : 'bg-slate-600'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform ${isRecurring ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            {/* repeat until date */}
+            {isRecurring && (
+              <div className="px-6 py-5">
+                <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  Repeat Until <span className="text-slate-500 font-normal normal-case tracking-normal">(optional — leave blank to repeat forever)</span>
+                </label>
+                <input
+                  type="date"
+                  value={repeatUntil}
+                  onChange={(e) => setRepeatUntil(e.target.value)}
+                  min={dateRange.endDate || undefined}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-600 bg-slate-700/50 text-slate-200 text-sm font-medium outline-none hover:bg-slate-700 focus:bg-slate-700 [color-scheme:dark]"
+                />
+                <p className="text-xs text-indigo-400 font-medium mt-2">
+                  This budget will auto-renew every {period} until {repeatUntil ? fmtDisplay(repeatUntil) : 'you stop it'}.
+                </p>
               </div>
             )}
           </div>

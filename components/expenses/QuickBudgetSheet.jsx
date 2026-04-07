@@ -10,13 +10,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Loader2, Wallet, ChevronRight } from 'lucide-react';
+import { X, Check, Loader2, RefreshCw, Wallet, ChevronRight } from 'lucide-react';
 import { getToken } from '@/lib/authenticate';
 
 const API   = process.env.NEXT_PUBLIC_API_URL;
 const SCHEME = 'jwt';
 
-const PERIOD_OPTIONS = [
+const PERIOD_OPTIONS = [  
   { value: 'weekly',  label: 'Weekly' },
   { value: 'monthly', label: 'Monthly' },
   { value: 'yearly',  label: 'Yearly' },
@@ -225,6 +225,8 @@ export default function QuickBudgetSheet({
   const [period,        setPeriod]        = useState('monthly');
   const [name,          setName]          = useState('');
   const [dateRange,     setDateRange]     = useState({ startDate: '', endDate: '' });
+  const [isRecurring,   setIsRecurring]   = useState(false);
+  const [repeatUntil,   setRepeatUntil]   = useState('');
   const [errors,        setErrors]        = useState({});
   const [loading,       setLoading]       = useState(false);
   const [success,       setSuccess]       = useState(false);
@@ -236,6 +238,8 @@ export default function QuickBudgetSheet({
     setAmount(prefillAmount > 0 ? String(Math.ceil(prefillAmount)) : '');
     setPeriod('monthly');
     setName('');
+    setIsRecurring(false);
+    setRepeatUntil('');
     setErrors({});
     setLoading(false);
     setSuccess(false);
@@ -282,6 +286,8 @@ export default function QuickBudgetSheet({
         endDate:        `${dateRange.endDate}T23:59:59.999Z`,
         notifications:  true,
         alertThreshold: 80,
+        isRecurring,
+        repeatUntil:    isRecurring && repeatUntil ? `${repeatUntil}T23:59:59.999Z` : null,
       };
 
       const res = await fetch(`${API}/budgets`, {
@@ -457,6 +463,46 @@ export default function QuickBudgetSheet({
                       </button>
                     )}
                   </div>
+                </div>
+
+                {/* Recurring toggle */}
+                <div className="bg-slate-800/60 rounded-xl border border-slate-700/60 divide-y divide-slate-700/60">
+                  <div className="px-4 py-3.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`p-1.5 rounded-lg ${isRecurring ? 'bg-indigo-500/20' : 'bg-slate-700'}`}>
+                        <RefreshCw size={14} className={isRecurring ? 'text-indigo-400' : 'text-slate-400'} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-200">Repeat Budget</p>
+                        <p className="text-xs text-slate-400">Auto-renew each {period} period</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsRecurring((p) => !p)}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isRecurring ? 'bg-indigo-600' : 'bg-slate-600'}`}
+                    >
+                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${isRecurring ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                    </button>
+                  </div>
+
+                  {isRecurring && (
+                    <div className="px-4 py-3.5">
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                        Repeat Until <span className="text-slate-500 font-normal">(optional)</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={repeatUntil}
+                        onChange={(e) => setRepeatUntil(e.target.value)}
+                        min={dateRange.endDate || undefined}
+                        className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 [color-scheme:dark]"
+                      />
+                      <p className="text-xs text-indigo-400 mt-1.5">
+                        Leaves blank to repeat forever.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit error */}
