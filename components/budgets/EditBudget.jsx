@@ -283,6 +283,7 @@ export default function EditBudget() {
 
   // ── render ────────────────────────────────────────────────────────────────
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
 
       {/* sticky header */}
@@ -592,5 +593,56 @@ export default function EditBudget() {
         </form>
       </div>
     </div>
+
+    {/* ── Update scope modal (recurring budgets only) ───────────────────── */}
+    {showScopeModal && pendingPayload && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="w-full max-w-sm bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+              <Edit2 className="w-5 h-5 text-indigo-400" />
+            </div>
+            <div>
+              <p className="text-base font-bold text-white">Update Recurring Budget</p>
+              <p className="text-xs text-slate-400">{budget?.name}</p>
+            </div>
+          </div>
+
+          <p className="text-sm text-slate-300">Which months should this change apply to?</p>
+
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => commitUpdate(pendingPayload, 'this')}
+              className="w-full px-4 py-3 rounded-xl bg-slate-700/60 border border-slate-600 text-white text-sm font-bold hover:bg-slate-700 transition-colors text-left"
+            >
+              This month only
+              <p className="text-xs font-normal text-slate-400 mt-0.5">Past and future months are unaffected.</p>
+            </button>
+            <button
+              onClick={() => commitUpdate(pendingPayload, 'future')}
+              className="w-full px-4 py-3 rounded-xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-200 text-sm font-bold hover:bg-indigo-500/25 transition-colors text-left"
+            >
+              This and all future months
+              <p className="text-xs font-normal text-indigo-400/70 mt-0.5">Past months keep their original values.</p>
+            </button>
+            <button
+              onClick={() => commitUpdate(pendingPayload, 'all')}
+              className="w-full px-4 py-3 rounded-xl bg-purple-500/15 border border-purple-500/40 text-purple-200 text-sm font-bold hover:bg-purple-500/25 transition-colors text-left"
+            >
+              All months
+              <p className="text-xs font-normal text-purple-400/70 mt-0.5">Updates every month in the entire series.</p>
+            </button>
+          </div>
+
+          <button
+            onClick={() => setShowScopeModal(false)}
+            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-400 text-sm font-semibold hover:bg-slate-700/50 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
