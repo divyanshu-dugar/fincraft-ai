@@ -8,6 +8,7 @@ import {
   BellOff,
   CalendarDays,
   Check,
+  Edit2,
   Loader2,
   Sparkles,
   Target,
@@ -75,12 +76,14 @@ export default function EditBudget() {
   const params = useParams();
   const id = params?.id;
 
-  const [pageLoading,   setPageLoading]   = useState(true);
-  const [saving,        setSaving]        = useState(false);
-  const [success,       setSuccess]       = useState(false);
-  const [categoryTree,  setCategoryTree]  = useState([]);
-  const [categoryValue, setCategoryValue] = useState(null);
-  const [budget,        setBudget]        = useState(null);
+  const [pageLoading,    setPageLoading]    = useState(true);
+  const [saving,         setSaving]         = useState(false);
+  const [success,        setSuccess]        = useState(false);
+  const [categoryTree,   setCategoryTree]   = useState([]);
+  const [categoryValue,  setCategoryValue]  = useState(null);
+  const [budget,         setBudget]         = useState(null);
+  const [showScopeModal, setShowScopeModal] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState(null);
 
   // form fields
   const [amount,        setAmount]        = useState('');
@@ -210,24 +213,38 @@ export default function EditBudget() {
   const clearErr = (field) => setErrors((p) => ({ ...p, [field]: '' }));
 
   // ── submit ────────────────────────────────────────────────────────────────
+  const buildPayload = () => {
+    const catId = categoryValue.subcategoryId || categoryValue.parentId;
+    return {
+      name: name.trim(),
+      amount: Number(amount),
+      period,
+      category: catId,
+      startDate: new Date(dateRange.startDate + 'T00:00:00Z').toISOString(),
+      endDate:   new Date(dateRange.endDate   + 'T23:59:59.999Z').toISOString(),
+      notifications,
+      alertThreshold: threshold,
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+    // For recurring budgets, ask the user what scope to update
+    if (budget?.isRecurring) {
+      setPendingPayload(buildPayload());
+      setShowScopeModal(true);
+      return;
+    }
+    await commitUpdate(buildPayload(), 'this');
+  };
+
+  const commitUpdate = async (payload, scope) => {
     setSaving(true);
+    setShowScopeModal(false);
     try {
       const token = getToken();
-      const catId = categoryValue.subcategoryId || categoryValue.parentId;
-      const payload = {
-        name: name.trim(),
-        amount: Number(amount),
-        period,
-        category: catId,
-        startDate: new Date(dateRange.startDate + 'T00:00:00Z').toISOString(),
-        endDate:   new Date(dateRange.endDate   + 'T23:59:59.999Z').toISOString(),
-        notifications,
-        alertThreshold: threshold,
-      };
-      const res = await fetch(`${API}/budgets/${id}`, {
+      const res = await fetch(`${API}/budgets/${id}?updateScope=${scope}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify(payload),

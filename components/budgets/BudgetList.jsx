@@ -104,6 +104,7 @@ export default function BudgetList() {
   const [alerts,       setAlerts]       = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [alertsOpen,   setAlertsOpen]   = useState(true);
+  const [deleteModal,  setDeleteModal]  = useState(null); // { budget }
 
   // ── rollover on mount ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -135,6 +136,18 @@ export default function BudgetList() {
     setLoading(true);
     try {
       const token = getToken();
+      // Pre-create recurring budgets for future months before fetching
+      const nowDate = new Date();
+      const isFuture =
+        currentYear > nowDate.getFullYear() ||
+        (currentYear === nowDate.getFullYear() && currentMonth > nowDate.getMonth());
+      if (isFuture) {
+        await fetch(`${API}/budgets/rollover-to`, {
+          method: "POST",
+          headers: { Authorization: `jwt ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ targetYear: currentYear, targetMonth: currentMonth }),
+        }).catch(() => {});
+      }
       const start = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-01`;
       const end   = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).toISOString().split("T")[0];
       const qs    = new URLSearchParams({ startDate: start, endDate: end });
@@ -196,19 +209,21 @@ export default function BudgetList() {
   });
 
   // ── mutations ─────────────────────────────────────────────────────────────
-  async function deleteBudget(id) {
-    if (!confirm("Delete this budget? This cannot be undone.")) return;
+  async function performDelete(budget, cascade) {
     try {
       const token = getToken();
-      const res = await fetch(`${API}/budgets/${id}`, {
+      const url = cascade
+        ? `${API}/budgets/${budget._id}?cascade=true`
+        : `${API}/budgets/${budget._id}`;
+      const res = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `jwt ${token}` },
       });
       if (res.ok) {
-        setBudgets((prev) => prev.filter((b) => b._id !== id));
+        setDeleteModal(null);
         fetchAlerts();
-        // Refresh stats
         if (view === "month") fetchMonthData();
+        else fetchOtherData();
       }
     } catch { /* silent */ }
   }
@@ -537,6 +552,7 @@ export default function BudgetList() {
                           )}
                         </div>
                         <p className="text-xs text-slate-400 truncate">{catName}</p>
+                        <p className="text-sm font-bold text-indigo-300 mt-0.5">{fmt(budget.amount)}<span className="text-xs font-semibold text-slate-500"> / {budget.period}</span></p>
                       </div>
                     </div>
                     <StatusBadge status={status} />
@@ -547,7 +563,10 @@ export default function BudgetList() {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-semibold text-slate-400">{Math.min(Math.round(pct), 100)}% used</span>
                       <span className="text-xs font-semibold text-slate-400">
-                        {fmt(budget.proportionalBudget ?? budget.amount)}
+                        {/* Show proportional cap for this period; if same as full amount, omit the fraction */}
+                        {budget.proportionalBudget && Math.abs(budget.proportionalBudget - budget.amount) > 1
+                          ? <>{fmt(budget.proportionalBudget)} <span className="text-slate-600">of {fmt(budget.amount)}</span></>
+                          : fmt(budget.amount)}
                       </span>
                     </div>
                     <ProgressBar pct={pct} />
@@ -590,7 +609,7 @@ export default function BudgetList() {
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => deleteBudget(budget._id)}
+                        onClick={() => setDeleteModal({ budget })}
                         className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/15 transition-colors"
                         title="Delete"
                       >
@@ -606,5 +625,61 @@ export default function BudgetList() {
 
       </div>
     </div>
+
+    {/* ── Delete confirmation modal ─────────────────────────────────────── */}
+    {deleteModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="w-full max-w-sm bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+              <Trash2 className="w-5 h-5 text-rose-400" />
+            </div>
+            <div>
+              <p className="text-base font-bold text-white">Delete Budget</p>
+              <p className="text-xs text-slate-400">{deleteModal.budget.name}</p>
+            </div>
+          </div>
+
+          {deleteModal.budget.isRecurring ? (
+            <>
+              <p className="text-sm text-slate-300">This is a recurring budget. What would you like to delete?</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => performDelete(deleteModal.budget, false)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-sm font-bold hover:bg-amber-500/30 transition-colors text-left"
+                >
+                  This month only
+                  <p className="text-xs font-normal text-amber-400/70 mt-0.5">Other months in the series are unaffected.</p>
+                </button>
+                <button
+                  onClick={() => performDelete(deleteModal.budget, true)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-sm font-bold hover:bg-rose-500/30 transition-colors text-left"
+                >
+                  This and all future months
+                  <p className="text-xs font-normal text-rose-400/70 mt-0.5">All upcoming recurrences will be removed.</p>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-slate-300">This will permanently delete the budget. This cannot be undone.</p>
+              <button
+                onClick={() => performDelete(deleteModal.budget, false)}
+                className="w-full px-4 py-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-sm font-bold hover:bg-rose-500/30 transition-colors"
+              >
+                Delete budget
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={() => setDeleteModal(null)}
+            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-400 text-sm font-semibold hover:bg-slate-700/50 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
   );
 }

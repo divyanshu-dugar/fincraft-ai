@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { isAuthenticated } from '../lib/authenticate';
+import { isAuthenticated, isTokenExpired, refreshAccessToken } from '../lib/authenticate';
 
 const RouteGuard = ({ children }) => {
   const router = useRouter();
@@ -18,13 +18,27 @@ const RouteGuard = ({ children }) => {
       return;
     }
 
-    // If not authenticated, redirect
+    // If not authenticated at all, redirect
     if (!isAuthenticated()) {
       setAuthorized(false);
       router.push('/login');
-    } else {
-      setAuthorized(true);
+      return;
     }
+
+    // If the access token is expired, try to silently refresh before deciding
+    if (isTokenExpired()) {
+      refreshAccessToken().then((refreshed) => {
+        if (refreshed) {
+          setAuthorized(true);
+        } else {
+          setAuthorized(false);
+          router.push('/login');
+        }
+      });
+      return;
+    }
+
+    setAuthorized(true);
   }, [pathname, router]);
 
   // Render children only if authorized, otherwise show loader or nothing
