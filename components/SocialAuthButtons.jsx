@@ -5,66 +5,17 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
 import { socialLogin } from '@/lib/authenticate';
 
-// Apple JS SDK is loaded once from CDN via a <script> tag injected at mount.
-function useAppleScriptReady() {
-  const [ready, setReady] = useState(
-    typeof window !== 'undefined' && !!window.AppleID
-  );
-
-  useEffect(() => {
-    if (ready) return;
-    const existing = document.getElementById('apple-sdk');
-    if (existing) {
-      existing.addEventListener('load', () => setReady(true));
-      return;
-    }
-    const s = document.createElement('script');
-    s.id = 'apple-sdk';
-    s.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
-    s.onload = () => {
-      window.AppleID?.auth.init({
-        clientId:    process.env.NEXT_PUBLIC_APPLE_SERVICE_ID,
-        scope:       'name email',
-        redirectURI: process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI,
-        usePopup:    true,
-      });
-      setReady(true);
-    };
-    document.head.appendChild(s);
-  }, [ready]);
-
-  return ready;
-}
-
 export default function SocialAuthButtons({ accentClass = 'cyan' }) {
   const router = useRouter();
-  const appleReady = useAppleScriptReady();
   const [error, setError] = useState('');
   const [loadingProvider, setLoadingProvider] = useState(null);
 
   // ── Google ──────────────────────────────────────────────────────────────
   const handleGoogle = useGoogleLogin({
-    flow: 'implicit',        // Gets an access_token; we need credential (id_token)
-    // Use oneTap / credential response:
-    onSuccess: () => {},     // not used in credential mode
+    flow: 'implicit',
+    onSuccess: () => {},
     onError: () => setError('Google sign-in was cancelled or failed.'),
   });
-
-  // Use credential response (ID token) via renderButton alternative approach:
-  // We trigger Google's One Tap / popup that returns a credential (JWT)
-  const triggerGoogleCredential = () => {
-    setError('');
-    setLoadingProvider('google');
-    // @react-oauth/google's useGoogleLogin with ux_mode implicit gives access_token,
-    // but we need the ID token (credential). We use the credential callback approach.
-    window.google?.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        // Fall back to redirect popup
-        handleGoogle();
-      }
-    });
-    setLoadingProvider(null);
-  };
 
   const onGoogleCredential = async (credential) => {
     setLoadingProvider('google');
@@ -132,35 +83,9 @@ export default function SocialAuthButtons({ accentClass = 'cyan' }) {
     }
   };
 
-  // ── Apple ───────────────────────────────────────────────────────────────
-  const handleAppleClick = async () => {
-    if (!appleReady) { setError('Apple SDK not ready yet. Please try again.'); return; }
-    setError('');
-    setLoadingProvider('apple');
-    try {
-      const data = await window.AppleID.auth.signIn();
-      // data.authorization.id_token  — JWT to send to backend
-      // data.user?.email / data.user?.name — only on first sign-in
-      const { id_token, code } = data.authorization;
-      const email = data.user?.email || undefined;
-      const name  = data.user?.name
-        ? `${data.user.name.firstName ?? ''} ${data.user.name.lastName ?? ''}`.trim()
-        : undefined;
-
-      await socialLogin('apple', { idToken: id_token, email, name, code });
-      router.push('/dashboard');
-    } catch (err) {
-      if (err?.error === 'popup_closed_by_user' || err?.error === 'user_cancelled_authorize') {
-        // User dismissed — silent
-      } else {
-        setError(err?.message || 'Apple sign-in failed.');
-      }
-    } finally {
-      setLoadingProvider(null);
-    }
-  };
-
-  const border = accentClass === 'emerald' ? 'border-emerald-400/30 hover:border-emerald-400/60' : 'border-cyan-400/30 hover:border-cyan-400/60';
+  const border = accentClass === 'emerald'
+    ? 'border-emerald-400/30 hover:border-emerald-400/60'
+    : 'border-cyan-400/30 hover:border-cyan-400/60';
 
   return (
     <div className="space-y-3">
@@ -194,23 +119,6 @@ export default function SocialAuthButtons({ accentClass = 'cyan' }) {
           </svg>
         )}
         Continue with Google
-      </button>
-
-      {/* Apple */}
-      <button
-        type="button"
-        onClick={handleAppleClick}
-        disabled={!!loadingProvider || !appleReady}
-        className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-slate-800/70 border ${border} text-white text-sm font-bold hover:bg-slate-700/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
-      >
-        {loadingProvider === 'apple' ? (
-          <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-        ) : (
-          <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.56-1.32 3.1-2.54 4Zm-3.5-17.02c.06 2.29-1.68 4.09-3.93 3.87-.25-2.2 1.9-4.1 3.93-3.87Z"/>
-          </svg>
-        )}
-        Continue with Apple
       </button>
     </div>
   );
