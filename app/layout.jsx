@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar"
 import RouteGuard from "@/components/RouteGuard";
 import OAuthProviders from "@/components/OAuthProviders";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,21 @@ export default function RootLayout({ children }) {
         <OAuthProviders>
           <RouteGuard>
             <Navbar />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3500,
+                style: {
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid rgba(99,102,241,0.2)',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                },
+                success: { iconTheme: { primary: '#34d399', secondary: '#1e293b' } },
+                error:   { iconTheme: { primary: '#f87171', secondary: '#1e293b' } },
+              }}
+            />
             <main className="min-h-screen">
               {children}
             </main>
