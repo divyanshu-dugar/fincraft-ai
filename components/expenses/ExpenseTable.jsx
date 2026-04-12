@@ -17,7 +17,7 @@
  * @project FinCraft AI
  */
 
-import { Pencil, Trash2, TrendingUp, Plus } from "lucide-react";
+import { Pencil, Trash2, TrendingUp, Plus, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
@@ -38,7 +38,12 @@ export default function ExpenseTable({
   formatDate,
   currentMonth,
   currentYear,
+  selectedIds = new Set(),
+  onToggleSelect,
+  onToggleSelectAll,
 }) {
+  const allSelected = expenses.length > 0 && expenses.every((e) => selectedIds.has(e._id));
+  const someSelected = expenses.some((e) => selectedIds.has(e._id));
   /* ============================================================
      Utility Helpers
      ============================================================ */
@@ -188,13 +193,28 @@ export default function ExpenseTable({
                 <div className="hidden md:block px-4 md:px-6 py-4 overflow-x-auto bg-slate-800/80 border-y border-slate-700/50">
                   <table className="w-full min-w-[720px] table-fixed border-separate border-spacing-0">
                     <colgroup>
-                      <col className="w-[30%]" />
-                      <col className="w-[20%]" />
+                      <col className="w-[5%]" />
+                      <col className="w-[27%]" />
+                      <col className="w-[18%]" />
                       <col className="w-[35%]" />
                       <col className="w-[15%]" />
                     </colgroup>
                     <thead>
                       <tr className="bg-slate-800/60 text-left">
+                        <th className="px-3 py-3.5 border-b-2 border-slate-700">
+                          <button
+                            onClick={() => onToggleSelectAll && onToggleSelectAll(expenses)}
+                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-150 ${
+                              allSelected
+                                ? "bg-blue-500 border-blue-400"
+                                : someSelected
+                                  ? "bg-blue-500/40 border-blue-400/60"
+                                  : "border-slate-500 hover:border-blue-400"
+                            }`}
+                          >
+                            {(allSelected || someSelected) && <Check size={12} className="text-white" strokeWidth={3} />}
+                          </button>
+                        </th>
                         {["Category", "Amount", "Note", "Actions"].map((header) => (
                           <th
                             key={header}
@@ -226,8 +246,20 @@ export default function ExpenseTable({
                               transition={{
                                 delay: dateIndex * 0.1 + expenseIndex * 0.05,
                               }}
-                              className="group border-b border-slate-700/30 last:border-b-0 odd:bg-slate-800/80 even:bg-slate-800/40 hover:bg-slate-700/40 transition-colors"
+                              className={`group border-b border-slate-700/30 last:border-b-0 odd:bg-slate-800/80 even:bg-slate-800/40 hover:bg-slate-700/40 transition-colors ${selectedIds.has(expense._id) ? "!bg-blue-500/10 border-blue-500/20" : ""}`}
                             >
+                              <td className="px-3 py-4">
+                                <button
+                                  onClick={() => onToggleSelect && onToggleSelect(expense._id)}
+                                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-150 ${
+                                    selectedIds.has(expense._id)
+                                      ? "bg-blue-500 border-blue-400"
+                                      : "border-slate-500 hover:border-blue-400"
+                                  }`}
+                                >
+                                  {selectedIds.has(expense._id) && <Check size={12} className="text-white" strokeWidth={3} />}
+                                </button>
+                              </td>
                               <td className="px-4 lg:px-6 py-4">
                                 <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-300 bg-slate-700/50 border border-slate-600">
                                   <span
@@ -318,16 +350,28 @@ export default function ExpenseTable({
                           transition={{
                             delay: dateIndex * 0.1 + expenseIndex * 0.05,
                           }}
-                          className="bg-slate-800/60 rounded-xl border border-slate-700 p-4"
+                          className={`bg-slate-800/60 rounded-xl border p-4 ${selectedIds.has(expense._id) ? "border-blue-500/40 bg-blue-500/10" : "border-slate-700"}`}
                         >
                           <div className="flex items-start justify-between gap-3">
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-slate-300 bg-slate-700/50 border border-slate-600">
-                              <span
-                                className="w-2.5 h-2.5 rounded-full"
-                                style={{ backgroundColor: categoryColor }}
-                              />
-                              {categoryName}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => onToggleSelect && onToggleSelect(expense._id)}
+                                className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-150 shrink-0 ${
+                                  selectedIds.has(expense._id)
+                                    ? "bg-blue-500 border-blue-400"
+                                    : "border-slate-500 hover:border-blue-400"
+                                }`}
+                              >
+                                {selectedIds.has(expense._id) && <Check size={12} className="text-white" strokeWidth={3} />}
+                              </button>
+                              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-slate-300 bg-slate-700/50 border border-slate-600">
+                                <span
+                                  className="w-2.5 h-2.5 rounded-full"
+                                  style={{ backgroundColor: categoryColor }}
+                                />
+                                {categoryName}
+                              </span>
+                            </div>
                             <div className="text-right">
                               <div className="text-base font-semibold text-white">
                                 {formatCurrency(expense.amount)}

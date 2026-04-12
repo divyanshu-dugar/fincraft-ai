@@ -33,7 +33,7 @@ export function DashboardHeader({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
             <div className="relative shrink-0">
               <div className="flex items-center space-x-1 bg-slate-800 rounded-xl p-1">
                 {["weekly", "monthly", "yearly"].map((range) => (
