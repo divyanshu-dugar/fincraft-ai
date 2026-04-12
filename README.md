@@ -70,7 +70,7 @@ Refinements List
 - [ ] 42. **Multi-currency support** — let users set their default currency, display with correct symbol/formatting
 43. **Keyboard shortcuts** — `N` to add new expense, `D` for dashboard, `Esc` to close modals
 - [ ] 44. **Toast notifications for operations** — already using `react-hot-toast` but ensure every create/update/delete shows confirmation
-45. **Skeleton loading states** — replace spinners with skeleton screens (you already have the `Skeleton` shadcn component)
+- [ ] 45. **Skeleton loading states** — replace spinners with skeleton screens (you already have the `Skeleton` shadcn component)
 46. **Dark/Light theme toggle** — currently only dark mode; some users prefer light
 47. **Add breadcrumb navigation** — helps users understand where they are, especially on edit pages
 48. **Responsive tables** — expense/income tables should be card layouts on mobile, not horizontally scrolling tables
