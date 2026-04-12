@@ -15,10 +15,11 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown, Wallet } from "lucide-react";
 
 import QuickBudgetSheet from "./QuickBudgetSheet";
+import BulkActionsBar from "./BulkActionsBar";
 
 import { getToken } from "@/lib/authenticate";
 
@@ -48,6 +49,7 @@ const ExpenseList = () => {
   const [loading, setLoading] = useState(true);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   /**
    * ================================
@@ -212,6 +214,7 @@ const ExpenseList = () => {
             : allExpenses.filter((expense) => expense.category?._id === selectedCategory);
 
       setExpenses(filteredExpenses);
+      setSelectedIds(new Set());
     } catch (error) {
       console.error("Error fetching expenses:", error);
     } finally {
@@ -272,11 +275,125 @@ const ExpenseList = () => {
 
       if (response.ok) {
         setExpenses((prev) => prev.filter((e) => e._id !== id));
+        setSelectedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
         fetchStats();
         window.dispatchEvent(new CustomEvent('expense-added')); // re-check budget alerts
       }
     } catch (error) {
       console.error("Error deleting expense:", error);
+    }
+  };
+
+  /**
+   * Selection helpers for bulk operations.
+   */
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (visibleExpenses) => {
+    const allVisible = visibleExpenses.map((e) => e._id);
+    const allSelected = allVisible.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allVisible.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => new Set([...prev, ...allVisible]));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  /**
+   * Bulk delete selected expenses.
+   */
+  const bulkDelete = async () => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-delete`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids }),
+        }
+      );
+      if (response.ok) {
+        setExpenses((prev) => prev.filter((e) => !selectedIds.has(e._id)));
+        setSelectedIds(new Set());
+        fetchStats();
+        window.dispatchEvent(new CustomEvent('expense-added'));
+      }
+    } catch (error) {
+      console.error("Error bulk deleting expenses:", error);
+    }
+  };
+
+  /**
+   * Bulk re-categorize selected expenses.
+   */
+  const bulkRecategorize = async (categoryId) => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-recategorize`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids, categoryId }),
+        }
+      );
+      if (response.ok) {
+        setSelectedIds(new Set());
+        fetchExpenses();
+        fetchStats();
+      }
+    } catch (error) {
+      console.error("Error bulk recategorizing:", error);
+    }
+  };
+
+  /**
+   * Bulk edit dates for selected expenses.
+   */
+  const bulkEditDate = async (date) => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-edit-date`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids, date }),
+        }
+      );
+      if (response.ok) {
+        setSelectedIds(new Set());
+        fetchExpenses();
+        fetchStats();
+      }
+    } catch (error) {
+      console.error("Error bulk editing dates:", error);
     }
   };
 
@@ -485,6 +602,9 @@ const ExpenseList = () => {
           formatDate={formatDate}
           currentMonth={currentMonth}
           currentYear={currentYear}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onToggleSelectAll={toggleSelectAll}
         />
 
 
@@ -524,8 +644,8 @@ const ExpenseList = () => {
         }}
       />
 
-      {/* Sticky total bar */}
-      {expenses.length > 0 && (
+      {/* Sticky total bar — hidden when bulk selection is active */}
+      {expenses.length > 0 && selectedIds.size === 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-700/60 px-6 py-3 flex items-center justify-between shadow-2xl">
           <span className="text-sm text-slate-400 font-medium">
             {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
@@ -534,6 +654,20 @@ const ExpenseList = () => {
           <span className="text-lg font-black text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
         </div>
       )}
+
+      {/* Bulk Actions Bar */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <BulkActionsBar
+            selectedCount={selectedIds.size}
+            onBulkDelete={bulkDelete}
+            onBulkRecategorize={bulkRecategorize}
+            onBulkEditDate={bulkEditDate}
+            onClearSelection={clearSelection}
+            categories={categoryTree}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Floating month nav arrows */}
       <motion.button
