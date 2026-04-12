@@ -6,6 +6,7 @@ import { getToken } from '@/lib/authenticate';
 import { CategoryPicker } from '@/components/categories/CategoryPicker';
 import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
 import CurrencyBadge from '@/components/ui/CurrencyBadge';
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   CalendarDays,
@@ -161,10 +162,11 @@ export default function AddExpense() {
         window.dispatchEvent(new CustomEvent('expense-added'));
       }
 
+      toast.success(isRecurring ? 'Recurring expense set!' : 'Expense added!');
       setSuccess(true);
       setTimeout(() => router.push('/expense/list'), 900);
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -199,13 +201,6 @@ export default function AddExpense() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-          {/* form error banner */}
-          {errors.form && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-400 font-medium">
-              {errors.form}
-            </div>
-          )}
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
           <div className="bg-slate-800/60 rounded-2xl border border-slate-700 p-6">

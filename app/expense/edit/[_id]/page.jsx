@@ -6,6 +6,7 @@ import { getToken } from '@/lib/authenticate';
 import { CategoryPicker } from '@/components/categories/CategoryPicker';
 import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
 import CurrencyBadge from '@/components/ui/CurrencyBadge';
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   CalendarDays,
@@ -187,10 +188,11 @@ const EditExpense = () => {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.message || 'Failed to update expense');
       }
+      toast.success('Expense updated!');
       setSuccess(true);
       setTimeout(() => router.push(returnUrl), 900);
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
@@ -206,9 +208,10 @@ const EditExpense = () => {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) throw new Error('Failed to delete expense');
+      toast.success('Expense deleted.');
       router.push(returnUrl);
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -265,13 +268,6 @@ const EditExpense = () => {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-          {/* form error banner */}
-          {errors.form && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-400 font-medium">
-              {errors.form}
-            </div>
-          )}
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
           <div className="bg-slate-800/60 rounded-2xl border border-slate-700 p-6">

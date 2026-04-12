@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
@@ -372,13 +373,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     if (!selectedFile) return;
     const name = selectedFile.name.toLowerCase();
     if (type === "image") {
-      if (!/\.(jpg|jpeg|png|gif|webp)$/.test(name)) { alert("Please select a valid image (JPG, PNG, GIF, WebP)"); return; }
+      if (!/\.(jpg|jpeg|png|gif|webp)$/.test(name)) { toast.error("Please select a valid image (JPG, PNG, GIF, WebP)"); return; }
       setUploadType("image");
       handleImageUpload(selectedFile);
     } else {
       const ext = name.split(".").pop();
-      if (!["csv", "xlsx", "xls"].includes(ext)) { alert("Please select a CSV or Excel file"); return; }
-      if (selectedFile.size > MAX_SIZE) { alert("File is too large (max 5 MB)"); return; }
+      if (!["csv", "xlsx", "xls"].includes(ext)) { toast.error("Please select a CSV or Excel file"); return; }
+      if (selectedFile.size > MAX_SIZE) { toast.error("File is too large (max 5 MB)"); return; }
       setUploadType("csv");
       parseFile(selectedFile);
     }
@@ -400,10 +401,10 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       if (res.ok && result.expenses?.length > 0) {
         buildEditableRows(result.expenses);
       } else {
-        alert("No expenses found in image. Please try another screenshot.");
+        toast.error("No expenses found in image. Please try another screenshot.");
       }
     } catch (err) {
-      alert("Error processing image: " + err.message);
+      toast.error("Error processing image: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -429,8 +430,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     reader.onload = (e) => {
       try {
         if (f.name.endsWith(".csv")) parseCSV(e.target.result);
-        else alert("Excel parsing is not supported yet. Please export as CSV.");
-      } catch { alert("Error parsing file. Please check the format."); }
+        else toast.error("Excel parsing is not supported yet. Please export as CSV.");
+      } catch { toast.error("Error parsing file. Please check the format."); }
     };
     if (f.name.endsWith(".csv")) reader.readAsText(f);
     else reader.readAsArrayBuffer(f);
@@ -493,7 +494,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
         const noDate = editableRows.filter((r) => !r.date);
         const noAmount = editableRows.filter((r) => !r.amount);
         if (noDate.length || noAmount.length) {
-          alert(`${noDate.length + noAmount.length} row(s) are missing date or amount. Please review all expenses.`);
+          toast.error(`${noDate.length + noAmount.length} row(s) are missing date or amount. Please review all expenses.`);
           setLoading(false);
           return;
         }
@@ -539,7 +540,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
         throw new Error(result.message || "Import failed");
       }
     } catch (err) {
-      alert("Import failed: " + err.message);
+      toast.error("Import failed: " + err.message);
     } finally {
       setLoading(false);
     }

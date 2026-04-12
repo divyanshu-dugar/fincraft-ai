@@ -8,6 +8,7 @@
  * total spending and inherits the visible date range.
  */
 
+import toast from 'react-hot-toast';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Loader2, RefreshCw, Wallet, ChevronRight } from 'lucide-react';
@@ -304,13 +305,14 @@ export default function QuickBudgetSheet({
         throw new Error(data.error || data.message || 'Failed to create budget');
       }
 
+      toast.success('Budget created!');
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
         onClose();
       }, 1200);
     } catch (err) {
-      setErrors({ submit: err.message });
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }

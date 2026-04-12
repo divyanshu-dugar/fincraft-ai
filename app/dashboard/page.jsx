@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getToken } from "@/lib/authenticate";
@@ -83,7 +84,7 @@ export default function Dashboard() {
   const handleCustomDateApply = () => {
     if (customStartDate && customEndDate) {
       if (new Date(customStartDate) > new Date(customEndDate)) {
-        alert("Start date must be before end date");
+        toast.error("Start date must be before end date");
         return;
       }
       setTimeRange("custom");

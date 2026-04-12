@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { getToken } from "@/lib/authenticate";
 import {
@@ -85,12 +86,15 @@ export default function SavingsGoals() {
       
       if (res.ok) {
         await fetchGoals(); // refresh data
+        toast.success('Saved amount updated!');
       } else {
         const error = await res.json();
         console.error("Failed to update saved amount:", error);
+        toast.error('Failed to update saved amount.');
       }
     } catch (err) {
       console.error("Error updating saved amount:", err);
+      toast.error('Failed to update saved amount.');
     }
   };
 
@@ -103,7 +107,7 @@ export default function SavingsGoals() {
       : `${process.env.NEXT_PUBLIC_API_URL}/saving-goals`;
     const method = editingGoal ? "PUT" : "POST";
 
-    await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -111,18 +115,28 @@ export default function SavingsGoals() {
       },
       body: JSON.stringify(payload),
     });
-
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      toast.error(d.error || d.message || 'Failed to save goal');
+      return;
+    }
+    toast.success(editingGoal ? 'Goal updated!' : 'Goal created!');
     fetchGoals();
     resetForm();
   };
 
   const deleteGoal = async (id) => {
     const token = getToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${id}`, {
       method: "DELETE",
       headers: { Authorization: `jwt ${token}` },
     });
-    setGoals(goals.filter((g) => g._id !== id));
+    if (res.ok) {
+      toast.success('Goal deleted.');
+      setGoals(goals.filter((g) => g._id !== id));
+    } else {
+      toast.error('Failed to delete goal.');
+    }
   };
 
   const resetForm = () => {

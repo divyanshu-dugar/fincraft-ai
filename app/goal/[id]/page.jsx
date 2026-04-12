@@ -1,5 +1,7 @@
 "use client";
 
+import toast from "react-hot-toast";
+
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -181,8 +183,9 @@ export default function GoalDetailPage() {
       setContribAmount("");
       setContribNote("");
       setShowContribForm(false);
+      toast.success('Contribution logged!');
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
     } finally {
       setSubmitting(false);
     }
@@ -199,8 +202,9 @@ export default function GoalDetailPage() {
       const updated = await res.json();
       setGoal(updated);
       setDeleteConfirmId(null);
+      toast.success('Contribution removed.');
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
     }
   };
 

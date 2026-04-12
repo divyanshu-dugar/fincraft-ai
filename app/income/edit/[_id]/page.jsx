@@ -6,6 +6,7 @@ import { getToken } from '@/lib/authenticate';
 import { IncomeCategoryPicker } from '@/components/categories/IncomeCategoryPicker';
 import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
 import CurrencyBadge from '@/components/ui/CurrencyBadge';
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   CalendarDays,
@@ -135,10 +136,11 @@ export default function EditIncome() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.message || 'Failed to update income');
       }
+      toast.success('Income updated!');
       setSuccess(true);
       setTimeout(() => router.push('/income/list'), 900);
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
@@ -154,9 +156,10 @@ export default function EditIncome() {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) throw new Error('Failed to delete income');
+      toast.success('Income deleted.');
       router.push('/income/list');
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -244,12 +247,6 @@ export default function EditIncome() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-          {errors.form && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-400 font-medium">
-              {errors.form}
-            </div>
-          )}
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
           <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">

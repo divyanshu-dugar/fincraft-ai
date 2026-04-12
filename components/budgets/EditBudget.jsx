@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   Bell,
@@ -253,10 +254,11 @@ export default function EditBudget() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.message || 'Failed to update budget');
       }
+      toast.success('Budget updated!');
       setSuccess(true);
       setTimeout(() => router.push('/budget/list'), 900);
     } catch (err) {
-      setErrors((p) => ({ ...p, form: err.message }));
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
@@ -312,21 +314,6 @@ export default function EditBudget() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-          {/* form error */}
-          {errors.form && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-400 font-medium">
-              {errors.form}
-            </div>
-          )}
-
-          {/* success */}
-          {success && (
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 flex items-center gap-3">
-              <Check className="w-5 h-5 text-emerald-400" />
-              <p className="text-sm font-semibold text-emerald-400">Budget updated! Redirecting…</p>
-            </div>
-          )}
 
           {/* ── status preview card ─────────────────────────────────────── */}
           {budget && (
