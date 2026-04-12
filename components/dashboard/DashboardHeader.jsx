@@ -23,19 +23,19 @@ export function DashboardHeader({
   return (
     <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-cyan-400/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 sm:h-16 gap-2 sm:gap-0">
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               Fincraft Dashboard
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-400">
               Your financial command center
             </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="flex items-center space-x-2 bg-slate-800 rounded-xl p-1">
+          <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-1 sm:pb-0">
+            <div className="relative shrink-0">
+              <div className="flex items-center space-x-1 bg-slate-800 rounded-xl p-1">
                 {["weekly", "monthly", "yearly"].map((range) => (
                   <button
                     key={range}
@@ -43,7 +43,7 @@ export function DashboardHeader({
                       setTimeRange(range);
                       setShowCustomDatePicker(false);
                     }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                       timeRange === range
                         ? "bg-slate-700 text-white shadow-sm"
                         : "text-slate-400 hover:text-slate-200"
@@ -56,7 +56,7 @@ export function DashboardHeader({
                   onClick={() =>
                     setShowCustomDatePicker(!showCustomDatePicker)
                   }
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-1 ${
+                  className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1 whitespace-nowrap ${
                     timeRange === "custom"
                       ? "bg-slate-700 text-white shadow-sm"
                       : "text-slate-400 hover:text-slate-200"
@@ -214,13 +214,13 @@ export function DashboardHeader({
 
             <button
               onClick={loadDashboardData}
-              className="p-2 hover:bg-slate-800 rounded-xl transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-slate-800 rounded-xl transition-colors shrink-0"
               title="Refresh data"
             >
-              <RefreshCw size={20} className="text-slate-400" />
+              <RefreshCw size={18} className="text-slate-400" />
             </button>
 
-            <button className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-sm font-medium hover:shadow-lg hover:shadow-cyan-500/20 transition-shadow">
+            <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-xs sm:text-sm font-medium hover:shadow-lg hover:shadow-cyan-500/20 transition-shadow whitespace-nowrap shrink-0">
               Export Report
             </button>
           </div>

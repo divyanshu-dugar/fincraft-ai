@@ -20,6 +20,7 @@ export default function Navbar() {
 
   const hoverTimeout = useRef(null);
   const mobileMenuRef = useRef(null);
+  const navRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -33,10 +34,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when clicking outside
+  // Close mobile menu when clicking outside (exclude both the panel and the nav/hamburger)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+      const outsidePanel = mobileMenuRef.current && !mobileMenuRef.current.contains(event.target);
+      const outsideNav = navRef.current && !navRef.current.contains(event.target);
+      if (outsidePanel && outsideNav) {
         setMobileMenuOpen(false);
         setMobileActiveDropdown(null);
         setMobileActiveSubmenu(null);
@@ -120,7 +123,9 @@ export default function Navbar() {
   const solidNav = !isHome || scrolled;
 
   return (
+    <>
     <nav
+      ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         solidNav
           ? 'bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-b border-cyan-400/10 backdrop-blur-xl shadow-lg shadow-black/20'
@@ -411,8 +416,9 @@ export default function Navbar() {
           </motion.button>
         </div>
       </div>
+    </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — rendered outside <nav> to avoid backdrop-filter containing-block issue */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -432,7 +438,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed inset-y-16 right-0 w-full max-w-sm bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
+              className="md:hidden fixed top-16 bottom-0 right-0 w-full max-w-sm bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
             >
               <div className="p-4 space-y-3">
                 {/* Home Link */}
@@ -663,6 +669,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
