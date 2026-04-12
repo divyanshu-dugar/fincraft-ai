@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
 import { IncomeCategoryPicker } from '@/components/categories/IncomeCategoryPicker';
+import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
+import CurrencyBadge from '@/components/ui/CurrencyBadge';
 import {
   ArrowLeft,
   CalendarDays,
@@ -28,6 +30,11 @@ export default function EditIncome() {
   const [date,   setDate]   = useState('');
   const [amount, setAmount] = useState('');
   const [note,   setNote]   = useState('');
+  const [currency, setCurrency] = useState('USD');
+
+  // ── currency prefs ─────────────────────────────────────────────────────────
+  const { currencies } = useCurrencyPrefs();
+  const currencyObj = currencies.find((c) => c.code === currency) ?? { symbol: '$', code: currency };
 
   const [errors,        setErrors]        = useState({});
   const [loading,       setLoading]       = useState(true);
@@ -61,6 +68,7 @@ export default function EditIncome() {
       setDate(data.date.split('T')[0]);
       setAmount(String(data.amount));
       setNote(data.note || '');
+      setCurrency(data.currency || 'USD');
       // Resolve category object from id
       if (data.category) {
         const catId = data.category._id || data.category;
@@ -121,7 +129,7 @@ export default function EditIncome() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income/${params._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-        body: JSON.stringify({ date, category: category._id, amount: Number(amount), note }),
+        body: JSON.stringify({ date, category: category._id, amount: Number(amount), note, currency }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -249,7 +257,7 @@ export default function EditIncome() {
               Amount <span className="text-rose-400">*</span>
             </label>
             <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
-              <span className="text-4xl font-black text-slate-600 select-none">$</span>
+              <CurrencyBadge value={currency} onChange={setCurrency} currencies={currencies} size="lg" />
               <input
                 type="number"
                 inputMode="decimal"
@@ -283,7 +291,7 @@ export default function EditIncome() {
                         : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
-                    ${v.toLocaleString('en-US')}
+                    {currencyObj.symbol}{v.toLocaleString('en-US')}
                   </button>
                 ))}
               </div>

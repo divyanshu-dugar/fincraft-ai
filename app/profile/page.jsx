@@ -20,8 +20,14 @@ import {
   Edit3,
   Save,
   X,
+  Globe,
+  Star,
+  Plus,
+  Search,
 } from 'lucide-react';
 import { getToken, readToken, removeToken } from '@/lib/authenticate';
+import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
+import { CURRENCIES } from '@/lib/constants/currencies';
 
 const AUTH_SCHEME = 'jwt';
 const API = process.env.NEXT_PUBLIC_API_URL;
@@ -180,6 +186,13 @@ export default function ProfilePage() {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteToast, setDeleteToast] = useState({ type: '', message: '' });
+
+  // Currency prefs
+  const {
+    currencies, defaultCurrency, saving: savingCurrency,
+    addCurrency, removeCurrency, setDefaultCurrency,
+  } = useCurrencyPrefs();
+  const [currencySearch, setCurrencySearch] = useState('');
 
   const authHeader = useCallback(() => ({
     Authorization: `${AUTH_SCHEME} ${getToken()}`,
@@ -518,6 +531,102 @@ export default function ProfilePage() {
                 disabled={!currentPassword || !newPassword || !confirmPassword}
               />
             </form>
+          </SectionCard>
+
+          {/* ── Currencies ── */}
+          <SectionCard icon={Globe} title="Currencies" subtitle="Set your default currency and configure which currencies you use" accent="cyan">
+            {/* Current list */}
+            <div className="space-y-2 mb-5">
+              {currencies.map((c) => (
+                <div
+                  key={c.code}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                    c.code === defaultCurrency
+                      ? 'bg-cyan-500/10 border-cyan-500/30'
+                      : 'bg-slate-800/40 border-white/5'
+                  }`}
+                >
+                  <span className="text-lg font-bold text-slate-300 w-8 shrink-0">{c.symbol}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{c.name}</p>
+                    <p className="text-xs text-slate-500 font-mono">{c.code}</p>
+                  </div>
+                  {c.code === defaultCurrency ? (
+                    <span className="flex items-center gap-1 text-xs font-bold text-cyan-400 bg-cyan-500/15 px-2 py-0.5 rounded-full">
+                      <Star className="w-3 h-3" /> Default
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setDefaultCurrency(c.code)}
+                      disabled={savingCurrency}
+                      className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-medium disabled:opacity-40"
+                    >
+                      Set default
+                    </button>
+                  )}
+                  {c.code !== defaultCurrency && (
+                    <button
+                      type="button"
+                      onClick={() => removeCurrency(c.code)}
+                      disabled={savingCurrency}
+                      className="text-slate-600 hover:text-red-400 transition-colors disabled:opacity-40"
+                      title="Remove"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Add currency */}
+            <div className="space-y-2">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Add currency</p>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                <input
+                  type="text"
+                  value={currencySearch}
+                  onChange={(e) => setCurrencySearch(e.target.value)}
+                  placeholder="Search currencies…"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/10 transition-all"
+                />
+              </div>
+              <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-700/50 divide-y divide-slate-700/30">
+                {CURRENCIES.filter(
+                  (c) =>
+                    !currencies.some((existing) => existing.code === c.code) &&
+                    (currencySearch === '' ||
+                      c.name.toLowerCase().includes(currencySearch.toLowerCase()) ||
+                      c.code.toLowerCase().includes(currencySearch.toLowerCase()))
+                ).map((c) => (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => { addCurrency(c); setCurrencySearch(''); }}
+                    disabled={savingCurrency}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-slate-700/50 transition-colors text-slate-300 disabled:opacity-40"
+                  >
+                    <span className="w-6 font-bold text-slate-400 shrink-0">{c.symbol}</span>
+                    <span className="flex-1">{c.name}</span>
+                    <span className="font-mono text-xs text-slate-500">{c.code}</span>
+                    <Plus className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  </button>
+                ))}
+                {CURRENCIES.filter(
+                  (c) =>
+                    !currencies.some((e) => e.code === c.code) &&
+                    (currencySearch === '' ||
+                      c.name.toLowerCase().includes(currencySearch.toLowerCase()) ||
+                      c.code.toLowerCase().includes(currencySearch.toLowerCase()))
+                ).length === 0 && (
+                  <div className="px-4 py-3 text-xs text-slate-500 text-center">
+                    {currencySearch ? 'No currencies match your search' : 'All currencies added'}
+                  </div>
+                )}
+              </div>
+            </div>
           </SectionCard>
 
           {/* ── Danger Zone ── */}

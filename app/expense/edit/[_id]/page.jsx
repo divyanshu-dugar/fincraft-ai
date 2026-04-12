@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
 import { CategoryPicker } from '@/components/categories/CategoryPicker';
+import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
+import CurrencyBadge from '@/components/ui/CurrencyBadge';
 import {
   ArrowLeft,
   CalendarDays,
@@ -39,6 +41,11 @@ const EditExpense = () => {
   const [date,   setDate]   = useState('');
   const [amount, setAmount] = useState('');
   const [note,   setNote]   = useState('');
+  const [currency, setCurrency] = useState('USD');
+
+  // ── currency prefs ─────────────────────────────────────────────────────────
+  const { currencies } = useCurrencyPrefs();
+  const currencyObj = currencies.find((c) => c.code === currency) ?? { symbol: '$', code: currency };
 
   const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(true);
@@ -88,6 +95,7 @@ const EditExpense = () => {
       setDate(data.date.split('T')[0]);
       setAmount(String(data.amount));
       setNote(data.note || '');
+      setCurrency(data.currency || 'USD');
 
       if (data.category) {
         const cat = data.category;
@@ -172,6 +180,7 @@ const EditExpense = () => {
           category: categoryId,
           amount: Number(amount),
           note,
+          currency,
         }),
       });
       if (!res.ok) {
@@ -271,7 +280,7 @@ const EditExpense = () => {
             </label>
 
             <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700/50 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
-              <span className="text-4xl font-black text-slate-600 select-none">$</span>
+              <CurrencyBadge value={currency} onChange={setCurrency} currencies={currencies} size="lg" />
               <input
                 type="number"
                 inputMode="decimal"
@@ -307,7 +316,7 @@ const EditExpense = () => {
                         : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
-                    ${v.toLocaleString('en-US')}
+                    {currencyObj.symbol}{v.toLocaleString('en-US')}
                   </button>
                 ))}
               </div>

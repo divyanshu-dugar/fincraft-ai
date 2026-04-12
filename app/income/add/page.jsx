@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
 import { IncomeCategoryPicker } from '@/components/categories/IncomeCategoryPicker';
+import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
+import CurrencyBadge from '@/components/ui/CurrencyBadge';
 import {
   ArrowLeft,
   CalendarDays,
@@ -40,6 +42,12 @@ export default function AddIncome() {
   const [isRecurring,  setIsRecurring]  = useState(false);
   const [frequency,    setFrequency]    = useState('monthly');
   const [recurEndDate, setRecurEndDate] = useState('');
+
+  // ── currency ──────────────────────────────────────────────────────────────
+  const { currencies, defaultCurrency } = useCurrencyPrefs();
+  const [currency, setCurrency] = useState('USD');
+  useEffect(() => { if (defaultCurrency) setCurrency(defaultCurrency); }, [defaultCurrency]);
+  const currencyObj = currencies.find((c) => c.code === currency) ?? { symbol: '$', code: currency };
 
   // ── fetch categories ──────────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
@@ -100,6 +108,7 @@ export default function AddIncome() {
             category: category._id,
             amount: Number(amount),
             note,
+            currency,
             frequency,
             startDate: date,
             endDate: recurEndDate || null,
@@ -113,7 +122,7 @@ export default function AddIncome() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-          body: JSON.stringify({ date, category: category._id, amount: Number(amount), note }),
+          body: JSON.stringify({ date, category: category._id, amount: Number(amount), note, currency }),
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
@@ -174,7 +183,7 @@ export default function AddIncome() {
             </label>
 
             <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
-              <span className="text-4xl font-black text-slate-600 select-none">$</span>
+              <CurrencyBadge value={currency} onChange={setCurrency} currencies={currencies} size="lg" />
               <input
                 type="number"
                 inputMode="decimal"
@@ -210,7 +219,7 @@ export default function AddIncome() {
                         : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
-                    ${v.toLocaleString('en-US')}
+                    {currencyObj.symbol}{v.toLocaleString('en-US')}
                   </button>
                 ))}
               </div>
