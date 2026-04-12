@@ -4,16 +4,12 @@ Refinements List
 <summary>Refinements List</summary>
 # Fincraft — SaaS-Level Improvements Roadmap
 
----
-
 ## 💰 Monetization & Subscription
 
 1. **Add a Pricing / Subscription page** — Free tier (basic tracking), Pro tier (AI chat, advanced analytics, unlimited categories), show feature comparison table
 2. **Integrate Stripe payment gateway** — handle subscription lifecycle (checkout, billing portal, invoice emails, plan upgrades/downgrades)
 3. **Add usage quotas on free tier** — e.g., 50 expenses/month, 5 AI chat messages/day, 3 budgets max — with upgrade prompts when limits are hit
 4. **Add a billing settings page** — users can view invoices, update payment method, cancel/resume subscription
-
----
 
 ## 🤖 AI & Intelligence
 
@@ -26,7 +22,6 @@ Refinements List
 11. **Anomaly detection** — AI flags unusual transactions (e.g., "This $500 purchase is 3x your average in this category")
 12. **"What-if" scenario modeling** — "What if I reduce dining out by 30%? How much would I save in 6 months?"
 
----
 
 ## 📊 Analytics & Data Visualization
 
@@ -38,7 +33,6 @@ Refinements List
 18. **Export reports as PDF** — monthly financial statement, budget report, tax-ready expense summaries
 19. **Custom date range on all pages** — currently dashboard has this, extend to all list/analytics views
 
----
 
 ## 🔐 Auth & Security
 
@@ -52,7 +46,6 @@ Refinements List
 27. **CSRF protection** — if you ever move to cookie-based auth
 28. **Security headers** — add `helmet` middleware to Express for HTTP security headers
 
----
 
 ## 🏗️ Architecture & Code Quality
 
@@ -67,7 +60,7 @@ Refinements List
 37. **Add database migrations/seeding** — scripts to set up initial categories, demo data for new users
 38. **Add health check endpoint to API** — `/api/health` returning DB connection status, uptime, version
 
----
+
 
 ## 🎨 UX & Frontend Polish
 
@@ -84,7 +77,7 @@ Refinements List
 49. **Add a sidebar layout** — for authenticated pages, a persistent sidebar with nav items is more efficient than dropdown menus for a SaaS app
 50. **Add a footer** — with links to docs, support, terms of service, privacy policy
 
----
+
 
 ## 📱 Mobile & PWA
 
@@ -93,7 +86,7 @@ Refinements List
 53. **Add pull-to-refresh** — on list pages when used on mobile
 54. **Add haptic feedback** — subtle vibrations on actions when supported
 
----
+
 
 ## 📦 Data Management
 
@@ -105,7 +98,7 @@ Refinements List
 60. **Soft delete with undo** — instead of permanent deletes, soft-delete with a 30-second undo toast
 61. **Archive old data** — allow users to archive previous years' data to keep the active view clean
 
----
+
 
 ## 🔔 Notifications & Engagement
 
@@ -114,7 +107,7 @@ Refinements List
 - [ ] 64. **Budget alert emails** — when spending hits 80%/100% of budget
 65. **Goal milestone celebrations** — confetti animation when a savings goal hits 25%, 50%, 75%, 100%
 
----
+
 
 ## 🧪 Testing & Quality
 
@@ -124,7 +117,7 @@ Refinements List
 69. **Add CI/CD pipeline** — GitHub Actions to run tests, lint, build on every PR
 70. **Add error tracking** — Sentry or similar for catching runtime errors in production
 
----
+
 
 ## ⚙️ Infrastructure & DevOps
 
@@ -137,7 +130,7 @@ Refinements List
 77. **Add request timeouts** — the AI chat proxy has no timeout; if the LLM service hangs, the API hangs too
 78. **Add database connection pooling** — both the API and LLM service create new connections; add connection pool limits
 
----
+
 
 ## 📄 Legal & Compliance
 
@@ -147,7 +140,7 @@ Refinements List
 82. **GDPR data deletion** — "Delete my account and all data" button in profile settings
 83. **Add data encryption at rest** — encrypt sensitive fields in MongoDB (notes, amounts)
 
----
+
 
 ## 🌐 Growth & Marketing
 
@@ -159,7 +152,7 @@ Refinements List
 89. **Add a changelog/what's new page** — keep users informed about new features
 90. **Add a feedback widget** — in-app button to submit feature requests or bug reports
 
----
+
 
 > **Suggested priority order:** 20 → 29 → 39 → 5 → 1–2 → 21 → 30 → 38 → 69 → 9
 > *(Fix security first → clean up code → improve UX → add AI features → monetize → CI/CD)*
@@ -325,7 +318,7 @@ What are we doing?
 ### expenses
 
 | Method | Endpoint | Description | Headers | Body | Response |
-|--------|----------|-------------|---------|------|----------|
+|--|-|-|||-|
 | `GET` | `/expenses` | Get user expenses | `Authorization` | - | `[expenses]` |
 | `POST` | `/expenses` | Create expense | `Authorization` | `{amount, category, type, date}` | `{expense}` |
 | `PUT` | `/expenses/:id` | Update expense | `Authorization` | `{amount, category}` | `{expense}` |
