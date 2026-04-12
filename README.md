@@ -72,7 +72,7 @@ Refinements List
 ## 🎨 UX & Frontend Polish
 
 39. **Add a proper onboarding flow** — after registration, guide users: set currency → create categories → add first expense → set first budget → tour of AI chat
-40. **Empty states for all pages** — when no expenses/budgets/goals exist, show helpful illustrations + CTAs ("Add your first expense!")
+- [ ] 40. **Empty states for all pages** — when no expenses/budgets/goals exist, show helpful illustrations + CTAs ("Add your first expense!")
 41. **Add a global command palette** — `Cmd+K` to quickly navigate, search transactions, or start an AI query
 - [ ] 42. **Multi-currency support** — let users set their default currency, display with correct symbol/formatting
 43. **Keyboard shortcuts** — `N` to add new expense, `D` for dashboard, `Esc` to close modals
