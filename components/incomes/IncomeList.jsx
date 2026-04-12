@@ -8,7 +8,7 @@ import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
 import IncomeSummary from "./IncomeSummary";
-import LoadingSpinner from "./LoadingSpinner";
+import { ListPageSkeleton } from "@/components/skeletons/PageSkeletons";
 
 const IncomeList = () => {
   const [incomes, setIncomes] = useState([]);
@@ -229,7 +229,7 @@ const IncomeList = () => {
     });
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <ListPageSkeleton accentFrom="from-green-600" accentVia="via-emerald-600" accentTo="to-teal-700" />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">

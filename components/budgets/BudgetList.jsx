@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
+import { CardGridSkeleton } from "@/components/skeletons/PageSkeletons";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -493,9 +494,7 @@ export default function BudgetList() {
 
         {/* ── budget cards grid ────────────────────────────────────────────── */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
-          </div>
+          <CardGridSkeleton count={6} />
         ) : filteredBudgets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-slate-800/60 rounded-2xl border border-cyan-400/20">
             <div className="w-16 h-16 rounded-2xl bg-slate-700 flex items-center justify-center mb-4">

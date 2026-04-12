@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChatMessagesSkeleton } from "@/components/skeletons/PageSkeletons";
 import {
   Send,
   Plus,
@@ -721,9 +722,7 @@ export default function ChatPage() {
         {/* Messages area */}
         <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-5">
           {loadingMessages ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
-            </div>
+            <ChatMessagesSkeleton />
           ) : !activeSession || messages.length === 0 ? (
             <WelcomeState onPrompt={(text) => sendMessage(text)} />
           ) : (

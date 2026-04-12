@@ -18,7 +18,7 @@ import {
   Sparkles,
   CreditCard,
 } from "lucide-react";
-import LoadingSpinner from "@/components/expenses/LoadingSpinner";
+import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 import { MetricCards } from "@/components/dashboard/MetricCards";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -313,7 +313,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <DashboardSkeleton />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pb-20 py-20">

@@ -1,6 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { GoalDetailSkeleton } from "@/components/skeletons/PageSkeletons";
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -211,14 +212,7 @@ export default function GoalDetailPage() {
   // ── Loading / Error ──────────────────────────────────────────────────────
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-purple-800 border-t-purple-400 animate-spin" />
-          <p className="text-slate-400 font-medium">Loading goal…</p>
-        </div>
-      </div>
-    );
+    return <GoalDetailSkeleton />;
   }
 
   if (error || !goal) {

@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { getToken } from '@/lib/authenticate';
+import { CategoryListSkeleton } from '@/components/skeletons/PageSkeletons';
 import {
   AlertTriangle,
   Check,
@@ -355,12 +356,7 @@ export default function IncomeCategoryPage() {
 
         {/* ── list ──────────────────────────────────────────────────────────── */}
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="flex items-center gap-3 text-slate-500">
-              <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
-              <span className="text-sm font-medium">Loading categories…</span>
-            </div>
-          </div>
+          <CategoryListSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">

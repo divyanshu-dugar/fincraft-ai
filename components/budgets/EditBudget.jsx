@@ -16,6 +16,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { getToken } from '@/lib/authenticate';
+import { EditFormSkeleton } from '@/components/skeletons/PageSkeletons';
 import { CategoryPicker } from '@/components/categories/CategoryPicker';
 
 const API = process.env.NEXT_PUBLIC_API_URL;
@@ -276,11 +277,7 @@ export default function EditBudget() {
 
   // ── loading skeleton ──────────────────────────────────────────────────────
   if (pageLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
-      </div>
-    );
+    return <EditFormSkeleton accentColor="bg-gradient-to-br from-indigo-500 to-purple-600" />;
   }
 
   // ── render ────────────────────────────────────────────────────────────────

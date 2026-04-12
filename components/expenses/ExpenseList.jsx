@@ -26,7 +26,7 @@ import { getToken } from "@/lib/authenticate";
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseTable from "./ExpenseTable";
 
-import LoadingSpinner from "./LoadingSpinner";
+import { ListPageSkeleton } from "@/components/skeletons/PageSkeletons";
 import ImportExpensesModal from "./ImportExpensesModel";
 
 /**
@@ -451,7 +451,7 @@ const ExpenseList = () => {
    * ================================
    */
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <ListPageSkeleton accentFrom="from-blue-600" accentVia="via-indigo-600" accentTo="to-purple-700" />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">

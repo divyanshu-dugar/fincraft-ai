@@ -6,6 +6,7 @@ import { getToken } from '@/lib/authenticate';
 import { IncomeCategoryPicker } from '@/components/categories/IncomeCategoryPicker';
 import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
 import CurrencyBadge from '@/components/ui/CurrencyBadge';
+import { EditFormSkeleton } from '@/components/skeletons/PageSkeletons';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
@@ -169,14 +170,7 @@ export default function EditIncome() {
   const isAmountSet = amount && Number(amount) > 0;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-400">
-          <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
-          <span className="text-sm font-medium">Loading income…</span>
-        </div>
-      </div>
-    );
+    return <EditFormSkeleton accentColor="bg-gradient-to-br from-emerald-500 to-green-600" />;
   }
 
   return (
