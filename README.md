@@ -42,10 +42,10 @@ Refinements List
 
 ## 🔐 Auth & Security
 
-20. **Add JWT token expiration** — currently `jwt.sign()` has no `expiresIn`, tokens never expire (critical security issue)
-21. **Add refresh token rotation** — short-lived access tokens (15 min) + long-lived refresh tokens with rotation
-22. **Add email verification on registration** — prevent fake signups, verify email before allowing login
-23. **OAuth social login** — Google, Apple sign-in for frictionless onboarding
+- [ ] 20. **Add JWT token expiration** — currently `jwt.sign()` has no `expiresIn`, tokens never expire (critical security issue)
+- [ ] 21. **Add refresh token rotation** — short-lived access tokens (15 min) + long-lived refresh tokens with rotation
+- [ ] 22. **Add email verification on registration** — prevent fake signups, verify email before allowing login
+- [ ] 23. **OAuth social login** — Google, Apple sign-in for frictionless onboarding
 24. **Two-factor authentication (2FA)** — TOTP-based (Google Authenticator) for account security
 25. **Rate limiting on all endpoints** — prevent brute-force attacks on login, API abuse
 26. **Input validation with a library** — add `zod`, `joi` or `express-validator` for consistent server-side validation (currently minimal)
@@ -74,9 +74,9 @@ Refinements List
 39. **Add a proper onboarding flow** — after registration, guide users: set currency → create categories → add first expense → set first budget → tour of AI chat
 40. **Empty states for all pages** — when no expenses/budgets/goals exist, show helpful illustrations + CTAs ("Add your first expense!")
 41. **Add a global command palette** — `Cmd+K` to quickly navigate, search transactions, or start an AI query
-42. **Multi-currency support** — let users set their default currency, display with correct symbol/formatting
+- [ ] 42. **Multi-currency support** — let users set their default currency, display with correct symbol/formatting
 43. **Keyboard shortcuts** — `N` to add new expense, `D` for dashboard, `Esc` to close modals
-44. **Toast notifications for operations** — already using `react-hot-toast` but ensure every create/update/delete shows confirmation
+- [ ] 44. **Toast notifications for operations** — already using `react-hot-toast` but ensure every create/update/delete shows confirmation
 45. **Skeleton loading states** — replace spinners with skeleton screens (you already have the `Skeleton` shadcn component)
 46. **Dark/Light theme toggle** — currently only dark mode; some users prefer light
 47. **Add breadcrumb navigation** — helps users understand where they are, especially on edit pages
@@ -97,10 +97,10 @@ Refinements List
 
 ## 📦 Data Management
 
-55. **Bulk operations** — select multiple expenses and bulk delete, bulk re-categorize, bulk edit dates
+- [ ] 55. **Bulk operations** — select multiple expenses and bulk delete, bulk re-categorize, bulk edit dates
 56. **Data export** — export all data as CSV/JSON (GDPR compliance, user portability)
 57. **Data import from banks** — CSV import already exists; add template matching for popular banks (Chase, RBC, etc.)
-58. **Recurring expense automation** — auto-create expenses from recurring patterns (e.g., auto-log Netflix $15.99 on the 1st of each month)
+- [ ] 58. **Recurring expense automation** — auto-create expenses from recurring patterns (e.g., auto-log Netflix $15.99 on the 1st of each month)
 59. **Transaction search** — full-text search bar across all transactions (beyond the AI semantic search)
 60. **Soft delete with undo** — instead of permanent deletes, soft-delete with a 30-second undo toast
 61. **Archive old data** — allow users to archive previous years' data to keep the active view clean
@@ -109,9 +109,9 @@ Refinements List
 
 ## 🔔 Notifications & Engagement
 
-62. **In-app notification center** — bell icon in navbar showing budget alerts, goal milestones, AI tips
+- [ ] 62. **In-app notification center** — bell icon in navbar showing budget alerts ✅, goal milestones 🟡, AI tips 🟡
 63. **Email notification preferences** — let users toggle: weekly digest, budget alerts, goal reminders
-64. **Budget alert emails** — when spending hits 80%/100% of budget (threshold already in model, but no notification delivery)
+- [ ] 64. **Budget alert emails** — when spending hits 80%/100% of budget
 65. **Goal milestone celebrations** — confetti animation when a savings goal hits 25%, 50%, 75%, 100%
 
 ---
