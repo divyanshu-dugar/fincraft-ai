@@ -79,7 +79,7 @@ export function DashboardHeader({
 
               {/* Custom Date Picker Dropdown */}
               {showCustomDatePicker && (
-                <div className="custom-date-picker absolute right-0 mt-2 w-80 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-4 z-50">
+                <div className="custom-date-picker fixed inset-x-3 top-auto mt-2 sm:absolute sm:inset-x-auto sm:right-0 w-auto sm:w-80 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-4 z-50">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-slate-200">
                       Select Date Range

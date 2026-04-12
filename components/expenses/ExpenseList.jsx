@@ -517,53 +517,56 @@ const ExpenseList = () => {
           transition={{ delay: 0.1 }}
           className="relative overflow-hidden rounded-2xl border border-blue-400/20 mb-5"
         >
-          <div className="bg-gradient-to-r from-slate-900 via-blue-900/70 to-indigo-900/70 px-5 py-4">
+          <div className="bg-gradient-to-r from-slate-900 via-blue-900/70 to-indigo-900/70 px-4 py-3 sm:px-5 sm:py-4">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(99,102,241,0.3),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(56,189,248,0.2),transparent_45%)]" />
-            <div className="relative flex items-center gap-3">
+            <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 
-              {/* Set Budget — shrinks to content */}
-              <button
-                onClick={() => setBudgetSheetOpen(true)}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-blue-100 hover:bg-white/20 hover:text-white transition-all backdrop-blur-sm"
-              >
-                <Wallet size={13} />
-                Set Budget
-              </button>
-
-              {/* Center: big month + total + count */}
-              <div className="flex-1 text-center">
+              {/* Center: big month + total + count — shown first on mobile, centered on desktop */}
+              <div className="text-center sm:flex-1 sm:order-2">
                 {!isCustomRange ? (
-                  <h2 className="text-2xl font-black text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                     {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
                   </h2>
                 ) : (
-                  <h2 className="text-lg font-bold text-blue-100">
+                  <h2 className="text-base sm:text-lg font-bold text-blue-100">
                     {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
                     {dateRange.startDate && dateRange.endDate && " – "}
                     {dateRange.endDate && new Date(dateRange.endDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
                   </h2>
                 )}
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <span className="text-base font-bold text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
+                  <span className="text-sm sm:text-base font-bold text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
                   <span className="inline-flex items-center rounded-full bg-white/15 text-blue-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
                     {expenses.length} expense{expenses.length !== 1 ? "s" : ""}
                   </span>
                 </div>
               </div>
 
-              {/* Filters — shrinks to content */}
-              <button
-                onClick={() => setShowFilters((prev) => !prev)}
-                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm ${
-                  showFilters
-                    ? "bg-blue-500/30 border-blue-400/60 text-blue-200"
-                    : "bg-white/10 border-white/20 text-blue-100 hover:bg-white/20 hover:text-white"
-                }`}
-              >
-                <SlidersHorizontal size={13} />
-                Filters
-                <ChevronDown size={12} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
-              </button>
+              {/* Buttons row — side by side on mobile, flanking center on desktop */}
+              <div className="flex items-center justify-between gap-2 sm:contents">
+                {/* Set Budget */}
+                <button
+                  onClick={() => setBudgetSheetOpen(true)}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-blue-100 hover:bg-white/20 hover:text-white transition-all backdrop-blur-sm sm:order-1"
+                >
+                  <Wallet size={13} />
+                  Set Budget
+                </button>
+
+                {/* Filters */}
+                <button
+                  onClick={() => setShowFilters((prev) => !prev)}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm sm:order-3 ${
+                    showFilters
+                      ? "bg-blue-500/30 border-blue-400/60 text-blue-200"
+                      : "bg-white/10 border-white/20 text-blue-100 hover:bg-white/20 hover:text-white"
+                  }`}
+                >
+                  <SlidersHorizontal size={13} />
+                  Filters
+                  <ChevronDown size={12} className={`transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+                </button>
+              </div>
 
             </div>
           </div>
