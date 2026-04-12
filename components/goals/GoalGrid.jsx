@@ -9,6 +9,7 @@ export default function GoalGrid({
   onDelete,
   onChangeSavedAmount,
   onUpdateSavedAmount,
+  onCreateGoal,
   formatCurrency,
   formatDate,
   getDaysRemaining,
@@ -109,6 +110,14 @@ export default function GoalGrid({
           <p className="text-slate-400 text-lg">
             Start your financial journey by creating your first savings goal.
           </p>
+          {onCreateGoal && (
+            <button
+              onClick={onCreateGoal}
+              className="mt-2 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+            >
+              <span className="text-lg">+</span> Create Your First Goal
+            </button>
+          )}
         </div>
       </div>
     );

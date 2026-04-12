@@ -124,7 +124,8 @@ export function CategoryBreakdown({ dashboardData, formatCurrency, getCategoryIc
               <DollarSign className="w-6 h-6 text-slate-500" />
             )}
           </div>
-          <p className="text-slate-500 text-sm">No {view} data this period</p>
+          <p className="text-white font-semibold text-sm mb-1">No {view} data this period</p>
+          <p className="text-slate-500 text-xs max-w-xs mx-auto">Try selecting a different time range, or add your first {view === "expenses" ? "expense" : "income"} to see the breakdown.</p>
         </div>
       )}
     </div>

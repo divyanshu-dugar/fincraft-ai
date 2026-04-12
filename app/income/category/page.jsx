@@ -366,15 +366,18 @@ export default function IncomeCategoryPage() {
             <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">
               <Tags className="w-7 h-7 text-slate-600" />
             </div>
-            <p className="text-sm font-semibold text-slate-500">
-              {search ? 'No categories match your search' : 'No categories yet'}
+            <h3 className="text-lg font-bold text-white mb-1">
+              {search ? 'No matching categories' : 'No categories yet'}
+            </h3>
+            <p className="text-sm text-slate-500 max-w-xs mx-auto">
+              {search ? 'Try a different search term.' : 'Organize your income streams by creating categories like Salary, Freelance, or Investments.'}
             </p>
             {!search && (
               <button
                 onClick={() => setAdding(true)}
-                className="mt-4 text-sm font-bold text-emerald-400 hover:underline"
+                className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
               >
-                Create your first category →
+                <span className="text-base">+</span> Create Your First Category
               </button>
             )}
           </div>

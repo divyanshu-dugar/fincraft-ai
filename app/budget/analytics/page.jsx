@@ -604,7 +604,13 @@ export default function BudgetAnalyticsPage() {
               <Wallet className="w-9 h-9 text-indigo-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">No budgets found</h3>
-            <p className="text-slate-400">There are no active budgets for the selected date range. Try adjusting the dates.</p>
+            <p className="text-slate-400 mb-5">There are no active budgets for the selected date range. Try adjusting the dates or create a new budget.</p>
+            <a
+              href="/budget/add"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+            >
+              <span className="text-base">+</span> Create Budget
+            </a>
           </div>
         )}
 

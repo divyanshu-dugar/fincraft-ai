@@ -170,7 +170,12 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
               <div className="w-14 h-14 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <List className="w-7 h-7 text-slate-500" />
               </div>
-              <p className="text-slate-500 text-sm">No transactions yet</p>
+              <p className="text-white font-semibold text-sm mb-1">No transactions yet</p>
+              <p className="text-slate-500 text-xs max-w-xs mx-auto mb-4">Start tracking your finances by adding an expense or income entry.</p>
+              <div className="flex items-center justify-center gap-3">
+                <a href="/expense/add" className="px-4 py-2 bg-rose-500/15 text-rose-400 text-xs font-semibold rounded-lg border border-rose-500/30 hover:bg-rose-500/25 transition-colors">+ Add Expense</a>
+                <a href="/income/add" className="px-4 py-2 bg-emerald-500/15 text-emerald-400 text-xs font-semibold rounded-lg border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors">+ Add Income</a>
+              </div>
             </div>
           )}
         </div>

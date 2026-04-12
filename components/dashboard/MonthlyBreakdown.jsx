@@ -75,9 +75,13 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-slate-500 text-sm text-center py-8">
-          No data for this period.
-        </p>
+        <div className="text-center py-10">
+          <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <CalendarRange className="w-6 h-6 text-slate-500" />
+          </div>
+          <p className="text-white font-semibold text-sm mb-1">No monthly data yet</p>
+          <p className="text-slate-500 text-xs max-w-xs mx-auto">Add expenses or income to see your month-by-month financial breakdown.</p>
+        </div>
       ) : !collapsed && (
         <div className="overflow-x-auto">
           <table className="w-full">

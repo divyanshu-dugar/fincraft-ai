@@ -49,8 +49,9 @@ export function AIInsights({ insights }) {
             <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Brain className="w-6 h-6 text-slate-500" />
             </div>
-            <p className="text-slate-400 text-sm">
-              Add more data to generate insights
+            <p className="text-white font-semibold text-sm mb-1">No insights yet</p>
+            <p className="text-slate-500 text-xs max-w-xs mx-auto">
+              Add a few expenses and income entries — AI insights will appear automatically as patterns emerge.
             </p>
           </div>
         )}

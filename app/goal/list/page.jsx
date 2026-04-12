@@ -209,6 +209,7 @@ export default function SavingsGoals() {
 
         <GoalGrid
           goals={goals}
+          onCreateGoal={() => setShowForm(true)}
           onEdit={(g) => {
             setEditingGoal(g);
             setFormData({
