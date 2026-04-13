@@ -28,6 +28,8 @@ import { AIInsights } from "@/components/dashboard/AIInsights";
 import { RecentTransactionsTable } from "@/components/dashboard/RecentTransactionsTable";
 import { MonthlyBreakdown } from "@/components/dashboard/MonthlyBreakdown";
 import { SectionToggler } from "@/components/dashboard/SectionToggler";
+import { CashFlowForecast } from "@/components/dashboard/CashFlowForecast";
+import { ForecastInsightsBanner } from "@/components/dashboard/ForecastInsightsBanner";
 import {
   formatCurrency,
   formatCurrencyDetailed,
@@ -54,6 +56,7 @@ export default function Dashboard() {
   const [activeSections, setActiveSections] = useState({
     categories: true,
     monthly: true,
+    forecast: true,
     budgets: true,
     insights: true,
     transactions: true,
@@ -335,6 +338,9 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Forecast Insights Banner — subtle, dismissable */}
+        <ForecastInsightsBanner />
+
         {/* Top Metrics — always visible */}
         <MetricCards
           dashboardData={dashboardData}
@@ -395,6 +401,13 @@ export default function Dashboard() {
               dashboardData={dashboardData}
               formatCurrency={formatCurrency}
             />
+          </div>
+        )}
+
+        {/* Cash Flow Forecast */}
+        {activeSections.forecast && (
+          <div className="mb-8">
+            <CashFlowForecast />
           </div>
         )}
 

@@ -1,10 +1,11 @@
 "use client";
 
-import { BarChart2, CalendarRange, Target, Brain, List } from "lucide-react";
+import { BarChart2, CalendarRange, Target, Brain, List, Activity } from "lucide-react";
 
 const SECTIONS = [
   { key: "categories", label: "Category Breakdown", icon: BarChart2 },
   { key: "monthly", label: "Monthly Overview", icon: CalendarRange },
+  { key: "forecast", label: "Cash Flow Forecast", icon: Activity },
   { key: "budgets", label: "Budget Health", icon: Target },
   { key: "insights", label: "AI Insights", icon: Brain },
   { key: "transactions", label: "Transactions", icon: List },
