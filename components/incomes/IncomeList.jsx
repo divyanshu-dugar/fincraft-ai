@@ -1,48 +1,74 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Repeat } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
 import IncomeSummary from "./IncomeSummary";
+import BulkActionsBar from "./BulkActionsBar";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { ListPageSkeleton } from "@/components/skeletons/PageSkeletons";
 
 const IncomeList = () => {
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const today = new Date();
+  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+
+  // Read from URL params if present
+  const urlStartDate = searchParams.get("startDate");
+  const urlEndDate = searchParams.get("endDate");
+  const urlCategory = searchParams.get("category");
+  const urlMonth = searchParams.get("month");
+  const urlYear = searchParams.get("year");
+
+  const initMonth = urlMonth !== null
+    ? parseInt(urlMonth, 10)
+    : urlStartDate
+      ? parseInt(urlStartDate.split("-")[1], 10) - 1
+      : todayUTC.getUTCMonth();
+  const initYear = urlYear !== null
+    ? parseInt(urlYear, 10)
+    : urlStartDate
+      ? parseInt(urlStartDate.split("-")[0], 10)
+      : todayUTC.getUTCFullYear();
+
   const [incomes, setIncomes] = useState([]);
   const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const today = new Date();
-  const firstDayUTC = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)
-  );
-  const todayUTC = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-  );
-
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || "all");
+  const [currentMonth, setCurrentMonth] = useState(initMonth);
+  const [currentYear, setCurrentYear] = useState(initYear);
   const [dateRange, setDateRange] = useState({
-    startDate: firstDayUTC.toISOString().split("T")[0],
-    endDate: todayUTC.toISOString().split("T")[0],
+    startDate: urlStartDate || new Date(Date.UTC(initYear, initMonth, 1)).toISOString().split("T")[0],
+    endDate: urlEndDate || new Date(Date.UTC(initYear, initMonth + 1, 0)).toISOString().split("T")[0],
   });
-
-  // Pagination
-  const [currentMonth, setCurrentMonth] = useState(todayUTC.getUTCMonth());
-  const [currentYear, setCurrentYear] = useState(todayUTC.getUTCFullYear());
   const [isCustomRange, setIsCustomRange] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-
-  const router = useRouter();
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // 🟢 Load all data when filters change
   useEffect(() => {
     fetchCategories();
     fetchIncomes();
     fetchStats();
-  }, [selectedCategory, dateRange]);
+    // Update URL params for deep-linking
+    const params = new URLSearchParams();
+    if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
+    if (dateRange.startDate) params.set("startDate", dateRange.startDate);
+    if (dateRange.endDate) params.set("endDate", dateRange.endDate);
+    params.set("month", currentMonth);
+    params.set("year", currentYear);
+    const url = `/income/list?${params.toString()}`;
+    router.replace(url, { scroll: false });
+  }, [selectedCategory, dateRange, currentMonth, currentYear]);
 
   // Process any overdue recurring incomes on first mount (fire-and-forget)
   useEffect(() => {
@@ -64,7 +90,7 @@ const IncomeList = () => {
   }, []);
 
   // 🟣 Fetch user-specific categories
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const token = getToken();
       const res = await fetch(
@@ -82,10 +108,10 @@ const IncomeList = () => {
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
-  };
+  }, []);
 
   // 🟣 Fetch incomes
-  const fetchIncomes = async () => {
+  const fetchIncomes = useCallback(async () => {
     try {
       const token = getToken();
       let url = "";
@@ -100,22 +126,17 @@ const IncomeList = () => {
 
       // Determine which endpoint to use
       if (selectedCategory === "all") {
-        // Use main income endpoint with date filter
         url = `${process.env.NEXT_PUBLIC_API_URL}/income`;
         if (dateQueryString) {
           url = `${url}?${dateQueryString}`;
         }
       } else {
-        // Use category-specific date range endpoint
         if (dateQueryString) {
           url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}/date-range?${dateQueryString}`;
         } else {
-          // If no date range, use just category endpoint
           url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}`;
         }
       }
-
-      console.log("Fetching incomes from URL:", url); // Debug log
 
       const res = await fetch(url, {
         headers: {
@@ -125,23 +146,22 @@ const IncomeList = () => {
       });
 
       if (!res.ok) {
-        console.error("Income response not OK:", res.status, res.statusText);
         throw new Error(`Failed to fetch incomes: ${res.status}`);
       }
 
       const data = await res.json();
       setIncomes(data);
+      setSelectedIds(new Set());
     } catch (error) {
       console.error("Error fetching incomes:", error);
-      // Fallback to empty array
       setIncomes([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange, selectedCategory]);
 
   // 🟣 Fetch aggregated stats
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const token = getToken();
       const res = await fetch(
@@ -158,15 +178,20 @@ const IncomeList = () => {
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
+  }, []);
+
+  // 🟣 Delete income (via modal)
+  const deleteIncome = (id) => {
+    setDeleteTarget(id);
   };
 
-  // 🟣 Delete income
-  const deleteIncome = async (id) => {
-    if (!confirm("Are you sure you want to delete this income?")) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/income/${deleteTarget}`,
         {
           method: "DELETE",
           headers: { Authorization: `jwt ${token}` },
@@ -174,11 +199,119 @@ const IncomeList = () => {
       );
 
       if (res.ok) {
-        setIncomes(incomes.filter((e) => e._id !== id));
+        setIncomes((prev) => prev.filter((e) => e._id !== deleteTarget));
+        setSelectedIds((prev) => { const next = new Set(prev); next.delete(deleteTarget); return next; });
         fetchStats();
+        window.dispatchEvent(new CustomEvent('income-added'));
       }
     } catch (error) {
       console.error("Error deleting income:", error);
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTarget(null);
+    }
+  };
+
+  // 🟣 Selection helpers for bulk operations
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (visibleIncomes) => {
+    const allVisible = visibleIncomes.map((e) => e._id);
+    const allSelected = allVisible.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allVisible.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => new Set([...prev, ...allVisible]));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  // 🟣 Bulk operations
+  const bulkDelete = async () => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-delete`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `jwt ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids }),
+        }
+      );
+      if (response.ok) {
+        setIncomes((prev) => prev.filter((e) => !selectedIds.has(e._id)));
+        setSelectedIds(new Set());
+        fetchStats();
+        window.dispatchEvent(new CustomEvent('income-added'));
+      }
+    } catch (error) {
+      console.error("Error bulk deleting incomes:", error);
+    }
+  };
+
+  const bulkRecategorize = async (categoryId) => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-recategorize`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `jwt ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids, categoryId }),
+        }
+      );
+      if (response.ok) {
+        setSelectedIds(new Set());
+        fetchIncomes();
+        fetchStats();
+      }
+    } catch (error) {
+      console.error("Error bulk recategorizing:", error);
+    }
+  };
+
+  const bulkEditDate = async (date) => {
+    const ids = [...selectedIds];
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-edit-date`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `jwt ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids, date }),
+        }
+      );
+      if (response.ok) {
+        setSelectedIds(new Set());
+        fetchIncomes();
+        fetchStats();
+      }
+    } catch (error) {
+      console.error("Error bulk editing dates:", error);
     }
   };
 
@@ -203,25 +336,17 @@ const IncomeList = () => {
   const changeMonth = (direction) => {
     let newMonth = currentMonth + direction;
     let newYear = currentYear;
-
-    // Handle year rollover
     if (newMonth < 0) {
       newMonth = 11;
-      newYear -= 1;
+      newYear--;
     } else if (newMonth > 11) {
       newMonth = 0;
-      newYear += 1;
+      newYear++;
     }
-
-    // Update current month/year
     setCurrentMonth(newMonth);
     setCurrentYear(newYear);
-
-    // Calculate first and last day of the new month in UTC
     const firstDayUTC = new Date(Date.UTC(newYear, newMonth, 1));
     const lastDayUTC = new Date(Date.UTC(newYear, newMonth + 1, 0));
-
-    // Update date range state
     setIsCustomRange(false);
     setDateRange({
       startDate: firstDayUTC.toISOString().split("T")[0],
@@ -370,6 +495,11 @@ const IncomeList = () => {
           deleteIncome={deleteIncome}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
+          currentMonth={currentMonth}
+          currentYear={currentYear}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onToggleSelectAll={toggleSelectAll}
         />
 
         {/* Summary */}
@@ -402,6 +532,50 @@ const IncomeList = () => {
       >
         <ChevronRight size={22} strokeWidth={2.5} />
       </motion.button>
+
+      {/* Sticky total bar (hidden when bulk selection active) */}
+      {incomes.length > 0 && selectedIds.size === 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-700/60 px-6 py-3 flex items-center justify-between shadow-2xl">
+          <span className="text-sm text-slate-400 font-medium">
+            {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+            <span className="ml-2 text-slate-500">· {incomes.length} income{incomes.length !== 1 ? "s" : ""}</span>
+          </span>
+          <span className="text-lg font-black text-white">{formatCurrency(incomes.reduce((s, e) => s + e.amount, 0))}</span>
+        </div>
+      )}
+
+      {/* Bulk Actions Bar */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <BulkActionsBar
+            selectedCount={selectedIds.size}
+            onBulkDelete={bulkDelete}
+            onBulkRecategorize={bulkRecategorize}
+            onBulkEditDate={bulkEditDate}
+            onClearSelection={clearSelection}
+            categories={categories}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Floating Add Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => router.push("/income/add")}
+        className="fixed bottom-20 right-8 z-50 w-14 h-14 bg-gradient-to-br from-green-600 to-emerald-600 text-white rounded-full shadow-2xl shadow-emerald-500/40 flex items-center justify-center hover:shadow-emerald-500/60 transition-shadow duration-200"
+        aria-label="Add income"
+      >
+        <Plus size={26} strokeWidth={2.5} />
+      </motion.button>
+
+      {/* Single Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        loading={deleteLoading}
+      />
     </div>
   );
 };

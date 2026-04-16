@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import ConfirmDeleteModal from '@/components/incomes/ConfirmDeleteModal';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -45,6 +46,7 @@ export default function RecurringIncomePage() {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
 
   const fetchRules = useCallback(async () => {
@@ -81,7 +83,6 @@ export default function RecurringIncomePage() {
   };
 
   const deleteRule = async (id) => {
-    if (!window.confirm('Delete this recurring income? Future entries will not be created, but past entries remain.')) return;
     setDeletingId(id);
     try {
       const token = getToken();
@@ -92,6 +93,7 @@ export default function RecurringIncomePage() {
       setRules((prev) => prev.filter((r) => r._id !== id));
     } catch { /* silent */ } finally {
       setDeletingId(null);
+      setConfirmDeleteId(null);
     }
   };
 
@@ -100,6 +102,14 @@ export default function RecurringIncomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+      <ConfirmDeleteModal
+        open={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={() => deleteRule(confirmDeleteId)}
+        loading={deletingId === confirmDeleteId}
+        title="Delete Recurring Income"
+        message="Future entries will not be created, but past entries remain. Are you sure you want to delete this recurring income?"
+      />
       {/* sticky header */}
       <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
@@ -110,16 +120,6 @@ export default function RecurringIncomePage() {
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          <div className="h-5 w-px bg-slate-700" />
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Repeat className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-base font-bold text-white leading-none">Recurring Incomes</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5">Auto-generated on schedule</p>
-            </div>
-          </div>
           <div className="ml-auto">
             <button
               onClick={() => router.push('/income/add')}

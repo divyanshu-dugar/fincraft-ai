@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { getToken } from '@/lib/authenticate';
 import { IncomeCategoryPicker } from '@/components/categories/IncomeCategoryPicker';
 import { useCurrencyPrefs } from '@/lib/hooks/useCurrencyPrefs';
@@ -22,9 +22,20 @@ import {
 
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
 
+const toApiLocalDateTime = (dateString) => (dateString ? `${dateString}T00:00:00` : '');
+
 export default function EditIncome() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+
+  const returnUrl = (() => {
+    const m = searchParams.get('month');
+    const y = searchParams.get('year');
+    return m !== null && y !== null
+      ? `/income/list?month=${m}&year=${y}`
+      : '/income/list';
+  })();
 
   const [categories, setCategories] = useState([]);
   const [category,   setCategory]   = useState(null);
@@ -84,13 +95,28 @@ export default function EditIncome() {
     }
   }, [params._id]);
 
+  const seedIfEmpty = useCallback(async (cats) => {
+    if (cats && cats.length > 0) return;
+    const token = getToken();
+    if (!token) return;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories/seed`, {
+        method: 'POST',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      const refreshed = await fetchCategories();
+      setCategories(refreshed || []);
+    } catch { /* silent */ }
+  }, [fetchCategories]);
+
   useEffect(() => {
     (async () => {
       const cats = await fetchCategories();
       setCategories(cats || []);
       await fetchIncome(cats || []);
+      seedIfEmpty(cats);
     })();
-  }, [fetchCategories, fetchIncome]);
+  }, [fetchCategories, fetchIncome, seedIfEmpty]);
 
   // ── add category inline ─────────────────────────────────────────────────
   const handleAddCategory = async (name) => {
@@ -131,7 +157,7 @@ export default function EditIncome() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income/${params._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-        body: JSON.stringify({ date, category: category._id, amount: Number(amount), note, currency }),
+        body: JSON.stringify({ date: toApiLocalDateTime(date), category: category._id, amount: Number(amount), note, currency }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -139,7 +165,7 @@ export default function EditIncome() {
       }
       toast.success('Income updated!');
       setSuccess(true);
-      setTimeout(() => router.push('/income/list'), 900);
+      setTimeout(() => router.push(returnUrl), 900);
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -158,7 +184,7 @@ export default function EditIncome() {
       });
       if (!res.ok) throw new Error('Failed to delete income');
       toast.success('Income deleted.');
-      router.push('/income/list');
+      router.push(returnUrl);
     } catch (err) {
       toast.error(err.message);
       setConfirmDelete(false);

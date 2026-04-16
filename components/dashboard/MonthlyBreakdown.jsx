@@ -4,8 +4,13 @@ import { useState } from "react";
 import { CalendarRange, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from "lucide-react";
 
 export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
-  const rows = dashboardData?.monthlyBreakdown || [];
+  const allRows = dashboardData?.monthlyBreakdown || [];
   const [collapsed, setCollapsed] = useState(false);
+  const [monthsToShow, setMonthsToShow] = useState(6);
+  const [customMonths, setCustomMonths] = useState(6);
+
+  // Show only the last N months
+  const rows = allRows.slice(-monthsToShow);
 
   const formatMonth = (key) => {
     const [year, month] = key.split("-");
@@ -50,9 +55,40 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
               </>
             )}
           </button>
-          <div className="p-2.5 bg-indigo-500/20 rounded-xl">
-            <CalendarRange className="w-5 h-5 text-indigo-400" />
-          </div>
+          <select
+            className="px-2 py-1 text-xs rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 focus:outline-none"
+            value={monthsToShow}
+            onChange={e => {
+              const val = e.target.value;
+              if (val === 'custom') {
+                setMonthsToShow(customMonths);
+              } else {
+                setMonthsToShow(Number(val));
+              }
+            }}
+          >
+            <option value={2}>Last 2 months</option>
+            <option value={4}>Last 4 months</option>
+            <option value={6}>Last 6 months</option>
+            <option value={12}>Last 12 months</option>
+            <option value={allRows.length}>All</option>
+            <option value="custom">Custom…</option>
+          </select>
+          {monthsToShow === 'custom' || (![2,4,6,12,allRows.length].includes(monthsToShow)) ? (
+            <input
+              type="number"
+              min={1}
+              max={allRows.length}
+              value={customMonths}
+              onChange={e => {
+                const val = Math.max(1, Math.min(allRows.length, Number(e.target.value)));
+                setCustomMonths(val);
+                setMonthsToShow(val);
+              }}
+              className="w-16 px-2 py-1 text-xs rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 focus:outline-none"
+              placeholder="N months"
+            />
+          ) : null}
         </div>
       </div>
 

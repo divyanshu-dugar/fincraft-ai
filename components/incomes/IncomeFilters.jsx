@@ -1,6 +1,7 @@
 "use client";
 
-import { Calendar, Filter, Tag } from "lucide-react";
+import { Calendar, Filter, Tag, Search } from "lucide-react";
+import { useState, useMemo } from "react";
 
 export default function IncomeFilters({
   categories,
@@ -11,6 +12,11 @@ export default function IncomeFilters({
   onCustomRangeApply,
   onCustomRangeReset,
 }) {
+  const [search, setSearch] = useState("");
+  const filteredCategories = useMemo(() => {
+    if (!search) return categories;
+    return categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase()));
+  }, [categories, search]);
   return (
     <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 mb-10 transition-all duration-300">
       {/* Header */}
@@ -33,19 +39,29 @@ export default function IncomeFilters({
 
       {/* Filters Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* 🏷 Category Filter */}
+        {/* 🏷 Category Filter with Search */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-slate-400 mb-2 flex items-center">
             <Tag className="w-4 h-4 mr-2 text-emerald-400" />
             Category
           </label>
+          <div className="relative mb-2">
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search categories..."
+              className="pl-9 pr-3 py-2 text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200 w-full"
+            />
+            <Search className="absolute left-2 top-2.5 w-4 h-4 text-slate-400" />
+          </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-4 py-2.5 text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
           >
             <option value="all">All Categories</option>
-            {categories?.map((category) => (
+            {filteredCategories?.map((category) => (
               <option key={category._id || category.name} value={category._id}>
                 {category.name}
               </option>

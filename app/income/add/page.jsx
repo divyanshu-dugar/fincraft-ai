@@ -22,6 +22,8 @@ import {
 
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
 
+const toApiLocalDateTime = (dateString) => (dateString ? `${dateString}T00:00:00` : '');
+
 function today() {
   return new Date().toLocaleDateString('en-CA');
 }
@@ -63,7 +65,28 @@ export default function AddIncome() {
     } catch { /* silent */ }
   }, []);
 
+  const [seedLoading, setSeedLoading] = useState(false);
+
+  const seedIfEmpty = useCallback(async () => {
+    const token = getToken();
+    if (!token || seedLoading) return;
+    setSeedLoading(true);
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories/seed`, {
+        method: 'POST',
+        headers: { Authorization: `jwt ${token}` },
+      });
+      await fetchCategories();
+    } catch { /* silent */ }
+    finally { setSeedLoading(false); }
+  }, [fetchCategories, seedLoading]);
+
   useEffect(() => { fetchCategories(); }, [fetchCategories]);
+
+  useEffect(() => {
+    if (!seedLoading && categories.length === 0) seedIfEmpty();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories.length]);
 
   // ── add category inline ─────────────────────────────────────────────────
   const handleAddCategory = async (name) => {
@@ -102,7 +125,7 @@ export default function AddIncome() {
       const token = getToken();
 
       if (isRecurring) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes`, {
+        const recurRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
           body: JSON.stringify({
@@ -111,25 +134,28 @@ export default function AddIncome() {
             note,
             currency,
             frequency,
-            startDate: date,
-            endDate: recurEndDate || null,
+            startDate: toApiLocalDateTime(date),
+            endDate: recurEndDate ? toApiLocalDateTime(recurEndDate) : null,
           }),
         });
-        if (!res.ok) {
-          const d = await res.json().catch(() => ({}));
+        if (!recurRes.ok) {
+          const d = await recurRes.json().catch(() => ({}));
           throw new Error(d.error || 'Failed to create recurring income');
         }
       } else {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
-          body: JSON.stringify({ date, category: category._id, amount: Number(amount), note, currency }),
+          body: JSON.stringify({ date: toApiLocalDateTime(date), category: category._id, amount: Number(amount), note, currency }),
         });
         if (!res.ok) {
           const d = await res.json().catch(() => ({}));
           throw new Error(d.message || 'Failed to add income');
         }
       }
+
+      // Notify listeners to re-check (e.g. income-related alerts)
+      window.dispatchEvent(new CustomEvent('income-added'));
 
       toast.success(isRecurring ? 'Recurring income set!' : 'Income added!');
       setSuccess(true);
