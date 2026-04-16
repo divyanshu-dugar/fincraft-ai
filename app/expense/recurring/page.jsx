@@ -14,6 +14,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { getToken } from '@/lib/authenticate';
+import ConfirmDeleteModal from '@/components/expenses/ConfirmDeleteModal';
 
 const FREQUENCY_LABELS = {
   daily: 'Daily',
@@ -46,6 +47,7 @@ export default function RecurringExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const fetchRules = useCallback(async () => {
     const token = getToken();
@@ -81,7 +83,6 @@ export default function RecurringExpensesPage() {
   };
 
   const deleteRule = async (id) => {
-    if (!window.confirm('Delete this recurring expense? Future entries will not be created, but past entries remain.')) return;
     setDeletingId(id);
     try {
       const token = getToken();
@@ -92,6 +93,7 @@ export default function RecurringExpensesPage() {
       setRules((prev) => prev.filter((r) => r._id !== id));
     } catch { /* silent */ } finally {
       setDeletingId(null);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -99,6 +101,7 @@ export default function RecurringExpensesPage() {
   const inactive = rules.filter((r) => !r.isActive);
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
       {/* sticky header */}
       <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
@@ -166,7 +169,7 @@ export default function RecurringExpensesPage() {
                         key={rule._id}
                         rule={rule}
                         onToggle={toggleActive}
-                        onDelete={deleteRule}
+                        onDelete={(id) => setDeleteConfirmId(id)}
                         deletingId={deletingId}
                         togglingId={togglingId}
                       />
@@ -188,7 +191,7 @@ export default function RecurringExpensesPage() {
                         key={rule._id}
                         rule={rule}
                         onToggle={toggleActive}
-                        onDelete={deleteRule}
+                        onDelete={(id) => setDeleteConfirmId(id)}
                         deletingId={deletingId}
                         togglingId={togglingId}
                       />
@@ -201,6 +204,16 @@ export default function RecurringExpensesPage() {
         )}
       </div>
     </div>
+
+      <ConfirmDeleteModal
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={() => deleteRule(deleteConfirmId)}
+        loading={!!deletingId}
+        title="Delete Recurring Expense"
+        message="Delete this recurring expense? Future entries will not be created, but past entries remain."
+      />
+    </>
   );
 }
 

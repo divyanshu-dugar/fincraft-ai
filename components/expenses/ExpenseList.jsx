@@ -20,6 +20,7 @@ import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, Che
 
 import QuickBudgetSheet from "./QuickBudgetSheet";
 import BulkActionsBar from "./BulkActionsBar";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 import { getToken } from "@/lib/authenticate";
 
@@ -253,18 +254,25 @@ const ExpenseList = () => {
    */
 
   /**
+   * Delete confirmation modal state.
+   */
+  const [deleteTarget, setDeleteTarget] = useState(null); // expense _id to delete
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  /**
    * Delete an expense after user confirmation.
    */
-  const deleteExpense = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this expense?"
-    );
-    if (!confirmed) return;
+  const deleteExpense = (id) => {
+    setDeleteTarget(id);
+  };
 
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/${deleteTarget}`,
         {
           method: "DELETE",
           headers: {
@@ -274,13 +282,16 @@ const ExpenseList = () => {
       );
 
       if (response.ok) {
-        setExpenses((prev) => prev.filter((e) => e._id !== id));
-        setSelectedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+        setExpenses((prev) => prev.filter((e) => e._id !== deleteTarget));
+        setSelectedIds((prev) => { const next = new Set(prev); next.delete(deleteTarget); return next; });
         fetchStats();
         window.dispatchEvent(new CustomEvent('expense-added')); // re-check budget alerts
       }
     } catch (error) {
       console.error("Error deleting expense:", error);
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -707,6 +718,13 @@ const ExpenseList = () => {
       >
         <Plus size={26} strokeWidth={2.5} />
       </motion.button>
+
+      <ConfirmDeleteModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        loading={deleteLoading}
+      />
     </div>
   );
 };

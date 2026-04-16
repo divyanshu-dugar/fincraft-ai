@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Tag, Calendar, X, ChevronDown } from "lucide-react";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 export default function BulkActionsBar({
   selectedCount,
@@ -16,19 +17,17 @@ export default function BulkActionsBar({
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (selectedCount === 0) return null;
 
   const handleBulkDelete = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${selectedCount} expense${selectedCount > 1 ? "s" : ""}? This cannot be undone.`
-    );
-    if (!confirmed) return;
     setLoading(true);
     try {
       await onBulkDelete();
     } finally {
       setLoading(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -131,7 +130,7 @@ export default function BulkActionsBar({
               <motion.button
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                onClick={handleBulkDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
                 className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:border-rose-400/60 hover:text-rose-200 transition-all duration-200 disabled:opacity-50"
               >
@@ -231,6 +230,15 @@ export default function BulkActionsBar({
           </AnimatePresence>
         </div>
       </div>
+
+      <ConfirmDeleteModal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleBulkDelete}
+        loading={loading}
+        title={`Delete ${selectedCount} Expense${selectedCount > 1 ? 's' : ''}`}
+        message={`Are you sure you want to delete ${selectedCount} expense${selectedCount > 1 ? 's' : ''}? This cannot be undone.`}
+      />
     </motion.div>
   );
 }

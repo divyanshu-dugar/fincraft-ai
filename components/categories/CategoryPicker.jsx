@@ -74,7 +74,7 @@ export function CategoryPicker({ tree = [], value, onChange, onAddCategory, plac
   // Keep hoverParent in sync with the latest tree data (e.g. after adding a subcategory)
   const resolvedHover = hoverParent ? tree.find((p) => p._id === hoverParent._id) || hoverParent : null;
 
-  const activeParent = resolvedHover || (step === 'child' && value?.parentId
+  const activeParent = resolvedHover || (value?.parentId
     ? tree.find((p) => p._id === value.parentId)
     : tree[0]);
 
