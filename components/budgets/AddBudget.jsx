@@ -10,6 +10,7 @@ import {
   Check,
   CalendarDays,
   Loader2,
+  Lock,
   RefreshCw,
   Sparkles,
   Target,
@@ -88,6 +89,7 @@ export default function AddBudget() {
   const [notifications, setNotifications] = useState(true);
   const [threshold,     setThreshold]     = useState(80);
   const [isRecurring,   setIsRecurring]   = useState(false);
+  const [isFixedExpense, setIsFixedExpense] = useState(false);
   const [repeatUntil,   setRepeatUntil]   = useState('');
   const [errors,        setErrors]        = useState({});
   const [loading,       setLoading]       = useState(false);
@@ -174,6 +176,7 @@ export default function AddBudget() {
         endDate:   new Date(dateRange.endDate   + 'T23:59:59.999Z').toISOString(),
         notifications,
         alertThreshold: threshold,
+        isFixedExpense,
         isRecurring,
         repeatUntil: isRecurring && repeatUntil ? new Date(repeatUntil + 'T23:59:59.999Z').toISOString() : null,
       };
@@ -440,6 +443,26 @@ export default function AddBudget() {
                 </div>
               </div>
             )}
+
+            {/* fixed expense toggle */}
+            <div className="px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${isFixedExpense ? 'bg-amber-500/20' : 'bg-slate-700'}`}>
+                  <Lock className={`w-4 h-4 ${isFixedExpense ? 'text-amber-400' : 'text-slate-400'}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-200">Fixed Expense</p>
+                  <p className="text-xs text-slate-400">Only alert if spending exceeds the budget</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFixedExpense((p) => !p)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isFixedExpense ? 'bg-amber-600' : 'bg-slate-600'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform ${isFixedExpense ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
           </div>
 
           {/* ── recurring card ───────────────────────────────────────────── */}
