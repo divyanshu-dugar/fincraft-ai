@@ -27,6 +27,7 @@ import {
   ChevronsUpDown,
   Download,
   Filter,
+  SlidersHorizontal,
   LineChart as LineChartIcon,
   Minus,
   RefreshCw,
@@ -242,6 +243,7 @@ export default function IncomeAnalyticsPage() {
   const [sortKey,             setSortKey]             = useState("amount");
   const [sortDir,             setSortDir]             = useState("desc");
   const [showAllRows,         setShowAllRows]         = useState(false);
+  const [showFilters,          setShowFilters]          = useState(false);
   const [loading,             setLoading]             = useState(false);
   const [error,               setError]               = useState("");
   const [data, setData] = useState({
@@ -435,21 +437,41 @@ export default function IncomeAnalyticsPage() {
             </div>
           </div>
 
-          <button
-            onClick={exportCSV}
-            disabled={!hasData || isFirstLoad}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-600 bg-slate-800/60 text-sm font-semibold text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowFilters((p) => !p)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all ${
+                showFilters
+                  ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
+                  : "bg-slate-800/60 border-slate-600 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 hover:bg-emerald-500/10"
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {selectedCategoryIds.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 text-xs font-bold">
+                  {selectedCategoryIds.length}
+                </span>
+              )}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+            </button>
+            <button
+              onClick={exportCSV}
+              disabled={!hasData || isFirstLoad}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-600 bg-slate-800/60 text-sm font-semibold text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
 
         {/* ── controls ─────────────────────────────────────────────────────── */}
-        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 shadow-sm">
+        {showFilters && (
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 shadow-sm animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2 mb-5">
             <Filter className="w-4 h-4 text-slate-500" />
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Filters & Date range</h2>
@@ -533,6 +555,7 @@ export default function IncomeAnalyticsPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* ── error banner ─────────────────────────────────────────────────── */}
         {error && !loading && (
