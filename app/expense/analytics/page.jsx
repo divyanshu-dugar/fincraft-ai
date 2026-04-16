@@ -30,6 +30,7 @@ import {
   ExternalLink,
   Filter,
   GitCompare,
+  SlidersHorizontal,
   LineChart as LineChartIcon,
   Minus,
   RefreshCw,
@@ -423,6 +424,7 @@ export default function ExpenseAnalyticsPage() {
   const [momSectionOpen,      setMomSectionOpen]      = useState(true);
   const [categorySearch,      setCategorySearch]      = useState("");
   const [collapsedGroups,     setCollapsedGroups]     = useState({});
+  const [showFilters,         setShowFilters]         = useState(false);
   const [loading,             setLoading]             = useState(false);
   const [error,               setError]               = useState("");
   const [data, setData] = useState({
@@ -699,21 +701,41 @@ export default function ExpenseAnalyticsPage() {
             </div>
           </div>
 
-          <button
-            onClick={exportCSV}
-            disabled={!hasData || isFirstLoad}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-600 bg-slate-800 text-sm font-semibold text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowFilters((p) => !p)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all ${
+                showFilters
+                  ? "bg-blue-500/20 border-blue-400/60 text-blue-300"
+                  : "bg-slate-800 border-slate-600 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {selectedCategoryIds.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-blue-500/30 text-blue-300 text-xs font-bold">
+                  {selectedCategoryIds.length}
+                </span>
+              )}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+            </button>
+            <button
+              onClick={exportCSV}
+              disabled={!hasData || isFirstLoad}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-600 bg-slate-800 text-sm font-semibold text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
 
         {/* ── controls ─────────────────────────────────────────────────────── */}
-        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6">
+        {showFilters && (
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2 mb-5">
             <Filter className="w-4 h-4 text-slate-400" />
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Filters & Date range</h2>
@@ -917,6 +939,7 @@ export default function ExpenseAnalyticsPage() {
             )}
           </div>
         </div>
+        )}
 
         {/* ── error banner ─────────────────────────────────────────────────── */}
         {error && !loading && (
