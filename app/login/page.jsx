@@ -16,6 +16,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const [resendStatus, setResendStatus] = useState(''); // '' | 'sending' | 'sent'
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(e) {
@@ -24,7 +25,7 @@ export default function Login() {
     setWarning("");
 
     try {
-      await authenticateUser(user, password);
+      await authenticateUser(user, password, rememberMe);
       router.push("/dashboard");
     } catch (err) {
       if (err.code === 'EMAIL_NOT_VERIFIED') {
@@ -197,8 +198,19 @@ export default function Login() {
                   </div>
                 </motion.div>
 
-                {/* Forgot Password */}
-                <motion.div variants={itemVariants} className="flex justify-end">
+                {/* Remember Me & Forgot Password */}
+                <motion.div variants={itemVariants} className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer group/remember">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-2 border-cyan-400/30 bg-slate-800/50 text-cyan-500 focus:ring-cyan-400/40 focus:ring-offset-0 cursor-pointer"
+                    />
+                    <span className="text-sm text-slate-300 group-hover/remember:text-slate-200 transition-colors font-medium">
+                      Remember me
+                    </span>
+                  </label>
                   <Link
                     href="/forgot-password"
                     className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
