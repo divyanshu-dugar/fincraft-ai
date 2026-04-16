@@ -11,6 +11,7 @@ import {
   Check,
   Edit2,
   Loader2,
+  Lock,
   Sparkles,
   Target,
   TrendingUp,
@@ -95,6 +96,7 @@ export default function EditBudget() {
   const [dateRange,     setDateRange]     = useState({ startDate: '', endDate: '' });
   const [notifications, setNotifications] = useState(true);
   const [threshold,     setThreshold]     = useState(80);
+  const [isFixedExpense, setIsFixedExpense] = useState(false);
   const [errors,        setErrors]        = useState({});
 
   // Recalc date range when refDate or period changes (after initial load)
@@ -164,10 +166,11 @@ export default function EditBudget() {
         setPeriod(data.period ?? 'monthly');
         setNotifications(data.notifications ?? true);
         setThreshold(data.alertThreshold ?? 80);
+        setIsFixedExpense(data.isFixedExpense ?? false);
 
         // Derive refDate from startDate (the first day of the period)
-        const startStr = data.startDate ? new Date(data.startDate).toLocaleDateString('en-CA') : '';
-        const endStr   = data.endDate   ? new Date(data.endDate).toLocaleDateString('en-CA')   : '';
+        const startStr = data.startDate ? new Date(data.startDate).toLocaleDateString('en-CA', { timeZone: 'UTC' }) : '';
+        const endStr   = data.endDate   ? new Date(data.endDate).toLocaleDateString('en-CA', { timeZone: 'UTC' })   : '';
         setRefDate(startStr);
         setDateRange({ startDate: startStr, endDate: endStr });
 
@@ -226,6 +229,7 @@ export default function EditBudget() {
       endDate:   new Date(dateRange.endDate   + 'T23:59:59.999Z').toISOString(),
       notifications,
       alertThreshold: threshold,
+      isFixedExpense,
     };
   };
 
@@ -548,6 +552,26 @@ export default function EditBudget() {
                 </div>
               </div>
             )}
+
+            {/* fixed expense toggle */}
+            <div className="px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${isFixedExpense ? 'bg-amber-500/20' : 'bg-slate-700'}`}>
+                  <Lock className={`w-4 h-4 ${isFixedExpense ? 'text-amber-400' : 'text-slate-400'}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-200">Fixed Expense</p>
+                  <p className="text-xs text-slate-400">Only alert if spending exceeds the budget</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFixedExpense((p) => !p)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isFixedExpense ? 'bg-amber-600' : 'bg-slate-600'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform ${isFixedExpense ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
           </div>
 
           {/* ── submit ───────────────────────────────────────────────────── */}
