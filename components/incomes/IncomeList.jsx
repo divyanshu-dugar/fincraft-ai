@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Repeat } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Repeat, PieChart } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import IncomeFilters from "./IncomeFilters";
 import IncomeTable from "./IncomeTable";
@@ -393,9 +393,10 @@ const IncomeList = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/income/analytics")}
-                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200"
+                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
               >
-                📊 View Analytics
+                <PieChart size={20} />
+                View Analytics
               </motion.button>
             </div>
           </div>

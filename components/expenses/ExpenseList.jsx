@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown, Wallet } from "lucide-react";
+import { Plus, Upload, ChevronLeft, ChevronRight, Repeat, SlidersHorizontal, ChevronDown, Wallet, PieChart } from "lucide-react";
 
 import QuickBudgetSheet from "./QuickBudgetSheet";
 import BulkActionsBar from "./BulkActionsBar";
@@ -513,9 +513,10 @@ const ExpenseList = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/expense/analytics")}
-                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200"
+                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
               >
-                📊 View Analytics
+                <PieChart size={20} />
+                View Analytics
               </motion.button>
             </div>
           </div>
