@@ -419,14 +419,6 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
   );
 }
 
-// ─── sort icon ────────────────────────────────────────────────────────────────
-function SortIcon({ col, sortKey, sortDir }) {
-  if (sortKey !== col) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-300" />;
-  return sortDir === "asc"
-    ? <ChevronUp   className="w-3.5 h-3.5 text-emerald-500" />
-    : <ChevronDown className="w-3.5 h-3.5 text-emerald-500" />;
-}
-
 // ─── axis formatters (stable references, no inline closure) ──────────────────
 function yTickFmt(v) { return v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`; }
 
@@ -439,7 +431,6 @@ export default function IncomeAnalyticsPage() {
   const [chartView,           setChartView]           = useState("pie"); // "pie" | "bar"
   const [sortKey,             setSortKey]             = useState("amount");
   const [sortDir,             setSortDir]             = useState("desc");
-  const [showAllRows,         setShowAllRows]         = useState(false);
   const [momSectionOpen,      setMomSectionOpen]      = useState(true);
   const [categorySearch,      setCategorySearch]      = useState("");
   const [showFilters,         setShowFilters]         = useState(false);
@@ -476,11 +467,6 @@ export default function IncomeAnalyticsPage() {
       return typeof av === "string" ? av.localeCompare(bv) * dir : (av - bv) * dir;
     });
   }, [filteredTableRows, sortKey, sortDir]);
-
-  const visibleRows = useMemo(
-    () => (showAllRows ? sortedTableRows : sortedTableRows.slice(0, 20)),
-    [sortedTableRows, showAllRows]
-  );
 
   const maxAmount = useMemo(() => Math.max(...filteredTableRows.map((r) => r.amount), 1), [filteredTableRows]);
 
@@ -583,7 +569,6 @@ export default function IncomeAnalyticsPage() {
         throw new Error(body.error || "Failed to load analytics");
       }
       setData(await res.json());
-      setShowAllRows(false);
     } catch (err) {
       setError(err.message || "Failed to load analytics");
     } finally {
@@ -1157,158 +1142,6 @@ export default function IncomeAnalyticsPage() {
                       <p className="text-sm text-slate-400 text-center py-6">No data available for the selected filters.</p>
                     )}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* ── detailed table ─────────────────────────────────────────── */}
-            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-emerald-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
-              {/* table header */}
-              <div className="px-6 py-5 border-b border-slate-700 flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h2 className="text-lg font-bold text-white">Detailed breakdown</h2>
-                  <p className="text-sm text-slate-400 mt-0.5">
-                    {filteredTableRows.length} record{filteredTableRows.length !== 1 ? "s" : ""}
-                    &nbsp;· click any column header to sort
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-slate-400">
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" />Spike</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-500" />Normal</span>
-                  <span className="flex items-center gap-1.5"><span className="w-16 h-1 bg-gradient-to-r from-emerald-400 to-emerald-200 rounded-full" />Relative size</span>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead className="bg-slate-800/80 border-b border-slate-700">
-                    <tr>
-                      {[
-                        { key: "month",         label: "Month"     },
-                        { key: "category",      label: "Category"  },
-                        { key: "amount",        label: "Amount"    },
-                        { key: "changePct",     label: "Change %"  },
-                        { key: "movingAverage", label: "3-mo. avg" },
-                        { key: null,            label: "Size"      },
-                        { key: null,            label: "Anomaly"   },
-                      ].map(({ key, label }) => (
-                        <th
-                          key={label}
-                          onClick={() => key && handleSort(key)}
-                          className={`px-5 py-3.5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap ${key ? "cursor-pointer hover:text-white select-none" : ""}`}
-                        >
-                          <span className="flex items-center gap-1">
-                            {label}
-                            {key && <SortIcon col={key} sortKey={sortKey} sortDir={sortDir} />}
-                          </span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-slate-700/30">
-                    {visibleRows.map((row) => {
-                      const color    = row.categoryColor || categoryColor(data.categories, row.categoryId);
-                      const isSpike  = row.anomaly?.isSpike;
-                      const barWidth = Math.min((row.amount / maxAmount) * 100, 100);
-                      const hasChange = row.changePct !== null;
-                      const isUp     = hasChange && row.changePct > 0.5;
-                      const isDown   = hasChange && row.changePct < -0.5;
-                      return (
-                        <tr
-                          key={`${row.month}_${row.categoryId}`}
-                          className={`transition-colors hover:bg-slate-700/40 ${isSpike ? "bg-amber-500/10" : ""}`}
-                        >
-                          <td className="px-5 py-3.5 font-semibold text-slate-300 whitespace-nowrap">{fmtMonth(row.month)}</td>
-                          <td className="px-5 py-3.5">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                              <span className="font-medium text-white">{row.categoryIcon || ""} {row.category}</span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-3.5 font-bold text-white whitespace-nowrap">{money(row.amount)}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            {!hasChange ? (
-                              <span className="text-xs text-slate-600 font-medium">first month</span>
-                            ) : (
-                              <span className={`inline-flex items-center gap-1 font-semibold ${
-                                isUp ? "text-emerald-400" : isDown ? "text-rose-400" : "text-slate-500"
-                              }`}>
-                                {isUp   ? <ArrowUpRight   className="w-3.5 h-3.5" /> :
-                                 isDown ? <ArrowDownRight className="w-3.5 h-3.5" /> :
-                                          <Minus          className="w-3.5 h-3.5" />}
-                                {pct(row.changePct)}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">{money(row.movingAverage)}</td>
-                          <td className="px-5 py-3.5 w-32">
-                            <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden w-24">
-                              <div
-                                className="h-1.5 rounded-full transition-all duration-700"
-                                style={{ width: `${barWidth}%`, backgroundColor: color }}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-5 py-3.5">
-                            {isSpike ? (
-                              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
-                                row.anomaly.severity === "high" ? "bg-amber-500/20 text-amber-400" : "bg-yellow-500/20 text-yellow-400"
-                              }`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${row.anomaly.severity === "high" ? "bg-amber-500" : "bg-yellow-500"}`} />
-                                Spike · {row.anomaly.severity}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-500">
-                                <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
-                                Normal
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-
-                    {filteredTableRows.length === 0 && (
-                      <tr>
-                        <td colSpan={7} className="px-5 py-12 text-center">
-                          <p className="text-slate-400 font-medium">No records match the current filters.</p>
-                          <button onClick={() => setSelectedCategoryIds([])} className="mt-2 text-sm text-emerald-400 hover:underline">
-                            Clear category filters
-                          </button>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-
-                  {/* totals footer */}
-                  {filteredTableRows.length > 0 && (
-                    <tfoot className="bg-slate-800/80 border-t border-slate-700">
-                      <tr>
-                        <td colSpan={2} className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                          Total ({filteredTableRows.length} rows)
-                        </td>
-                        <td className="px-5 py-3.5 font-bold text-white">
-                          {money(filteredTableRows.reduce((s, r) => s + r.amount, 0))}
-                        </td>
-                        <td colSpan={4} />
-                      </tr>
-                    </tfoot>
-                  )}
-                </table>
-              </div>
-
-              {/* show more / less */}
-              {sortedTableRows.length > 20 && (
-                <div className="px-6 py-4 border-t border-slate-700 text-center bg-slate-800/40">
-                  <button
-                    onClick={() => setShowAllRows((p) => !p)}
-                    className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
-                  >
-                    {showAllRows
-                      ? "Show fewer rows"
-                      : `Show all ${sortedTableRows.length} rows (${sortedTableRows.length - 20} more)`}
-                  </button>
                 </div>
               )}
             </div>
