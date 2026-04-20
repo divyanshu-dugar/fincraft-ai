@@ -284,10 +284,10 @@ export default function AIInsightsModal({ isOpen, onClose }) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-4xl h-[600px] bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl border border-cyan-400/20 shadow-2xl shadow-cyan-500/20 flex overflow-hidden">
+      <div className="relative w-full max-w-4xl h-[600px] bg-gradient-to-br from-white dark:from-slate-900 to-slate-50 dark:to-slate-950 rounded-2xl border border-cyan-400/20 shadow-2xl shadow-cyan-500/20 flex overflow-hidden">
         
         {/* Sidebar - Chat Sessions */}
-        <div className="w-64 border-r border-cyan-400/10 flex flex-col bg-slate-950">
+        <div className="w-64 border-r border-cyan-400/10 flex flex-col bg-slate-50 dark:bg-slate-950">
           {/* Header */}
           <div className="p-4 border-b border-cyan-400/10">
             <button
@@ -306,7 +306,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
                 <Loader className="w-5 h-5 animate-spin text-cyan-400" />
               </div>
             ) : sessions.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-8">
+              <p className="text-sm text-slate-600 dark:text-slate-400 text-center py-8">
                 No conversations yet
               </p>
             ) : (
@@ -317,10 +317,10 @@ export default function AIInsightsModal({ isOpen, onClose }) {
                   className={`w-full text-left px-3 py-2 rounded-lg transition-colors group flex items-center justify-between cursor-pointer ${
                     currentSessionId === session._id
                       ? 'bg-cyan-500/20 border border-cyan-400/50'
-                      : 'hover:bg-slate-800'
+                      : 'hover:bg-slate-100 dark:bg-slate-800'
                   }`}
                 >
-                  <span className="text-sm truncate text-slate-200">
+                  <span className="text-sm truncate text-slate-800 dark:text-slate-200">
                     {session.sessionName}
                   </span>
                   <div
@@ -340,16 +340,16 @@ export default function AIInsightsModal({ isOpen, onClose }) {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-cyan-400/10">
             <div>
-              <h2 className="text-xl font-bold text-white">💡 AI Insights</h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">💡 AI Insights</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Get personalized financial insights and advice
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-slate-400 hover:text-white" />
+              <X className="w-5 h-5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white" />
             </button>
           </div>
 
@@ -358,7 +358,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="text-4xl mb-4">🤖</div>
-                <p className="text-slate-400">
+                <p className="text-slate-600 dark:text-slate-400">
                   Ask me anything about your finances!
                 </p>
                 <p className="text-sm text-slate-500 mt-2">
@@ -393,7 +393,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
                       className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg ${
                         msg.role === 'user'
                           ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                          : 'bg-slate-800 text-slate-100 border border-cyan-400/20'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-100 border border-cyan-400/20'
                       }`}
                     >
                       <p className="text-sm leading-relaxed break-words">
@@ -406,7 +406,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
             )}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-slate-800 text-slate-100 border border-cyan-400/20 px-4 py-3 rounded-lg flex items-center gap-2">
+                <div className="bg-slate-100 dark:bg-slate-800 text-slate-100 border border-cyan-400/20 px-4 py-3 rounded-lg flex items-center gap-2">
                   <Loader className="w-4 h-4 animate-spin" />
                   <span className="text-sm">Thinking...</span>
                 </div>
@@ -430,7 +430,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything about your finances..."
                 disabled={loading || !currentSessionId}
-                className="flex-1 px-4 py-3 bg-slate-800 border border-cyan-400/20 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 border border-cyan-400/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               />
               <button
                 type="submit"

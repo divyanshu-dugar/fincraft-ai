@@ -22,7 +22,7 @@ export function SectionToggler({ activeSections, toggleSection }) {
   };
 
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4 mb-8">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4 mb-8">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
           Visible Panels
@@ -44,7 +44,7 @@ export function SectionToggler({ activeSections, toggleSection }) {
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                 isActive
                   ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-sm"
-                  : "bg-slate-700/50 text-slate-400 border-slate-600 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-slate-700"
+                  : "bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 border-slate-600 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-slate-200 dark:bg-slate-700"
               }`}
             >
               <Icon size={15} />

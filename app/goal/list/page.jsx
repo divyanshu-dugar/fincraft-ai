@@ -203,7 +203,7 @@ export default function SavingsGoals() {
   if (loading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <GoalsHeader onNewGoal={() => setShowForm(true)} />
 

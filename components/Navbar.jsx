@@ -10,6 +10,7 @@ import {
   LayoutDashboard, Home, TrendingUp, TrendingDown, List, Tag,
 } from 'lucide-react';
 import BudgetAlertsBell from '@/components/BudgetAlertsBell';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -128,7 +129,7 @@ export default function Navbar() {
       ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         solidNav
-          ? 'bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-b border-cyan-400/10 backdrop-blur-xl shadow-lg shadow-black/20'
+          ? 'bg-gradient-to-br from-slate-50 dark:from-slate-950/95 via-slate-50/95 dark:via-slate-900/95 to-slate-50 dark:to-slate-950/95 border-b border-cyan-400/10 backdrop-blur-xl shadow-lg shadow-black/20'
           : 'bg-transparent border-b border-transparent'
       }`}
     >
@@ -148,7 +149,7 @@ export default function Navbar() {
               className="flex items-center gap-2"
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all">
-                <BarChart3 className="w-5 h-5 text-white" />
+                <BarChart3 className="w-5 h-5 text-slate-900 dark:text-white" />
               </div>
               <span className="text-xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                 Fincraft AI
@@ -165,7 +166,7 @@ export default function Navbar() {
                 className={`px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-1.5 ${
                   pathname === '/'
                     ? 'text-cyan-300 border border-cyan-400/50 bg-cyan-400/10'
-                    : 'text-slate-300 hover:text-cyan-300 hover:border-cyan-400/30 border border-transparent'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:border-cyan-400/30 border border-transparent'
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
@@ -181,7 +182,7 @@ export default function Navbar() {
                   className={`px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-1.5 ${
                     pathname === '/chat'
                       ? 'text-emerald-300 border border-emerald-400/50 bg-emerald-400/10'
-                      : 'text-slate-300 hover:text-emerald-300 hover:border-emerald-400/30 border border-transparent'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-emerald-300 hover:border-emerald-400/30 border border-transparent'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -209,7 +210,7 @@ export default function Navbar() {
                   className={`px-4 py-2 rounded-lg flex items-center space-x-1 transition-all cursor-pointer border ${
                     activeDropdown === menu.name
                       ? 'text-cyan-300 border-cyan-400/50 bg-cyan-400/10'
-                      : 'text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
                   }`}
                 >
                   <span>{menu.name}</span>
@@ -229,7 +230,7 @@ export default function Navbar() {
                       role="menu"
                       onMouseEnter={() => handleMenuEnter(menu.name)}
                       onMouseLeave={handleMenuLeave}
-                      className={`absolute left-0 top-full mt-2 ${menu.isMegaMenu ? 'w-[26rem]' : 'w-52'} bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden`}
+                      className={`absolute left-0 top-full mt-2 ${menu.isMegaMenu ? 'w-[26rem]' : 'w-52'} bg-gradient-to-br from-slate-100/95 dark:from-slate-800/95 to-white/95 dark:to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden`}
                     >
                       {menu.isMegaMenu ? (
                         /* Mega-menu: both groups side by side — no nested accordion needed */
@@ -248,7 +249,7 @@ export default function Navbar() {
                                   className={`flex items-center gap-2 px-2 py-2 text-sm rounded-lg transition-all ${
                                     isLinkActive(sub.href)
                                       ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                                      : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                      : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                                   }`}
                                   onClick={() => setActiveDropdown(null)}
                                 >
@@ -268,7 +269,7 @@ export default function Navbar() {
                             className={`flex items-center gap-2 px-4 py-3 text-sm transition-all border-b border-cyan-400/10 last:border-0 ${
                               isLinkActive(item.href)
                                 ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                                : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                             }`}
                             onClick={() => setActiveDropdown(null)}
                           >
@@ -285,6 +286,9 @@ export default function Navbar() {
 
             {/* Budget Alerts Bell */}
             {authenticated && <BudgetAlertsBell />}
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Auth Buttons */}
             {authenticated ? (
@@ -305,7 +309,7 @@ export default function Navbar() {
                   className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all border ${
                     activeDropdown === 'user'
                       ? 'text-cyan-300 border-cyan-400/40 bg-cyan-400/10'
-                      : 'text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 border-transparent hover:border-cyan-400/30'
                   }`}
                 >
                   <span className="w-8 h-8 bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 rounded-full flex items-center justify-center text-cyan-300 font-bold text-sm">
@@ -327,9 +331,9 @@ export default function Navbar() {
                       role="menu"
                       onMouseEnter={() => handleMenuEnter('user')}
                       onMouseLeave={handleMenuLeave}
-                      className="absolute right-0 mt-2 w-56 bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden"
+                      className="absolute right-0 mt-2 w-56 bg-gradient-to-br from-slate-100/95 dark:from-slate-800/95 to-white/95 dark:to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden"
                     >
-                      <div className="px-4 py-3 text-sm text-slate-400 border-b border-cyan-400/10">
+                      <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 border-b border-cyan-400/10">
                         Signed in as <span className="text-cyan-300 font-bold">{user?.userName}</span>
                       </div>
                       <Link
@@ -338,7 +342,7 @@ export default function Navbar() {
                         className={`flex items-center gap-2 px-4 py-3 text-sm border-b border-cyan-400/10 transition-all ${
                           isLinkActive('/dashboard')
                             ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                            : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                            : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                         }`}
                         onClick={() => setActiveDropdown(null)}
                       >
@@ -351,7 +355,7 @@ export default function Navbar() {
                         className={`flex items-center gap-2 px-4 py-3 text-sm border-b border-cyan-400/10 transition-all ${
                           isLinkActive('/profile')
                             ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                            : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                            : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                         }`}
                         onClick={() => setActiveDropdown(null)}
                       >
@@ -379,7 +383,7 @@ export default function Navbar() {
                     className={`px-4 py-2 rounded-lg transition-all font-medium ${
                       pathname === '/login'
                         ? 'text-cyan-300 border border-cyan-400/50 bg-cyan-400/10'
-                        : 'text-slate-300 hover:text-cyan-300 hover:border-cyan-400/30 border border-transparent'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:border-cyan-400/30 border border-transparent'
                     }`}
                   >
                     Login
@@ -403,7 +407,7 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="md:hidden text-slate-300 hover:text-cyan-300 p-2 rounded-lg border border-transparent hover:border-cyan-400/30 transition-all"
+            className="md:hidden text-slate-700 dark:text-slate-300 hover:text-cyan-300 p-2 rounded-lg border border-transparent hover:border-cyan-400/30 transition-all"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -438,7 +442,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="md:hidden fixed top-16 bottom-0 right-0 w-full max-w-sm bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
+              className="md:hidden fixed top-16 bottom-0 right-0 w-full max-w-sm bg-gradient-to-b from-white dark:from-slate-900 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 shadow-2xl z-50 overflow-y-auto border-l border-cyan-400/10"
             >
               <div className="p-4 space-y-3">
                 {/* Home Link */}
@@ -449,7 +453,7 @@ export default function Navbar() {
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                       pathname === '/'
                         ? 'text-cyan-300 bg-cyan-400/10 border border-cyan-400/50'
-                        : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20'
                     }`}
                   >
                     <Home className="w-4 h-4" />
@@ -466,7 +470,7 @@ export default function Navbar() {
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                         pathname === '/chat'
                           ? 'text-emerald-300 bg-emerald-400/10 border border-emerald-400/50'
-                          : 'text-slate-300 hover:text-emerald-300 hover:bg-emerald-400/10 border border-emerald-400/20'
+                          : 'text-slate-700 dark:text-slate-300 hover:text-emerald-300 hover:bg-emerald-400/10 border border-emerald-400/20'
                       }`}
                     >
                       <Sparkles className="w-4 h-4" />
@@ -486,7 +490,7 @@ export default function Navbar() {
                     <button
                       onClick={() => toggleMobileDropdown(menu.name)}
                       aria-expanded={mobileActiveDropdown === menu.name}
-                      className="w-full flex justify-between items-center px-4 py-3 rounded-xl text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20 transition-all font-medium"
+                      className="w-full flex justify-between items-center px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border border-cyan-400/20 transition-all font-medium"
                     >
                       <span>{menu.name}</span>
                       <motion.div
@@ -513,7 +517,7 @@ export default function Navbar() {
                                   <button
                                     onClick={() => toggleMobileSubmenu(group.title)}
                                     aria-expanded={mobileActiveSubmenu === group.title}
-                                    className="w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border border-transparent hover:border-cyan-400/30"
+                                    className="w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all border border-transparent hover:border-cyan-400/30"
                                   >
                                     <div className="flex items-center gap-1.5">
                                       {group.icon && <group.icon className="w-3.5 h-3.5 text-cyan-400" />}
@@ -544,7 +548,7 @@ export default function Navbar() {
                                               className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-all ${
                                                 isLinkActive(sub.href)
                                                   ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                                                  : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                                  : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                                               }`}
                                               onClick={() => setMobileMenuOpen(false)}
                                             >
@@ -566,7 +570,7 @@ export default function Navbar() {
                                   className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-all ${
                                     isLinkActive(item.href)
                                       ? 'text-cyan-300 bg-cyan-400/15 font-medium'
-                                      : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
+                                      : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10'
                                   }`}
                                   onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -592,7 +596,7 @@ export default function Navbar() {
                   {authenticated ? (
                     <>
                       <div className="px-4 py-3 bg-cyan-400/10 border border-cyan-400/30 rounded-xl">
-                        <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Signed in as</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wide mb-1">Signed in as</p>
                         <p className="font-bold text-cyan-300">{user?.userName}</p>
                       </div>
 
@@ -618,7 +622,7 @@ export default function Navbar() {
                           className={`w-full flex items-center justify-center gap-2 px-4 py-3 border rounded-xl font-medium transition-all ${
                             isLinkActive('/profile')
                               ? 'bg-cyan-400/15 text-cyan-300 border-cyan-400/40'
-                              : 'bg-slate-800/60 text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-white/10'
+                              : 'bg-slate-100/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-white/10'
                           }`}
                         >
                           <User className="w-4 h-4" />
@@ -645,7 +649,7 @@ export default function Navbar() {
                           className={`w-full flex items-center justify-center px-4 py-3 rounded-xl font-medium transition-all border ${
                             pathname === '/login'
                               ? 'text-cyan-300 bg-cyan-400/10 border-cyan-400/50'
-                              : 'text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-cyan-400/20'
+                              : 'text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:bg-cyan-400/10 border-cyan-400/20'
                           }`}
                         >
                           Login

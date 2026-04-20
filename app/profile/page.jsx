@@ -67,15 +67,15 @@ function SectionCard({ icon: Icon, title, subtitle, children, accent = 'cyan' })
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden"
+      className="bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden"
     >
       <div className="px-6 py-5 border-b border-white/5 flex items-center gap-4">
         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${accentMap[accent]} flex items-center justify-center shrink-0`}>
-          <Icon className="w-5 h-5 text-white" />
+          <Icon className="w-5 h-5 text-slate-900 dark:text-white" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-white">{title}</h2>
-          {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h2>
+          {subtitle && <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{subtitle}</p>}
         </div>
       </div>
       <div className="px-6 py-6">{children}</div>
@@ -86,7 +86,7 @@ function SectionCard({ icon: Icon, title, subtitle, children, accent = 'cyan' })
 function InputField({ label, icon: Icon, type = 'text', value, onChange, placeholder, disabled, readOnly, rightElement }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</label>
+      <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">{label}</label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
           <Icon className="w-4 h-4 text-slate-500" />
@@ -100,8 +100,8 @@ function InputField({ label, icon: Icon, type = 'text', value, onChange, placeho
           readOnly={readOnly}
           className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none
             ${readOnly || disabled
-              ? 'bg-slate-800/40 border-white/5 text-slate-400 cursor-not-allowed'
-              : 'bg-slate-800/60 border-white/10 text-white placeholder-slate-500 focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/20'
+              ? 'bg-slate-100/40 dark:bg-slate-800/40 border-white/5 text-slate-600 dark:text-slate-400 cursor-not-allowed'
+              : 'bg-slate-100/60 dark:bg-slate-800/60 border-white/10 text-slate-900 dark:text-white placeholder-slate-500 focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/20'
             }
             ${rightElement ? 'pr-10' : ''}
           `}
@@ -129,7 +129,7 @@ function PasswordInput({ label, icon: Icon, value, onChange, placeholder, disabl
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
-          className="text-slate-500 hover:text-slate-300 transition-colors"
+          className="text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors"
         >
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
@@ -342,7 +342,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 relative overflow-hidden">
 
       {/* Background orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -361,16 +361,16 @@ export default function ProfilePage() {
           {/* Avatar */}
           <div className="relative shrink-0">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-xl shadow-cyan-500/20">
-              <span className="text-2xl font-black text-white">{initials}</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">{initials}</span>
             </div>
             <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900" />
           </div>
 
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-white truncate">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white truncate">
               {profile?.userName || tokenUser?.userName}
             </h1>
-            <p className="text-sm text-slate-400 truncate">{profile?.email}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{profile?.email}</p>
             {memberSince && (
               <div className="flex items-center gap-1.5 mt-1.5">
                 <Calendar className="w-3.5 h-3.5 text-slate-500" />
@@ -437,7 +437,7 @@ export default function ProfilePage() {
                       onClick={cancelEdit}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-slate-300 hover:text-white text-sm font-medium transition-all"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white text-sm font-medium transition-all"
                     >
                       <X className="w-4 h-4" /> Cancel
                     </motion.button>
@@ -508,7 +508,7 @@ export default function ProfilePage() {
                     return (
                       <div
                         key={i}
-                        className={`h-1 flex-1 rounded-full transition-all ${i < strength ? colors[strength - 1] : 'bg-slate-700'}`}
+                        className={`h-1 flex-1 rounded-full transition-all ${i < strength ? colors[strength - 1] : 'bg-slate-200 dark:bg-slate-700'}`}
                       />
                     );
                   })}
@@ -537,12 +537,12 @@ export default function ProfilePage() {
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
                     c.code === defaultCurrency
                       ? 'bg-cyan-500/10 border-cyan-500/30'
-                      : 'bg-slate-800/40 border-white/5'
+                      : 'bg-slate-100/40 dark:bg-slate-800/40 border-white/5'
                   }`}
                 >
-                  <span className="text-lg font-bold text-slate-300 w-8 shrink-0">{c.symbol}</span>
+                  <span className="text-lg font-bold text-slate-700 dark:text-slate-300 w-8 shrink-0">{c.symbol}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{c.name}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{c.name}</p>
                     <p className="text-xs text-slate-500 font-mono">{c.code}</p>
                   </div>
                   {c.code === defaultCurrency ? (
@@ -584,10 +584,10 @@ export default function ProfilePage() {
                   value={currencySearch}
                   onChange={(e) => setCurrencySearch(e.target.value)}
                   placeholder="Search currencies…"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/10 transition-all"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-100/60 dark:bg-slate-800/60 border border-white/10 text-sm text-slate-900 dark:text-white placeholder-slate-500 outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/10 transition-all"
                 />
               </div>
-              <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-700/50 divide-y divide-slate-700/30">
+              <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-300/50 dark:border-slate-700/50 divide-y divide-slate-700/30">
                 {CURRENCIES.filter(
                   (c) =>
                     !currencies.some((existing) => existing.code === c.code) &&
@@ -600,9 +600,9 @@ export default function ProfilePage() {
                     type="button"
                     onClick={() => { addCurrency(c); setCurrencySearch(''); }}
                     disabled={savingCurrency}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-slate-700/50 transition-colors text-slate-300 disabled:opacity-40"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-slate-200/50 dark:bg-slate-700/50 transition-colors text-slate-700 dark:text-slate-300 disabled:opacity-40"
                   >
-                    <span className="w-6 font-bold text-slate-400 shrink-0">{c.symbol}</span>
+                    <span className="w-6 font-bold text-slate-600 dark:text-slate-400 shrink-0">{c.symbol}</span>
                     <span className="flex-1">{c.name}</span>
                     <span className="font-mono text-xs text-slate-500">{c.code}</span>
                     <Plus className="w-3.5 h-3.5 text-slate-500 shrink-0" />

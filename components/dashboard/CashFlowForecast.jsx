@@ -48,10 +48,10 @@ function ConfidenceMeter({ confidence }) {
       <Gauge size={16} className={text} />
       <div className="flex-1">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-slate-400">Forecast Confidence</span>
+          <span className="text-xs text-slate-600 dark:text-slate-400">Forecast Confidence</span>
           <span className={`text-xs font-semibold ${text}`}>{label} ({confidence}%)</span>
         </div>
-        <div className="w-full bg-slate-700 rounded-full h-1.5">
+        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
           <div
             className={`h-1.5 rounded-full bg-gradient-to-r ${bar} transition-all duration-500`}
             style={{ width: `${confidence}%` }}
@@ -66,31 +66,31 @@ function InsufficientDataState({ data }) {
   const { dataQuality, message } = data;
 
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
       <div className="flex items-start gap-4">
         <div className="p-3 bg-amber-500/15 rounded-xl shrink-0">
           <Database className="w-6 h-6 text-amber-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-white mb-2">Cash Flow Forecast</h3>
-          <p className="text-slate-300 text-sm leading-relaxed mb-4">{message}</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Cash Flow Forecast</h3>
+          <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-4">{message}</p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div className="bg-slate-700/50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-white">{dataQuality.totalHistoricalExpenses}</p>
-              <p className="text-xs text-slate-400 mt-1">Expenses Logged</p>
+            <div className="bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{dataQuality.totalHistoricalExpenses}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Expenses Logged</p>
             </div>
-            <div className="bg-slate-700/50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-white">{dataQuality.totalHistoricalIncome}</p>
-              <p className="text-xs text-slate-400 mt-1">Income Logged</p>
+            <div className="bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{dataQuality.totalHistoricalIncome}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Income Logged</p>
             </div>
-            <div className="bg-slate-700/50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-white">{dataQuality.distinctExpenseMonths}</p>
-              <p className="text-xs text-slate-400 mt-1">Months of Expenses</p>
+            <div className="bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{dataQuality.distinctExpenseMonths}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Months of Expenses</p>
             </div>
-            <div className="bg-slate-700/50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-white">{dataQuality.distinctIncomeMonths}</p>
-              <p className="text-xs text-slate-400 mt-1">Months of Income</p>
+            <div className="bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{dataQuality.distinctIncomeMonths}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Months of Income</p>
             </div>
           </div>
 
@@ -139,10 +139,10 @@ export function CashFlowForecast() {
 
   if (loading) {
     return (
-      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
+      <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
         <div className="flex items-center justify-center py-10">
           <Loader2 className="w-6 h-6 text-cyan-400 animate-spin mr-3" />
-          <span className="text-slate-400 text-sm">Analyzing your financial patterns...</span>
+          <span className="text-slate-600 dark:text-slate-400 text-sm">Analyzing your financial patterns...</span>
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ export function CashFlowForecast() {
 
   if (error) {
     return (
-      <div className="bg-slate-800/60 rounded-2xl border border-red-500/20 shadow-lg p-6">
+      <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-red-500/20 shadow-lg p-6">
         <div className="flex items-center gap-3 text-red-400">
           <AlertTriangle size={20} />
           <span className="text-sm">Could not load forecast. Please try again later.</span>
@@ -174,7 +174,7 @@ export function CashFlowForecast() {
   );
 
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg overflow-hidden">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg overflow-hidden">
       {/* Header */}
       <div className="p-6 pb-0">
         <div className="flex items-center justify-between mb-4">
@@ -183,15 +183,15 @@ export function CashFlowForecast() {
               <Activity className="w-5 h-5 text-cyan-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Cash Flow Forecast</h2>
-              <p className="text-slate-400 text-sm">Projected income & expenses based on your patterns</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Cash Flow Forecast</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm">Projected income & expenses based on your patterns</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <select
               value={forecastMonths}
               onChange={(e) => setForecastMonths(Number(e.target.value))}
-              className="bg-slate-700/50 border border-slate-600 text-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500/50"
+              className="bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600 text-slate-700 dark:text-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500/50"
             >
               <option value={1}>1 month</option>
               <option value={3}>3 months</option>
@@ -263,7 +263,7 @@ export function CashFlowForecast() {
               <div key={month.month} className="group">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${month.isCurrentMonth ? "text-cyan-300" : "text-slate-300"}`}>
+                    <span className={`text-sm font-medium ${month.isCurrentMonth ? "text-cyan-300" : "text-slate-700 dark:text-slate-300"}`}>
                       {formatMonth(month.month)}
                     </span>
                     {month.isCurrentMonth && (
@@ -279,26 +279,26 @@ export function CashFlowForecast() {
                 {/* Income bar */}
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] text-emerald-500 w-6 shrink-0">In</span>
-                  <div className="flex-1 bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
+                  <div className="flex-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-emerald-500/80 to-emerald-400/60 transition-all duration-500"
                       style={{ width: `${Math.max(incPct, 2)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 w-20 text-right shrink-0">
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 w-20 text-right shrink-0">
                     {formatCurrency(month.projectedIncome)}
                   </span>
                 </div>
                 {/* Expense bar */}
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-rose-500 w-6 shrink-0">Out</span>
-                  <div className="flex-1 bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
+                  <div className="flex-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-rose-500/80 to-rose-400/60 transition-all duration-500"
                       style={{ width: `${Math.max(expPct, 2)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 w-20 text-right shrink-0">
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 w-20 text-right shrink-0">
                     {formatCurrency(month.projectedExpense)}
                   </span>
                 </div>
@@ -335,7 +335,7 @@ export function CashFlowForecast() {
                     <p className={`text-xs font-semibold ${isWarning ? "text-amber-300" : "text-emerald-300"}`}>
                       {insight.title}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                       {insight.message}
                     </p>
                   </div>
@@ -350,7 +350,7 @@ export function CashFlowForecast() {
       <div className="px-6 pt-3 pb-4">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-cyan-400 transition-colors"
+          className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-colors"
         >
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           {expanded ? "Show less" : `Details${budgetRisks.length > 0 ? ` · ${budgetRisks.length} budget risk${budgetRisks.length > 1 ? "s" : ""}` : ""}${goalRisks.length > 0 ? ` · ${goalRisks.length} goal risk${goalRisks.length > 1 ? "s" : ""}` : ""}`}
@@ -378,7 +378,7 @@ export function CashFlowForecast() {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-white">{risk.categoryName}</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">{risk.categoryName}</span>
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                           risk.riskLevel === "high"
                             ? "bg-red-500/20 text-red-400"
@@ -389,7 +389,7 @@ export function CashFlowForecast() {
                           {risk.projectedPercent}% projected
                         </span>
                       </div>
-                      <div className="w-full bg-slate-700 rounded-full h-1.5 mb-2">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mb-2">
                         <div
                           className={`h-1.5 rounded-full transition-all ${
                             risk.riskLevel === "high" ? "bg-red-400" : risk.riskLevel === "medium" ? "bg-amber-400" : "bg-yellow-400"
@@ -397,7 +397,7 @@ export function CashFlowForecast() {
                           style={{ width: `${Math.min(risk.percentUsed, 100)}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <div className="flex items-center justify-between text-[10px] text-slate-600 dark:text-slate-400">
                         <span>Spent: {formatCurrency(risk.currentSpent)} / {formatCurrency(risk.budgetAmount)}</span>
                         <span>{risk.daysRemaining} days left</span>
                       </div>
@@ -423,12 +423,12 @@ export function CashFlowForecast() {
                   {goalRisks.map((risk) => (
                     <div key={risk.goalId} className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-white">{risk.goalName}</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">{risk.goalName}</span>
                         <span className="text-xs text-orange-400 font-medium">
                           {risk.monthsLeft} month{risk.monthsLeft > 1 ? "s" : ""} left
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                         You need to save {formatCurrency(risk.requiredMonthlySavings)}/mo but your projected savings 
                         are {formatCurrency(risk.projectedMonthlySavings)}/mo — a shortfall
                         of {formatCurrency(risk.shortfall)}/mo.
@@ -452,14 +452,14 @@ export function CashFlowForecast() {
                     const pct = (cat.avgMonthly / maxCat) * 100;
                     return (
                       <div key={i} className="flex items-center gap-3">
-                        <span className="text-xs text-slate-300 w-24 truncate">{cat.icon || "💰"} {cat.name}</span>
-                        <div className="flex-1 bg-slate-700/50 rounded-full h-2 overflow-hidden">
+                        <span className="text-xs text-slate-700 dark:text-slate-300 w-24 truncate">{cat.icon || "💰"} {cat.name}</span>
+                        <div className="flex-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-full h-2 overflow-hidden">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-blue-500/70 to-blue-400/50"
                             style={{ width: `${Math.max(pct, 3)}%` }}
                           />
                         </div>
-                        <span className="text-[10px] text-slate-400 w-16 text-right">{formatCurrency(cat.avgMonthly)}</span>
+                        <span className="text-[10px] text-slate-600 dark:text-slate-400 w-16 text-right">{formatCurrency(cat.avgMonthly)}</span>
                       </div>
                     );
                   })}

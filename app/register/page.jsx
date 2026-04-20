@@ -77,7 +77,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
 
@@ -90,7 +90,7 @@ export default function Register() {
           className="relative z-10 w-full max-w-md mx-auto"
         >
           <div className="group relative">
-            <div className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-emerald-400/40" />
+            <div className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-emerald-400/40" />
             <div className="relative p-10 text-center space-y-6">
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
@@ -100,18 +100,18 @@ export default function Register() {
                 <Mail className="w-10 h-10 text-emerald-400" />
               </motion.div>
               <div>
-                <h2 className="text-2xl font-black text-white mb-2">Check your inbox!</h2>
-                <p className="text-slate-300 text-sm leading-relaxed">
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Check your inbox!</h2>
+                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                   We sent a verification link to<br />
                   <span className="text-emerald-400 font-semibold">{registeredEmail}</span>
                 </p>
               </div>
-              <div className="bg-slate-800/60 border border-emerald-400/20 rounded-xl p-4 text-left space-y-2">
-                <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Next steps</p>
+              <div className="bg-slate-100/60 dark:bg-slate-800/60 border border-emerald-400/20 rounded-xl p-4 text-left space-y-2">
+                <p className="text-slate-600 dark:text-slate-400 text-xs font-semibold uppercase tracking-widest">Next steps</p>
                 {["Open the email from Fincraft AI", "Click \"Verify Email Address\"", "Sign in to your account"].map((step, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
-                    <span className="text-slate-300 text-sm">{step}</span>
+                    <span className="text-slate-700 dark:text-slate-300 text-sm">{step}</span>
                   </div>
                 ))}
               </div>
@@ -161,10 +161,10 @@ export default function Register() {
             >
               <User className="w-8 h-8 text-emerald-400" />
             </motion.div>
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2">
               Create Account
             </h1>
-            <p className="text-slate-300 font-light">
+            <p className="text-slate-700 dark:text-slate-300 font-light">
               Join Fincraft AI and take control of your finances
             </p>
           </motion.div>
@@ -175,7 +175,7 @@ export default function Register() {
             className="group relative"
           >
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-emerald-400/30 group-hover:border-emerald-400/60 transition-all duration-300"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-emerald-400/30 group-hover:border-emerald-400/60 transition-all duration-300"
               whileHover={{ boxShadow: "0 0 40px rgba(16, 185, 129, 0.2)" }}
             />
 
@@ -183,7 +183,7 @@ export default function Register() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Username Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="userName" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="userName" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Username
                   </label>
                   <div className="relative">
@@ -194,7 +194,7 @@ export default function Register() {
                       value={user}
                       onChange={(e) => setUser(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-emerald-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
                       placeholder="Choose a username"
                     />
                   </div>
@@ -202,7 +202,7 @@ export default function Register() {
 
                 {/* Email Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="email" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="email" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Email
                   </label>
                   <div className="relative">
@@ -213,7 +213,7 @@ export default function Register() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-emerald-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -221,7 +221,7 @@ export default function Register() {
 
                 {/* Password Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="password" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="password" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Password
                   </label>
                   <div className="relative">
@@ -233,7 +233,7 @@ export default function Register() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength="6"
-                      className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
+                      className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-emerald-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
                       placeholder="At least 6 characters"
                     />
                     <motion.button
@@ -241,7 +241,7 @@ export default function Register() {
                       onClick={() => setShowPassword(!showPassword)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-400 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-emerald-400 transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -254,7 +254,7 @@ export default function Register() {
 
                 {/* Confirm Password Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="password2" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="password2" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Confirm Password
                   </label>
                   <div className="relative">
@@ -265,7 +265,7 @@ export default function Register() {
                       value={password2}
                       onChange={(e) => setPassword2(e.target.value)}
                       required
-                      className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
+                      className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-emerald-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/40 transition-all duration-200"
                       placeholder="Confirm your password"
                     />
                     <motion.button
@@ -273,7 +273,7 @@ export default function Register() {
                       onClick={() => setShowPassword2(!showPassword2)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-400 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-emerald-400 transition-colors"
                     >
                       {showPassword2 ? (
                         <EyeOff className="w-5 h-5" />
@@ -302,7 +302,7 @@ export default function Register() {
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full relative group/btn py-3 px-4 rounded-xl font-bold text-lg text-white overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-full relative group/btn py-3 px-4 rounded-xl font-bold text-lg text-slate-900 dark:text-white overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl"
@@ -339,7 +339,7 @@ export default function Register() {
                   <div className="w-full border-t border-emerald-400/20"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 text-slate-400">
+                  <span className="px-2 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 text-slate-600 dark:text-slate-400">
                     Already have an account?
                   </span>
                 </div>
@@ -347,7 +347,7 @@ export default function Register() {
 
               {/* Login Link */}
               <motion.div variants={itemVariants} className="text-center">
-                <p className="text-slate-300 text-sm font-light mb-2">
+                <p className="text-slate-700 dark:text-slate-300 text-sm font-light mb-2">
                   Sign in to your existing account
                 </p>
                 <Link href="/login">
@@ -377,7 +377,7 @@ export default function Register() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
-                className="flex items-center gap-3 text-slate-300 text-sm"
+                className="flex items-center gap-3 text-slate-700 dark:text-slate-300 text-sm"
               >
                 <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                 <span className="font-light">{feature}</span>
@@ -388,7 +388,7 @@ export default function Register() {
           {/* Security Notice */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center justify-center gap-2 text-slate-400 text-sm"
+            className="flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 text-sm"
           >
             <Lock className="w-4 h-4 text-emerald-400/50" />
             <span>Your data is protected with military-grade encryption</span>

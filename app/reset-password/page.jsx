@@ -86,11 +86,11 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 flex items-center justify-center px-4">
         <div className="text-center space-y-4">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-          <h1 className="text-2xl font-bold text-white">Invalid Reset Link</h1>
-          <p className="text-slate-300">This password reset link is invalid or missing a token.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Invalid Reset Link</h1>
+          <p className="text-slate-700 dark:text-slate-300">This password reset link is invalid or missing a token.</p>
           <Link
             href="/forgot-password"
             className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium"
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -144,10 +144,10 @@ function ResetPasswordForm() {
             >
               <Lock className="w-8 h-8 text-cyan-400" />
             </motion.div>
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2">
               Reset Password
             </h1>
-            <p className="text-slate-300 font-light">
+            <p className="text-slate-700 dark:text-slate-300 font-light">
               Choose a new password for your account
             </p>
           </motion.div>
@@ -155,7 +155,7 @@ function ResetPasswordForm() {
           {/* Card */}
           <motion.div variants={itemVariants} className="group relative">
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
               whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
             />
 
@@ -169,8 +169,8 @@ function ResetPasswordForm() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-400/40 mb-2">
                     <CheckCircle className="w-7 h-7 text-emerald-400" />
                   </div>
-                  <h2 className="text-xl font-bold text-white">Password Reset!</h2>
-                  <p className="text-slate-300 text-sm">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Password Reset!</h2>
+                  <p className="text-slate-700 dark:text-slate-300 text-sm">
                     Your password has been updated. Redirecting to login...
                   </p>
                   <motion.div
@@ -183,7 +183,7 @@ function ResetPasswordForm() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* New Password */}
                   <motion.div variants={itemVariants}>
-                    <label htmlFor="password" className="block text-sm font-bold text-white mb-3">
+                    <label htmlFor="password" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                       New Password
                     </label>
                     <div className="relative">
@@ -195,7 +195,7 @@ function ResetPasswordForm() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
-                        className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border-2 border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
+                        className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border-2 border-cyan-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
                         placeholder="Minimum 6 characters"
                       />
                       <motion.button
@@ -203,7 +203,7 @@ function ResetPasswordForm() {
                         onClick={() => setShowPassword(!showPassword)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </motion.button>
@@ -212,7 +212,7 @@ function ResetPasswordForm() {
 
                   {/* Confirm Password */}
                   <motion.div variants={itemVariants}>
-                    <label htmlFor="password2" className="block text-sm font-bold text-white mb-3">
+                    <label htmlFor="password2" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                       Confirm Password
                     </label>
                     <div className="relative">
@@ -224,7 +224,7 @@ function ResetPasswordForm() {
                         onChange={(e) => setPassword2(e.target.value)}
                         required
                         minLength={6}
-                        className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border-2 border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
+                        className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border-2 border-cyan-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
                         placeholder="Re-enter your password"
                       />
                       <motion.button
@@ -232,7 +232,7 @@ function ResetPasswordForm() {
                         onClick={() => setShowPassword2(!showPassword2)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-colors"
                       >
                         {showPassword2 ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </motion.button>
@@ -287,7 +287,7 @@ function ResetPasswordForm() {
 export default function ResetPassword() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}

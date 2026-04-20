@@ -91,7 +91,7 @@ export function QuickActions() {
           <button
             key={label}
             onClick={() => router.push(route)}
-            className={`flex items-center justify-center gap-2 ${style} text-white py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all`}
+            className={`flex items-center justify-center gap-2 ${style} text-slate-900 dark:text-white py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all`}
           >
             <Plus size={15} strokeWidth={2.5} />
             <Icon size={16} />
@@ -102,7 +102,7 @@ export function QuickActions() {
       </div>
 
       {/* Quick navigation links */}
-      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4">
+      <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-4">
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
           Quick Links
         </p>

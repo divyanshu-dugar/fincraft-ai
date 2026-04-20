@@ -170,25 +170,25 @@ export default function AddIncome() {
   const isAmountSet = amount && Number(amount) > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
       {/* ── sticky header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          <div className="h-5 w-px bg-slate-700" />
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <IndianRupee className="w-4 h-4 text-white" />
+              <IndianRupee className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-none">Add Income</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5">Track your earnings</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Add Income</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5">Track your earnings</p>
             </div>
           </div>
         </div>
@@ -198,12 +198,12 @@ export default function AddIncome() {
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
               Amount <span className="text-rose-400">*</span>
             </label>
 
-            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
+            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-300 dark:border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
               <CurrencyBadge value={currency} onChange={setCurrency} currencies={currencies} size="lg" />
               <input
                 type="number"
@@ -214,7 +214,7 @@ export default function AddIncome() {
                 placeholder="0"
                 min="0"
                 step="1"
-                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-400' : 'text-white'}`}
+                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-400' : 'text-slate-900 dark:text-white'}`}
                 style={{ minWidth: 0 }}
               />
               {isAmountSet && (
@@ -227,7 +227,7 @@ export default function AddIncome() {
             {errors.amount && <p className="text-xs text-rose-500 font-semibold -mt-3 mb-4">{errors.amount}</p>}
 
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick select</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Quick select</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_AMOUNTS.map((v) => (
                   <button
@@ -237,7 +237,7 @@ export default function AddIncome() {
                     className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-150 ${
                       Number(amount) === v
                         ? 'bg-slate-200 text-slate-900 border-slate-200 shadow-md'
-                        : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
+                        : 'bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
                     {currencyObj.symbol}{v.toLocaleString('en-US')}
@@ -248,11 +248,11 @@ export default function AddIncome() {
           </div>
 
           {/* ── details card ──────────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
 
             {/* category */}
             <div className="px-6 py-5">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
                 Category <span className="text-rose-400">*</span>
               </label>
@@ -269,7 +269,7 @@ export default function AddIncome() {
 
             {/* date */}
             <div className="px-6 py-5">
-              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <CalendarDays className="w-3.5 h-3.5" />
                 Date <span className="text-rose-400">*</span>
               </label>
@@ -278,7 +278,7 @@ export default function AddIncome() {
                 type="date"
                 value={date}
                 onChange={(e) => { setDate(e.target.value); clearError('date'); }}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-slate-200 bg-slate-700/50 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-500 ${
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-slate-800 dark:text-slate-200 bg-slate-200/50 dark:bg-slate-700/50 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-500 ${
                   errors.date ? 'border-rose-500/50 ring-2 ring-rose-500/20' : 'border-slate-600'
                 }`}
               />
@@ -287,7 +287,7 @@ export default function AddIncome() {
 
             {/* note */}
             <div className="px-6 py-5">
-              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <NotebookPen className="w-3.5 h-3.5" />
                 Note
                 <span className="ml-auto font-normal normal-case tracking-normal text-slate-600">{note.length}/500</span>
@@ -298,18 +298,18 @@ export default function AddIncome() {
                 onChange={(e) => setNote(e.target.value.slice(0, 500))}
                 rows={3}
                 placeholder="What was this income for?"
-                className="w-full px-4 py-3 border border-slate-600 rounded-xl text-sm font-medium text-slate-200 bg-slate-700/50 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none"
+                className="w-full px-4 py-3 border border-slate-600 rounded-xl text-sm font-medium text-slate-800 dark:text-slate-200 bg-slate-200/50 dark:bg-slate-700/50 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none"
               />
             </div>
           </div>
 
           {/* ── recurring card ───────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 divide-y divide-slate-700">
             {/* toggle row */}
             <div className="px-6 py-5 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Repeat className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Recurring</span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Recurring</span>
               </div>
               <button
                 type="button"
@@ -331,7 +331,7 @@ export default function AddIncome() {
             {isRecurring && (
               <div className="px-6 py-5 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Frequency</label>
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Frequency</label>
                   <div className="grid grid-cols-4 gap-2">
                     {['daily', 'weekly', 'monthly', 'yearly'].map((f) => (
                       <button
@@ -341,7 +341,7 @@ export default function AddIncome() {
                         className={`py-2 rounded-xl text-xs font-bold capitalize border transition-all duration-150 ${
                           frequency === f
                             ? 'bg-emerald-600 border-emerald-600 text-white shadow-md'
-                            : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'
+                            : 'bg-slate-200/50 dark:bg-slate-700/50 border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-500'
                         }`}
                       >
                         {f}
@@ -350,14 +350,14 @@ export default function AddIncome() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">
                     End Date <span className="font-normal normal-case tracking-normal text-slate-600">(optional)</span>
                   </label>
                   <input
                     type="date"
                     value={recurEndDate}
                     onChange={(e) => setRecurEndDate(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-600 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 bg-slate-700/50"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600 text-sm font-medium text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 bg-slate-200/50 dark:bg-slate-700/50"
                   />
                 </div>
                 <p className="text-xs text-emerald-300/70">An income entry will be auto-created every {frequency === 'daily' ? 'day' : frequency === 'weekly' ? 'week' : frequency === 'monthly' ? 'month' : 'year'} starting from the date above.</p>
@@ -371,7 +371,7 @@ export default function AddIncome() {
               type="button"
               onClick={() => router.back()}
               disabled={loading}
-              className="flex-1 px-6 py-3.5 rounded-xl border border-slate-600 bg-slate-800 text-sm font-bold text-slate-300 hover:bg-slate-700 hover:border-slate-500 transition-all disabled:opacity-40"
+              className="flex-1 px-6 py-3.5 rounded-xl border border-slate-600 bg-slate-100 dark:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 hover:border-slate-500 transition-all disabled:opacity-40"
             >
               Cancel
             </button>

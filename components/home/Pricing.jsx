@@ -75,7 +75,7 @@ export default function Pricing() {
   };
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -121,13 +121,13 @@ export default function Pricing() {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
             Plans for Every{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
               Budget
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-light mb-10">
+          <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-light mb-10">
             Choose the perfect plan to unlock financial control with no surprises.
           </p>
 
@@ -139,7 +139,7 @@ export default function Pricing() {
             transition={{ delay: 0.3 }}
             className="flex items-center justify-center gap-4"
           >
-            <span className={`text-sm sm:text-base font-semibold transition-colors ${!isAnnual ? "text-white" : "text-slate-400"}`}>
+            <span className={`text-sm sm:text-base font-semibold transition-colors ${!isAnnual ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400"}`}>
               Monthly
             </span>
             <motion.button
@@ -154,7 +154,7 @@ export default function Pricing() {
                 className="w-7 h-7 bg-white rounded-full shadow-lg"
               />
             </motion.button>
-            <span className={`text-sm sm:text-base font-semibold transition-colors ${isAnnual ? "text-white" : "text-slate-400"}`}>
+            <span className={`text-sm sm:text-base font-semibold transition-colors ${isAnnual ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400"}`}>
               Annual
               <span className="ml-3 inline-block px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/30 to-teal-500/30 border border-emerald-400/50 text-sm text-emerald-300 font-bold">
                 Save 20%
@@ -186,7 +186,7 @@ export default function Pricing() {
               )}
 
               <motion.div
-                className={`absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border ${
+                className={`absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border ${
                   plan.highlighted ? "border-cyan-400/60" : "border-cyan-400/20 group-hover:border-cyan-400/60"
                 } transition-all duration-300 shadow-xl`}
                 whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
@@ -201,13 +201,13 @@ export default function Pricing() {
                     transition={{ delay: 0.3 }}
                     className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/30"
                   >
-                    <Zap className="w-4 h-4 text-white" />
-                    <span className="text-sm font-bold text-white">Most Popular</span>
+                    <Zap className="w-4 h-4 text-slate-900 dark:text-white" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">Most Popular</span>
                   </motion.div>
                 )}
 
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-2">{plan.name}</h3>
-                <p className="text-slate-400 mb-6 text-xs sm:text-sm font-light">{plan.description}</p>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-2">{plan.name}</h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-6 text-xs sm:text-sm font-light">{plan.description}</p>
 
                 <div className="mb-8">
                   <div className="flex items-baseline gap-2 mb-3">
@@ -220,7 +220,7 @@ export default function Pricing() {
                     >
                       ${isAnnual ? plan.annualPrice : plan.monthlyPrice}
                     </motion.span>
-                    <span className="text-xs sm:text-sm text-slate-400 font-light">{isAnnual ? "/year" : "/month"}</span>
+                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-light">{isAnnual ? "/year" : "/month"}</span>
                   </div>
                   {isAnnual && plan.monthlyPrice !== plan.annualPrice / 12 && (
                     <p className="text-xs sm:text-sm text-emerald-400 font-semibold">
@@ -236,7 +236,7 @@ export default function Pricing() {
                     className={`w-full py-3 rounded-lg font-bold text-base mb-8 transition-all duration-300 flex items-center justify-center gap-2 group ${
                       plan.highlighted
                         ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-xl shadow-cyan-500/30 hover:shadow-cyan-500/50"
-                        : "bg-slate-800/50 text-white border border-cyan-400/30 hover:border-cyan-400/60 hover:bg-slate-700/50"
+                        : "bg-slate-100/50 dark:bg-slate-800/50 text-white border border-cyan-400/30 hover:border-cyan-400/60 hover:bg-slate-200/50 dark:bg-slate-700/50"
                     }`}
                   >
                     {plan.cta}
@@ -255,7 +255,7 @@ export default function Pricing() {
                       className="flex items-start gap-3"
                     >
                       <Check className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed group-hover:text-slate-200 transition-colors">
+                      <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-light leading-relaxed group-hover:text-slate-800 dark:text-slate-200 transition-colors">
                         {feature}
                       </span>
                     </motion.div>

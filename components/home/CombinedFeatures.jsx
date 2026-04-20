@@ -96,7 +96,7 @@ export default function CombinedFeatures() {
   };
 
   return (
-    <section id="features" className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-32 sm:py-40 lg:py-48">
+    <section id="features" className="relative overflow-hidden bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-32 sm:py-40 lg:py-48">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -181,7 +181,7 @@ export default function CombinedFeatures() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight"
+            className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-8 leading-tight"
           >
             Your Personal Finance{" "} <br/>
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -194,7 +194,7 @@ export default function CombinedFeatures() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light"
+            className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-light"
           >
             Core tracking tools powered by AI-driven guidance. Manage income, expenses, and goals while receiving personalized insights, smart recommendations, and instant financial advice through our conversational AI advisor.
           </motion.p>
@@ -218,7 +218,7 @@ export default function CombinedFeatures() {
                 whileHover={{ y: -8, scale: 1.02 }}
               >
                 <motion.div
-                  className="absolute -inset-0.5 bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all duration-300"
+                  className="absolute -inset-0.5 bg-gradient-to-br from-slate-100/60 dark:from-slate-800/60 to-white/60 dark:to-slate-900/60 backdrop-blur-xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all duration-300"
                   whileHover={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.25)" }}
                 />
 
@@ -227,15 +227,15 @@ export default function CombinedFeatures() {
                     whileHover={{ scale: 1.2, rotate: 12 }}
                     className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-5 shadow-lg`}
                   >
-                    <Icon className="w-6 sm:w-7 h-6 sm:h-7 text-white" />
+                    <Icon className="w-6 sm:w-7 h-6 sm:h-7 text-slate-900 dark:text-white" />
                   </motion.div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-cyan-300 transition-colors">
                     {item.title}
 
                   </h3>
 
-                  <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-light flex-grow group-hover:text-slate-200 transition-colors">
+                  <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed font-light flex-grow group-hover:text-slate-800 dark:text-slate-200 transition-colors">
                     {item.description}
                   </p>
 
@@ -250,7 +250,7 @@ export default function CombinedFeatures() {
                   {item.comingSoon ? (
                     <motion.button
                       disabled
-                      className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 bg-slate-700/30 text-slate-400 border border-slate-600/50 cursor-not-allowed"
+                      className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 bg-slate-200/30 dark:bg-slate-700/30 text-slate-600 dark:text-slate-400 border border-slate-600/50 cursor-not-allowed"
                     >
                       Coming Soon
                     </motion.button>
@@ -289,7 +289,7 @@ export default function CombinedFeatures() {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="mt-28 text-center"
         >
-          <p className="text-slate-300 text-lg font-light mb-8">Get your personal finance mentor that adapts to your goals</p>
+          <p className="text-slate-700 dark:text-slate-300 text-lg font-light mb-8">Get your personal finance mentor that adapts to your goals</p>
           <motion.div
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.98 }}

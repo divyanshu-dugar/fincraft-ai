@@ -65,7 +65,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -116,10 +116,10 @@ export default function ForgotPassword() {
             >
               <Mail className="w-8 h-8 text-cyan-400" />
             </motion.div>
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2">
               Forgot Password?
             </h1>
-            <p className="text-slate-300 font-light">
+            <p className="text-slate-700 dark:text-slate-300 font-light">
               Enter your email and we'll send you a reset link
             </p>
           </motion.div>
@@ -127,7 +127,7 @@ export default function ForgotPassword() {
           {/* Card */}
           <motion.div variants={itemVariants} className="group relative">
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
               whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
             />
 
@@ -141,8 +141,8 @@ export default function ForgotPassword() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-400/40 mb-2">
                     <CheckCircle className="w-7 h-7 text-emerald-400" />
                   </div>
-                  <h2 className="text-xl font-bold text-white">Check your email</h2>
-                  <p className="text-slate-300 text-sm leading-relaxed">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Check your email</h2>
+                  <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                     If an account with that email exists, we've sent a password reset link.
                     The link expires in <span className="text-cyan-400 font-semibold">15 minutes</span>.
                   </p>
@@ -158,7 +158,7 @@ export default function ForgotPassword() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
                   <motion.div variants={itemVariants}>
-                    <label htmlFor="email" className="block text-sm font-bold text-white mb-3">
+                    <label htmlFor="email" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                       Email Address
                     </label>
                     <div className="relative">
@@ -169,7 +169,7 @@ export default function ForgotPassword() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border-2 border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
+                        className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border-2 border-cyan-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40 transition-all duration-200"
                         placeholder="you@example.com"
                       />
                     </div>

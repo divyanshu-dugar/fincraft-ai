@@ -91,9 +91,9 @@ export default function SocialAuthButtons({ accentClass = 'cyan' }) {
     <div className="space-y-3">
       {/* Divider */}
       <div className="relative flex items-center">
-        <div className="flex-1 border-t border-slate-700" />
+        <div className="flex-1 border-t border-slate-300 dark:border-slate-700" />
         <span className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-widest">or continue with</span>
-        <div className="flex-1 border-t border-slate-700" />
+        <div className="flex-1 border-t border-slate-300 dark:border-slate-700" />
       </div>
 
       {/* Error */}
@@ -106,7 +106,7 @@ export default function SocialAuthButtons({ accentClass = 'cyan' }) {
         type="button"
         onClick={handleGoogleClick}
         disabled={!!loadingProvider}
-        className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-slate-800/70 border ${border} text-white text-sm font-bold hover:bg-slate-700/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+        className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-slate-100/70 dark:bg-slate-800/70 border ${border} text-slate-900 dark:text-white text-sm font-bold hover:bg-slate-200/60 dark:bg-slate-700/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {loadingProvider === 'google' ? (
           <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />

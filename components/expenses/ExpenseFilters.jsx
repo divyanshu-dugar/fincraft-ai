@@ -102,7 +102,7 @@ export default function ExpenseFilters({
   })();
 
   return (
-    <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 shadow-sm rounded-2xl p-6 mb-10 transition-all duration-300 hover:shadow-md">
+    <div className="relative bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 shadow-sm rounded-2xl p-6 mb-10 transition-all duration-300 hover:shadow-md">
       {/* ============================================================
           Header Section - Displays title and reset action
          ============================================================ */}
@@ -118,7 +118,7 @@ export default function ExpenseFilters({
             setSelectedCategory("all");
             onCustomRangeReset?.();
           }}
-          className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
+          className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-400 transition-colors"
         >
           Reset Filters
         </button>
@@ -134,7 +134,7 @@ export default function ExpenseFilters({
             - Allows filtering expenses by category
            ======================================================== */}
         <div className="flex flex-col">
-          <label className="text-sm font-semibold text-slate-400 mb-2.5 flex items-center tracking-wide">
+          <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2.5 flex items-center tracking-wide">
             <Tag className="w-4 h-4 mr-2 text-purple-400" />
             Category
           </label>
@@ -144,10 +144,10 @@ export default function ExpenseFilters({
             <button
               ref={buttonRef}
               onClick={() => dropdownOpen ? setDropdownOpen(false) : openDropdown()}
-              className="w-full pl-4 pr-11 py-2.5 text-left text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 shadow-sm hover:border-purple-400/60 focus:ring-2 focus:ring-purple-400/40 focus:border-purple-400 outline-none transition-all duration-200 cursor-pointer flex items-center"
+              className="w-full pl-4 pr-11 py-2.5 text-left text-slate-800 dark:text-slate-200 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 shadow-sm hover:border-purple-400/60 focus:ring-2 focus:ring-purple-400/40 focus:border-purple-400 outline-none transition-all duration-200 cursor-pointer flex items-center"
             >
               <span className="flex-1 truncate">{selectedLabel}</span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400">
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-600 dark:text-slate-400">
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
               </span>
             </button>
@@ -162,7 +162,7 @@ export default function ExpenseFilters({
                   width: Math.max(dropdownPos.width, 260),
                   zIndex: 1000,
                 }}
-                className="max-h-72 overflow-y-auto rounded-xl bg-slate-800 border border-slate-700 py-2 shadow-xl"
+                className="max-h-72 overflow-y-auto rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 py-2 shadow-xl"
               >
                 {/* All Categories option */}
                 <button
@@ -170,7 +170,7 @@ export default function ExpenseFilters({
                   className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left rounded-lg mx-0 transition-colors ${
                     selectedCategory === "all"
                       ? "text-purple-300 bg-purple-500/15 font-semibold"
-                      : "text-slate-200 hover:bg-slate-700/60"
+                      : "text-slate-800 dark:text-slate-200 hover:bg-slate-200/60 dark:bg-slate-700/60"
                   }`}
                 >
                   {selectedCategory === "all" && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
@@ -204,7 +204,7 @@ export default function ExpenseFilters({
                         className={`w-full flex items-center gap-2 pl-10 pr-4 py-2 text-sm text-left transition-colors ${
                           selectedCategory === sub._id
                             ? "text-purple-300 bg-purple-500/15 font-semibold"
-                            : "text-slate-400 hover:bg-slate-700/60 hover:text-slate-200"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:bg-slate-700/60 hover:text-slate-800 dark:text-slate-200"
                         }`}
                       >
                         {selectedCategory === sub._id && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
@@ -226,7 +226,7 @@ export default function ExpenseFilters({
             - Filters expenses starting from selected date
            ======================================================== */}
         <div className="flex flex-col">
-          <label className="text-sm font-semibold text-slate-400 mb-2.5 flex items-center tracking-wide">
+          <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2.5 flex items-center tracking-wide">
             <Calendar className="w-4 h-4 mr-2 text-blue-400" />
             Start Date
           </label>
@@ -235,7 +235,7 @@ export default function ExpenseFilters({
             type="date"
             value={pendingStart}
             onChange={(e) => setPendingStart(e.target.value)}
-            className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 shadow-sm hover:border-blue-400/60 focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 [color-scheme:dark] outline-none transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 shadow-sm hover:border-blue-400/60 focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 [color-scheme:dark] outline-none transition-all duration-200"
           />
         </div>
 
@@ -244,7 +244,7 @@ export default function ExpenseFilters({
             - Filters expenses up to selected date
            ======================================================== */}
         <div className="flex flex-col">
-          <label className="text-sm font-semibold text-slate-400 mb-2.5 flex items-center tracking-wide">
+          <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2.5 flex items-center tracking-wide">
             <Calendar className="w-4 h-4 mr-2 text-pink-400" />
             End Date
           </label>
@@ -253,7 +253,7 @@ export default function ExpenseFilters({
             type="date"
             value={pendingEnd}
             onChange={(e) => setPendingEnd(e.target.value)}
-            className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 shadow-sm hover:border-pink-400/60 focus:ring-2 focus:ring-pink-400/40 focus:border-pink-400 [color-scheme:dark] outline-none transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 shadow-sm hover:border-pink-400/60 focus:ring-2 focus:ring-pink-400/40 focus:border-pink-400 [color-scheme:dark] outline-none transition-all duration-200"
           />
         </div>
       </div>

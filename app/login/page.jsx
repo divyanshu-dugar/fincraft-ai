@@ -79,7 +79,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 overflow-hidden flex items-center justify-center pt-18 py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -119,10 +119,10 @@ export default function Login() {
             >
               <Lock className="w-8 h-8 text-cyan-400" />
             </motion.div>
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2">
               Welcome Back
             </h1>
-            <p className="text-slate-300 font-light">
+            <p className="text-slate-700 dark:text-slate-300 font-light">
               Sign in to your Fincraft AI account
             </p>
           </motion.div>
@@ -133,7 +133,7 @@ export default function Login() {
             className="group relative"
           >
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/30 group-hover:border-cyan-400/60 transition-all duration-300"
               whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
             />
 
@@ -141,7 +141,7 @@ export default function Login() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Username Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="userName" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="userName" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Username
                   </label>
                   <div className="relative">
@@ -152,7 +152,7 @@ export default function Login() {
                       value={user}
                       onChange={(e) => setUser(e.target.value)}
                       required
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border-2 text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border-2 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
                         warning
                           ? "border-red-400/60 focus:border-red-400/80 focus:ring-red-400/40"
                           : "border-cyan-400/30 focus:border-cyan-400/60 focus:ring-cyan-400/40"
@@ -164,7 +164,7 @@ export default function Login() {
 
                 {/* Password Field */}
                 <motion.div variants={itemVariants}>
-                  <label htmlFor="password" className="block text-sm font-bold text-white mb-3">
+                  <label htmlFor="password" className="block text-sm font-bold text-slate-900 dark:text-white mb-3">
                     Password
                   </label>
                   <div className="relative">
@@ -175,7 +175,7 @@ export default function Login() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className={`w-full pl-12 pr-12 py-3 rounded-xl bg-slate-800/50 border-2 text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                      className={`w-full pl-12 pr-12 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border-2 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-1 transition-all duration-200 ${
                         warning
                           ? "border-red-400/60 focus:border-red-400/80 focus:ring-red-400/40"
                           : "border-cyan-400/30 focus:border-cyan-400/60 focus:ring-cyan-400/40"
@@ -187,7 +187,7 @@ export default function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -205,9 +205,9 @@ export default function Login() {
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-2 border-cyan-400/30 bg-slate-800/50 text-cyan-500 focus:ring-cyan-400/40 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-2 border-cyan-400/30 bg-slate-100/50 dark:bg-slate-800/50 text-cyan-500 focus:ring-cyan-400/40 focus:ring-offset-0 cursor-pointer"
                     />
-                    <span className="text-sm text-slate-300 group-hover/remember:text-slate-200 transition-colors font-medium">
+                    <span className="text-sm text-slate-700 dark:text-slate-300 group-hover/remember:text-slate-800 dark:text-slate-200 transition-colors font-medium">
                       Remember me
                     </span>
                   </label>
@@ -281,7 +281,7 @@ export default function Login() {
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full relative group/btn py-3 px-4 rounded-xl font-bold text-lg text-white overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-full relative group/btn py-3 px-4 rounded-xl font-bold text-lg text-slate-900 dark:text-white overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl"
@@ -318,7 +318,7 @@ export default function Login() {
                   <div className="w-full border-t border-cyan-400/20"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 text-slate-400">
+                  <span className="px-2 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 text-slate-600 dark:text-slate-400">
                     New to Fincraft?
                   </span>
                 </div>
@@ -326,7 +326,7 @@ export default function Login() {
 
               {/* Register Link */}
               <motion.div variants={itemVariants} className="text-center">
-                <p className="text-slate-300 text-sm font-light mb-2">
+                <p className="text-slate-700 dark:text-slate-300 text-sm font-light mb-2">
                   Don't have an account?
                 </p>
                 <Link href="/register">
@@ -345,7 +345,7 @@ export default function Login() {
           {/* Security Notice */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center justify-center gap-2 text-slate-400 text-sm"
+            className="flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 text-sm"
           >
             <Lock className="w-4 h-4 text-cyan-400/50" />
             <span>Your data is protected with bank-level encryption</span>

@@ -101,7 +101,7 @@ export default function RecurringIncomePage() {
   const inactive = rules.filter((r) => !r.isActive);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
       <ConfirmDeleteModal
         open={!!confirmDeleteId}
         onClose={() => setConfirmDeleteId(null)}
@@ -111,11 +111,11 @@ export default function RecurringIncomePage() {
         message="Future entries will not be created, but past entries remain. Are you sure you want to delete this recurring income?"
       />
       {/* sticky header */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
             onClick={() => router.push('/income/list')}
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
@@ -143,8 +143,8 @@ export default function RecurringIncomePage() {
             <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/15 rounded-2xl flex items-center justify-center">
               <Repeat className="w-8 h-8 text-emerald-400" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">No recurring incomes</h3>
-            <p className="text-slate-400 mb-6">Toggle &ldquo;Recurring&rdquo; when adding an income to set one up.</p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">No recurring incomes</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">Toggle &ldquo;Recurring&rdquo; when adding an income to set one up.</p>
             <button
               onClick={() => router.push('/income/add')}
               className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-colors"
@@ -156,7 +156,7 @@ export default function RecurringIncomePage() {
           <>
             {active.length > 0 && (
               <section>
-                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+                <h2 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
                   Active ({active.length})
                 </h2>
                 <div className="space-y-3">
@@ -178,7 +178,7 @@ export default function RecurringIncomePage() {
 
             {inactive.length > 0 && (
               <section>
-                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+                <h2 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
                   Paused ({inactive.length})
                 </h2>
                 <div className="space-y-3">
@@ -216,12 +216,12 @@ function RuleCard({ rule, onToggle, onDelete, deletingId, togglingId }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: rule.isActive ? 1 : 0.6 }}
       exit={{ opacity: 0, scale: 0.97 }}
-      className="bg-slate-800/60 rounded-2xl border border-slate-700 p-5 flex items-center gap-4"
+      className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300 dark:border-slate-700 p-5 flex items-center gap-4"
     >
       {/* frequency badge */}
       <div className={`shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br ${freqGradient} flex flex-col items-center justify-center shadow-lg`}>
-        <Repeat className="w-4 h-4 text-white mb-0.5" />
-        <span className="text-xs font-bold text-white">{FREQUENCY_LABELS[rule.frequency]}</span>
+        <Repeat className="w-4 h-4 text-slate-900 dark:text-white mb-0.5" />
+        <span className="text-xs font-bold text-slate-900 dark:text-white">{FREQUENCY_LABELS[rule.frequency]}</span>
       </div>
 
       {/* info */}
@@ -231,10 +231,10 @@ function RuleCard({ rule, onToggle, onDelete, deletingId, togglingId }) {
             className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{ backgroundColor: catColor }}
           />
-          <span className="text-sm font-bold text-white truncate">{catName}</span>
+          <span className="text-sm font-bold text-slate-900 dark:text-white truncate">{catName}</span>
         </div>
         {rule.note && (
-          <p className="text-xs text-slate-400 truncate mb-1">{rule.note}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 truncate mb-1">{rule.note}</p>
         )}
         <div className="flex items-center gap-3 text-xs text-slate-500">
           <span className="flex items-center gap-1">
@@ -263,7 +263,7 @@ function RuleCard({ rule, onToggle, onDelete, deletingId, togglingId }) {
           onClick={() => onToggle(rule)}
           disabled={togglingId === rule._id}
           title={rule.isActive ? 'Pause' : 'Resume'}
-          className="p-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:bg-slate-600 text-slate-300 transition-colors disabled:opacity-40"
+          className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600 hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition-colors disabled:opacity-40"
         >
           {rule.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </button>
@@ -271,7 +271,7 @@ function RuleCard({ rule, onToggle, onDelete, deletingId, togglingId }) {
           onClick={() => onDelete(rule._id)}
           disabled={deletingId === rule._id}
           title="Delete"
-          className="p-2 rounded-lg bg-slate-700/50 border border-rose-500/30 hover:bg-rose-500/15 text-rose-400 transition-colors disabled:opacity-40"
+          className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50 border border-rose-500/30 hover:bg-rose-500/15 text-rose-400 transition-colors disabled:opacity-40"
         >
           <Trash2 className="w-4 h-4" />
         </button>

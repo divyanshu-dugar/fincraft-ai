@@ -77,18 +77,18 @@ export default function ExpenseTable({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/60 rounded-3xl border border-cyan-400/20 text-center py-20"
+        className="bg-slate-100/60 dark:bg-slate-800/60 rounded-3xl border border-cyan-400/20 text-center py-20"
       >
         <div className="max-w-md mx-auto">
           <div className="w-20 h-20 mx-auto mb-6 bg-blue-500/15 rounded-2xl flex items-center justify-center">
             <TrendingUp className="w-8 h-8 text-blue-400" />
           </div>
 
-          <h3 className="text-3xl font-bold text-white mb-3">
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">
             No expenses yet
           </h3>
 
-          <p className="text-slate-400 text-lg mb-8">
+          <p className="text-slate-600 dark:text-slate-400 text-lg mb-8">
             Start tracking your spending journey by adding your first expense.
           </p>
 
@@ -144,7 +144,7 @@ export default function ExpenseTable({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden"
+      className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden"
     >
       <div>
         <AnimatePresence>
@@ -159,16 +159,16 @@ export default function ExpenseTable({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: dateIndex * 0.1 }}
-                className="border-b border-slate-700/50 last:border-b-0"
+                className="border-b border-slate-300/50 dark:border-slate-700/50 last:border-b-0"
               >
                 {/* ====================================================
                     Sticky Daily Header
                    ==================================================== */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 px-4 md:px-6 py-3 border-b border-slate-700/70">
+                <div className="relative overflow-hidden bg-gradient-to-r from-white dark:from-slate-900 via-blue-900 to-indigo-900 px-4 md:px-6 py-3 border-b border-slate-300/70 dark:border-slate-700/70">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_85%_80%,rgba(56,189,248,0.25),transparent_40%)]" />
                   <div className="relative flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm md:text-base font-semibold text-white">
+                      <h2 className="text-sm md:text-base font-semibold text-slate-900 dark:text-white">
                         {group.label}
                       </h2>
                       <span className="inline-flex items-center rounded-full bg-white/15 text-blue-50 text-[11px] font-semibold px-2 py-0.5 border border-white/25 backdrop-blur-sm">
@@ -180,7 +180,7 @@ export default function ExpenseTable({
                       <div className="text-[10px] font-semibold text-blue-100 uppercase tracking-[0.15em]">
                         Daily Total
                       </div>
-                      <div className="text-sm md:text-base font-bold text-white mt-0.5">
+                      <div className="text-sm md:text-base font-bold text-slate-900 dark:text-white mt-0.5">
                         {formatCurrency(dailyTotal)}
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export default function ExpenseTable({
                 {/* ====================================================
                     Expenses Table
                    ==================================================== */}
-                <div className="hidden md:block px-4 md:px-6 py-4 overflow-x-auto bg-slate-800/80 border-y border-slate-700/50">
+                <div className="hidden md:block px-4 md:px-6 py-4 overflow-x-auto bg-slate-100/80 dark:bg-slate-800/80 border-y border-slate-300/50 dark:border-slate-700/50">
                   <table className="w-full min-w-[720px] table-fixed border-separate border-spacing-0">
                     <colgroup>
                       <col className="w-[5%]" />
@@ -200,8 +200,8 @@ export default function ExpenseTable({
                       <col className="w-[15%]" />
                     </colgroup>
                     <thead>
-                      <tr className="bg-slate-800/60 text-left">
-                        <th className="px-3 py-3.5 border-b-2 border-slate-700">
+                      <tr className="bg-slate-100/60 dark:bg-slate-800/60 text-left">
+                        <th className="px-3 py-3.5 border-b-2 border-slate-300 dark:border-slate-700">
                           <button
                             onClick={() => onToggleSelectAll && onToggleSelectAll(expenses)}
                             className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-150 ${
@@ -212,13 +212,13 @@ export default function ExpenseTable({
                                   : "border-slate-500 hover:border-blue-400"
                             }`}
                           >
-                            {(allSelected || someSelected) && <Check size={12} className="text-white" strokeWidth={3} />}
+                            {(allSelected || someSelected) && <Check size={12} className="text-slate-900 dark:text-white" strokeWidth={3} />}
                           </button>
                         </th>
                         {["Category", "Amount", "Note", "Actions"].map((header) => (
                           <th
                             key={header}
-                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-slate-300 tracking-[0.14em] border-b-2 border-slate-700"
+                            className="px-4 lg:px-6 py-3.5 text-sm font-bold uppercase text-slate-700 dark:text-slate-300 tracking-[0.14em] border-b-2 border-slate-300 dark:border-slate-700"
                           >
                             <div className="flex items-center gap-2">
                               {header}
@@ -246,7 +246,7 @@ export default function ExpenseTable({
                               transition={{
                                 delay: dateIndex * 0.1 + expenseIndex * 0.05,
                               }}
-                              className={`group border-b border-slate-700/30 last:border-b-0 odd:bg-slate-800/80 even:bg-slate-800/40 hover:bg-slate-700/40 transition-colors ${selectedIds.has(expense._id) ? "!bg-blue-500/10 border-blue-500/20" : ""}`}
+                              className={`group border-b border-slate-300/30 dark:border-slate-700/30 last:border-b-0 odd:bg-slate-100/80 dark:bg-slate-800/80 even:bg-slate-100/40 dark:bg-slate-800/40 hover:bg-slate-200/40 dark:bg-slate-700/40 transition-colors ${selectedIds.has(expense._id) ? "!bg-blue-500/10 border-blue-500/20" : ""}`}
                             >
                               <td className="px-3 py-4">
                                 <button
@@ -257,11 +257,11 @@ export default function ExpenseTable({
                                       : "border-slate-500 hover:border-blue-400"
                                   }`}
                                 >
-                                  {selectedIds.has(expense._id) && <Check size={12} className="text-white" strokeWidth={3} />}
+                                  {selectedIds.has(expense._id) && <Check size={12} className="text-slate-900 dark:text-white" strokeWidth={3} />}
                                 </button>
                               </td>
                               <td className="px-4 lg:px-6 py-4">
-                                <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-300 bg-slate-700/50 border border-slate-600">
+                                <span className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600">
                                   <span
                                     className="w-2.5 h-2.5 rounded-full"
                                     style={{ backgroundColor: categoryColor }}
@@ -272,10 +272,10 @@ export default function ExpenseTable({
 
                               <td className="px-4 lg:px-6 py-4">
                                 <div className="flex flex-col">
-                                  <span className="text-base font-semibold text-white">
+                                  <span className="text-base font-semibold text-slate-900 dark:text-white">
                                     {formatCurrency(expense.amount)}
                                   </span>
-                                  <span className="text-xs text-slate-400 mt-0.5">
+                                  <span className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                                     {formatExpenseTime(expense.date)}
                                   </span>
                                 </div>
@@ -284,7 +284,7 @@ export default function ExpenseTable({
                               <td className="px-4 lg:px-6 py-4">
                                 {expense.note ? (
                                   <p
-                                    className="text-sm text-slate-300 leading-relaxed line-clamp-2 break-words"
+                                    className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-2 break-words"
                                     title={expense.note}
                                   >
                                     {expense.note}
@@ -304,11 +304,11 @@ export default function ExpenseTable({
                                     onClick={() =>
                                       router.push(`/expense/edit/${expense._id}?month=${currentMonth}&year=${currentYear}`)
                                     }
-                                    className="relative p-2 bg-slate-700/50 text-blue-400 rounded-lg border border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-400/60 hover:text-blue-300 transition-all duration-200 shadow-sm group/btn"
+                                    className="relative p-2 bg-slate-200/50 dark:bg-slate-700/50 text-blue-400 rounded-lg border border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-400/60 hover:text-blue-300 transition-all duration-200 shadow-sm group/btn"
                                     aria-label="Edit expense"
                                   >
                                     <Pencil size={16} />
-                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-slate-900 dark:text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                                       Edit
                                     </span>
                                   </motion.button>
@@ -317,11 +317,11 @@ export default function ExpenseTable({
                                     whileHover={{ scale: 1.06, y: -1 }}
                                     whileTap={{ scale: 0.94 }}
                                     onClick={() => deleteExpense(expense._id)}
-                                    className="relative p-2 bg-slate-700/50 text-rose-400 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-400/60 hover:text-rose-300 transition-all duration-200 shadow-sm group/btn"
+                                    className="relative p-2 bg-slate-200/50 dark:bg-slate-700/50 text-rose-400 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-400/60 hover:text-rose-300 transition-all duration-200 shadow-sm group/btn"
                                     aria-label="Delete expense"
                                   >
                                     <Trash2 size={16} />
-                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                                    <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-slate-900 dark:text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                                       Delete
                                     </span>
                                   </motion.button>
@@ -335,7 +335,7 @@ export default function ExpenseTable({
                   </table>
                 </div>
 
-                <div className="md:hidden px-4 pb-4 pt-3 space-y-3 bg-slate-800/80 border-y border-slate-700/50">
+                <div className="md:hidden px-4 pb-4 pt-3 space-y-3 bg-slate-100/80 dark:bg-slate-800/80 border-y border-slate-300/50 dark:border-slate-700/50">
                   <AnimatePresence>
                     {dailyExpenses.map((expense, expenseIndex) => {
                       const category = expense.category || {};
@@ -350,7 +350,7 @@ export default function ExpenseTable({
                           transition={{
                             delay: dateIndex * 0.1 + expenseIndex * 0.05,
                           }}
-                          className={`bg-slate-800/60 rounded-xl border p-4 ${selectedIds.has(expense._id) ? "border-blue-500/40 bg-blue-500/10" : "border-slate-700"}`}
+                          className={`bg-slate-100/60 dark:bg-slate-800/60 rounded-xl border p-4 ${selectedIds.has(expense._id) ? "border-blue-500/40 bg-blue-500/10" : "border-slate-300 dark:border-slate-700"}`}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2">
@@ -362,9 +362,9 @@ export default function ExpenseTable({
                                     : "border-slate-500 hover:border-blue-400"
                                 }`}
                               >
-                                {selectedIds.has(expense._id) && <Check size={12} className="text-white" strokeWidth={3} />}
+                                {selectedIds.has(expense._id) && <Check size={12} className="text-slate-900 dark:text-white" strokeWidth={3} />}
                               </button>
-                              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-slate-300 bg-slate-700/50 border border-slate-600">
+                              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600">
                                 <span
                                   className="w-2.5 h-2.5 rounded-full"
                                   style={{ backgroundColor: categoryColor }}
@@ -373,16 +373,16 @@ export default function ExpenseTable({
                               </span>
                             </div>
                             <div className="text-right">
-                              <div className="text-base font-semibold text-white">
+                              <div className="text-base font-semibold text-slate-900 dark:text-white">
                                 {formatCurrency(expense.amount)}
                               </div>
-                              <div className="text-xs text-slate-400">
+                              <div className="text-xs text-slate-600 dark:text-slate-400">
                                 {formatExpenseTime(expense.date)}
                               </div>
                             </div>
                           </div>
 
-                          <p className="mt-3 text-sm text-slate-300 leading-relaxed">
+                          <p className="mt-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                             {expense.note || "No note added"}
                           </p>
 
@@ -422,10 +422,10 @@ export default function ExpenseTable({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-slate-800/80 px-5 md:px-8 py-5 border-t border-slate-700/60"
+        className="bg-slate-100/80 dark:bg-slate-800/80 px-5 md:px-8 py-5 border-t border-slate-300/60 dark:border-slate-700/60"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
             Total <span className="font-semibold">{expenses.length}</span>{" "}
             expenses across{" "}
             <span className="font-semibold">{sortedDateKeys.length}</span> days

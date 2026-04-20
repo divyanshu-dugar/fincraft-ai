@@ -65,7 +65,7 @@ export default function FinancialTools() {
   };
 
   return (
-    <section id="tools" className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-32 sm:py-40 overflow-hidden">
+    <section id="tools" className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-32 sm:py-40 overflow-hidden">
       {/* Animated mesh gradient background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -127,7 +127,7 @@ export default function FinancialTools() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight"
+            className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-8 leading-tight"
           >
             Everything to{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -140,7 +140,7 @@ export default function FinancialTools() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light"
+            className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-light"
           >
             Powerful financial tools designed for the modern individual. From tracking to planning, we've got every aspect of your financial life covered.
           </motion.p>
@@ -173,7 +173,7 @@ export default function FinancialTools() {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="mt-28 text-center"
         >
-          <p className="text-slate-300 text-lg font-light mb-8">Ready to transform your financial journey?</p>
+          <p className="text-slate-700 dark:text-slate-300 text-lg font-light mb-8">Ready to transform your financial journey?</p>
           <motion.div
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.98 }}

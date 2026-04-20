@@ -184,7 +184,7 @@ function MessageBubble({ msg }) {
           ? "bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20"
           : "bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/20"
       }`}>
-        {isUser ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
+        {isUser ? <User className="w-4 h-4 text-slate-900 dark:text-white" /> : <Bot className="w-4 h-4 text-slate-900 dark:text-white" />}
       </div>
 
       {/* Bubble */}
@@ -192,7 +192,7 @@ function MessageBubble({ msg }) {
         <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
           isUser
             ? "bg-gradient-to-br from-cyan-600 to-blue-700 text-white rounded-br-sm"
-            : "bg-slate-800 border border-slate-700/50 text-slate-200 rounded-bl-sm"
+            : "bg-slate-100 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 rounded-bl-sm"
         }`}>
           {isUser ? (
             <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -223,9 +223,9 @@ function TypingIndicator() {
       className="flex gap-3 items-end"
     >
       <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-        <Bot className="w-4 h-4 text-white" />
+        <Bot className="w-4 h-4 text-slate-900 dark:text-white" />
       </div>
-      <div className="bg-slate-800 border border-slate-700/50 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+      <div className="bg-slate-100 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700/50 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
         <div className="flex gap-1 items-center h-4">
           {[0, 0.2, 0.4].map((delay) => (
             <motion.div
@@ -252,8 +252,8 @@ function SessionItem({ session, isActive, onSelect, onDelete }) {
     <div
       className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
         isActive
-          ? "bg-white/10 text-white"
-          : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+          ? "bg-white/10 text-slate-900 dark:text-white"
+          : "text-slate-600 dark:text-slate-400 hover:bg-white/5 hover:text-slate-800 dark:text-slate-200"
       }`}
       onClick={() => !confirmDelete && onSelect(session._id)}
     >
@@ -276,7 +276,7 @@ function SessionItem({ session, isActive, onSelect, onDelete }) {
           </button>
           <button
             onClick={() => setConfirmDelete(false)}
-            className="px-2 py-0.5 text-[10px] font-bold bg-slate-600 hover:bg-slate-500 text-white rounded-md transition-colors"
+            className="px-2 py-0.5 text-[10px] font-bold bg-slate-600 hover:bg-slate-500 text-slate-900 dark:text-white rounded-md transition-colors"
           >
             No
           </button>
@@ -308,20 +308,20 @@ function Sidebar({ sessions, activeSessionId, onSelect, onDelete, onNew, loading
       <aside className={`
         fixed md:relative z-40 md:z-auto
         flex flex-col w-72 h-full
-        bg-gradient-to-b from-slate-950 to-slate-900
-        border-r border-slate-800/60
+        bg-gradient-to-b from-slate-50 dark:from-slate-950 to-white dark:to-slate-900
+        border-r border-slate-200 dark:border-slate-800/60
         transition-transform duration-300
         ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-5 pb-4 border-b border-slate-800/60">
+        <div className="flex items-center justify-between px-4 pt-5 pb-4 border-b border-slate-200 dark:border-slate-800/60">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
-            <span className="text-sm font-bold text-white">Fincraft AI</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white">Fincraft AI</span>
           </div>
-          <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="md:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -342,7 +342,7 @@ function Sidebar({ sessions, activeSessionId, onSelect, onDelete, onNew, loading
         <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5 scrollbar-thin">
           {sessions.length === 0 && !loading && (
             <div className="text-center py-8 px-4">
-              <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
               </div>
               <p className="text-xs font-medium text-slate-500">No conversations yet</p>
@@ -369,7 +369,7 @@ function Sidebar({ sessions, activeSessionId, onSelect, onDelete, onNew, loading
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-4 border-t border-slate-800/60">
+        <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-800/60">
           <p className="text-[10px] text-slate-600 text-center leading-relaxed">
             Powered by GPT-4o · Your data stays private
           </p>
@@ -390,11 +390,11 @@ function QuestionCategory({ cat, onPrompt, defaultOpen }) {
         onClick={() => setOpen((p) => !p)}
         className="w-full flex items-center gap-3 px-4 py-3 text-left"
       >
-        <span className={`w-7 h-7 rounded-lg bg-slate-800/60 flex items-center justify-center flex-shrink-0`}>
+        <span className={`w-7 h-7 rounded-lg bg-slate-100/60 dark:bg-slate-800/60 flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-4 h-4 ${cat.iconColor}`} />
         </span>
-        <span className="flex-1 text-sm font-bold text-white">{cat.label}</span>
-        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <span className="flex-1 text-sm font-bold text-slate-900 dark:text-white">{cat.label}</span>
+        <ChevronDown className={`w-4 h-4 text-slate-600 dark:text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {/* Question chips */}
@@ -438,14 +438,14 @@ function WelcomeState({ onPrompt }) {
         className="mb-4"
       >
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
-          <Sparkles className="w-8 h-8 text-white" />
+          <Sparkles className="w-8 h-8 text-slate-900 dark:text-white" />
         </div>
       </motion.div>
       <motion.h2
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-2xl font-bold text-white mb-1 text-center"
+        className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center"
       >
         How can I help you today?
       </motion.h2>
@@ -453,7 +453,7 @@ function WelcomeState({ onPrompt }) {
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="text-sm text-slate-400 mb-6 text-center max-w-sm"
+        className="text-sm text-slate-600 dark:text-slate-400 mb-6 text-center max-w-sm"
       >
         Ask me anything about your spending, income, budgets, or savings goals.
       </motion.p>
@@ -680,7 +680,7 @@ export default function ChatPage() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen pt-16 bg-slate-950 overflow-hidden">
+    <div className="flex h-screen pt-16 bg-slate-50 dark:bg-slate-950 overflow-hidden">
 
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <Sidebar
@@ -698,20 +698,20 @@ export default function ChatPage() {
       <main className="flex-1 flex flex-col min-w-0 h-full">
 
         {/* Chat header */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 sm:px-6 h-14 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/60 shadow-sm">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 sm:px-6 h-14 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/60 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+            className="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-200/50 dark:bg-slate-700/50 rounded-lg transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white truncate">
+              <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                 {activeSession?.sessionName || "Fincraft AI"}
               </p>
               <p className="text-[10px] text-emerald-400 font-semibold">● Online</p>
@@ -761,14 +761,14 @@ export default function ChatPage() {
         </div>
 
         {/* Input bar */}
-        <div className="flex-shrink-0 border-t border-slate-800/60 bg-slate-900/80 backdrop-blur-xl px-4 sm:px-6 py-4">
+        <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-900/80 backdrop-blur-xl px-4 sm:px-6 py-4">
           {!activeSession && (
             <p className="text-xs text-slate-500 text-center mb-3">
               Typing a message will automatically start a new conversation.
             </p>
           )}
-          <div className={`flex items-end gap-3 rounded-2xl border bg-slate-800 shadow-sm transition-all ${
-            sending ? "border-slate-700" : "border-slate-700 focus-within:border-emerald-500 focus-within:shadow-emerald-500/10 focus-within:shadow-md"
+          <div className={`flex items-end gap-3 rounded-2xl border bg-slate-100 dark:bg-slate-800 shadow-sm transition-all ${
+            sending ? "border-slate-300 dark:border-slate-700" : "border-slate-300 dark:border-slate-700 focus-within:border-emerald-500 focus-within:shadow-emerald-500/10 focus-within:shadow-md"
           }`}>
             <textarea
               ref={textareaRef}
@@ -778,7 +778,7 @@ export default function ChatPage() {
               disabled={sending}
               placeholder="Ask about your finances… (Enter to send, Shift+Enter for new line)"
               rows={1}
-              className="flex-1 resize-none bg-transparent px-4 py-3.5 text-sm text-slate-200 placeholder-slate-500 outline-none leading-relaxed max-h-40 disabled:opacity-60"
+              className="flex-1 resize-none bg-transparent px-4 py-3.5 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-500 outline-none leading-relaxed max-h-40 disabled:opacity-60"
             />
             <div className="flex items-center gap-2 pr-3 pb-3 flex-shrink-0">
               <button

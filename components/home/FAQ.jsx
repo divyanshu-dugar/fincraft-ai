@@ -56,7 +56,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -102,13 +102,13 @@ export default function FAQ() {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
             Frequently Asked{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
-          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-light">
+          <p className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 max-w-2xl mx-auto font-light">
             Learn more about how Fincraft AI becomes your personalized financial mentor and advisor.
           </p>
         </motion.div>
@@ -131,7 +131,7 @@ export default function FAQ() {
                 className="w-full relative group/button"
               >
                 <motion.div
-                  className="absolute -inset-1 bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-2xl rounded-2xl border border-cyan-400/20 group-hover/button:border-cyan-400/50 transition-all duration-300"
+                  className="absolute -inset-1 bg-gradient-to-br from-slate-100/30 dark:from-slate-800/30 to-white/30 dark:to-slate-900/30 backdrop-blur-2xl rounded-2xl border border-cyan-400/20 group-hover/button:border-cyan-400/50 transition-all duration-300"
                   whileHover={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.15)" }}
                 />
 
@@ -143,7 +143,7 @@ export default function FAQ() {
                     >
                       <MessageCircle className="w-5 h-5 text-cyan-400" />
                     </motion.div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white group-hover/button:text-cyan-300 transition-colors">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white group-hover/button:text-cyan-300 transition-colors">
                       {faq.question}
                     </h3>
                   </div>
@@ -174,7 +174,7 @@ export default function FAQ() {
                       transition={{ duration: 0.3, delay: 0.1 }}
                       className="relative px-8 pb-8 pt-4 border-t border-cyan-400/20"
                     >
-                      <p className="text-slate-300 leading-relaxed font-light text-lg">
+                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-light text-lg">
                         {faq.answer}
                       </p>
                     </motion.div>
@@ -199,8 +199,8 @@ export default function FAQ() {
           />
 
           <div className="relative p-12 text-center">
-            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to meet your financial mentor?</h3>
-            <p className="text-slate-300 mb-8 font-light">
+            <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-4">Ready to meet your financial mentor?</h3>
+            <p className="text-slate-700 dark:text-slate-300 mb-8 font-light">
               Start getting personalized financial guidance adapted to your unique situation. Our support team is here to help you get started.
             </p>
             <motion.button

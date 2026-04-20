@@ -31,15 +31,15 @@ export default function ConfirmDeleteModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', duration: 0.35 }}
-            className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 w-full max-w-sm p-6 shadow-2xl"
+            className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-300 dark:border-slate-700 w-full max-w-sm p-6 shadow-2xl"
           >
             <div className="flex items-start gap-4 mb-5">
               <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-6 h-6 text-rose-400" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">{title}</h3>
-                <p className="text-sm text-slate-400 mt-1">{message}</p>
+                <h3 className="font-bold text-slate-900 dark:text-white text-lg">{title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{message}</p>
               </div>
             </div>
 
@@ -48,7 +48,7 @@ export default function ConfirmDeleteModal({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-5 py-2.5 text-sm font-semibold text-slate-300 border border-slate-600 bg-slate-800 rounded-xl hover:bg-slate-700 disabled:opacity-50 transition-all"
+                className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:bg-slate-700 disabled:opacity-50 transition-all"
               >
                 Cancel
               </button>

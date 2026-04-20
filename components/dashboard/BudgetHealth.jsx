@@ -2,13 +2,13 @@ import { Target } from "lucide-react";
 
 export function BudgetHealth({ dashboardData }) {
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Budget Health
           </h2>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
             {dashboardData?.budgets?.total || 0} active budgets
           </p>
         </div>
@@ -46,10 +46,10 @@ export function BudgetHealth({ dashboardData }) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-700">
+          <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Budget Compliance</span>
-              <span className="font-semibold text-white">
+              <span className="text-slate-600 dark:text-slate-400">Budget Compliance</span>
+              <span className="font-semibold text-slate-900 dark:text-white">
                 {Math.round(
                   (dashboardData.budgets.onTrack /
                     dashboardData.budgets.total) *
@@ -58,7 +58,7 @@ export function BudgetHealth({ dashboardData }) {
                 %
               </span>
             </div>
-            <div className="w-full bg-slate-700 rounded-full h-2 mt-2">
+            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-2">
               <div
                 className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"
                 style={{
@@ -74,10 +74,10 @@ export function BudgetHealth({ dashboardData }) {
         </div>
       ) : (
         <div className="text-center py-8">
-          <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Target className="w-6 h-6 text-slate-500" />
           </div>
-          <p className="text-slate-400 mb-4">No active budgets</p>
+          <p className="text-slate-600 dark:text-slate-400 mb-4">No active budgets</p>
           <button className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium transition-colors">
             Create First Budget
           </button>

@@ -217,7 +217,7 @@ export default function GoalDetailPage() {
 
   if (error || !goal) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-red-400 font-medium">{error || "Goal not found"}</p>
           <Link href="/goal/list" className="text-purple-400 underline text-sm">Back to goals</Link>
@@ -264,23 +264,23 @@ export default function GoalDetailPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Back + Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Link
             href="/goal/list"
-            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors mb-6"
           >
             <ArrowLeft size={16} /> Back to Goals
           </Link>
 
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-extrabold text-white tracking-tight">{goal.name}</h1>
+              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{goal.name}</h1>
               {goal.description && (
-                <p className="text-slate-400 mt-1 max-w-xl">{goal.description}</p>
+                <p className="text-slate-600 dark:text-slate-400 mt-1 max-w-xl">{goal.description}</p>
               )}
             </div>
 
@@ -291,7 +291,7 @@ export default function GoalDetailPage() {
               </span>
               <Link
                 href="/goal/list"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 shadow-sm transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 shadow-sm transition-colors"
               >
                 <Edit3 size={14} /> Edit Goal
               </Link>
@@ -304,14 +304,14 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-slate-800/60 rounded-3xl shadow-xl border border-cyan-400/20 p-8"
+          className="bg-slate-100/60 dark:bg-slate-800/60 rounded-3xl shadow-xl border border-cyan-400/20 p-8"
         >
           <div className="flex flex-col sm:flex-row items-center gap-8">
             {/* Ring */}
             <div className="relative flex-shrink-0">
               <ProgressRing percent={percent} size={160} stroke={14} />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-extrabold text-white">{Math.round(percent)}%</span>
+              <span className="text-3xl font-extrabold text-slate-900 dark:text-white">{Math.round(percent)}%</span>
               <span className="text-xs text-slate-500 font-medium">complete</span>
               </div>
             </div>
@@ -348,7 +348,7 @@ export default function GoalDetailPage() {
 
           {/* Progress bar */}
           <div className="mt-6">
-            <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${percent}%` }}
@@ -447,14 +447,14 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className="bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
+          className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                 <PiggyBank size={18} className="text-emerald-400" />
               </div>
-              <h2 className="text-lg font-bold text-white">Log Contribution</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Log Contribution</h2>
             </div>
             {!isComplete && !showContribForm && (
               <button
@@ -478,9 +478,9 @@ export default function GoalDetailPage() {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Amount *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Amount *</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 font-medium">$</span>
                       <input
                         type="number"
                         min="0.01"
@@ -489,19 +489,19 @@ export default function GoalDetailPage() {
                         placeholder="0.00"
                         value={contribAmount}
                         onChange={(e) => setContribAmount(e.target.value)}
-                        className="w-full pl-8 pr-4 py-2.5 border border-slate-600 bg-slate-700/50 text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                        className="w-full pl-8 pr-4 py-2.5 border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Note (optional)</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Note (optional)</label>
                     <input
                       type="text"
                       placeholder="e.g. November savings"
                       value={contribNote}
                       onChange={(e) => setContribNote(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-slate-600 bg-slate-700/50 text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                      className="w-full px-4 py-2.5 border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 placeholder-slate-400 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
                     />
                   </div>
                 </div>
@@ -523,7 +523,7 @@ export default function GoalDetailPage() {
                             key={q.label}
                             type="button"
                             onClick={() => setContribAmount(q.value.toFixed(2))}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/50 text-slate-300 hover:bg-emerald-500/15 hover:text-emerald-400 transition-colors border border-slate-600"
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-emerald-500/15 hover:text-emerald-400 transition-colors border border-slate-600"
                           >
                             {q.label}: {formatCurrency(q.value)}
                           </button>
@@ -543,7 +543,7 @@ export default function GoalDetailPage() {
                   <button
                     type="button"
                     onClick={() => { setShowContribForm(false); setContribAmount(""); setContribNote(""); }}
-                    className="px-5 py-2.5 rounded-xl border border-slate-600 text-slate-400 font-medium text-sm hover:bg-slate-700 transition-colors"
+                    className="px-5 py-2.5 rounded-xl border border-slate-600 text-slate-600 dark:text-slate-400 font-medium text-sm hover:bg-slate-200 dark:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
@@ -562,7 +562,7 @@ export default function GoalDetailPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
+          className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl shadow-md border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -570,7 +570,7 @@ export default function GoalDetailPage() {
                 <Target size={18} className="text-blue-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Contribution History</h2>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Contribution History</h2>
                 <p className="text-xs text-slate-500">{goal.contributions?.length ?? 0} total entries</p>
               </div>
             </div>
@@ -585,7 +585,7 @@ export default function GoalDetailPage() {
           ) : (
             <div className="space-y-1">
               {/* Running total header */}
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wide pb-2 border-b border-slate-700">
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wide pb-2 border-b border-slate-300 dark:border-slate-700">
                 <span>Contribution</span>
                 <span>Amount</span>
               </div>
@@ -604,22 +604,22 @@ export default function GoalDetailPage() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8 }}
                       transition={{ duration: 0.2, delay: idx * 0.04 }}
-                      className="group flex items-center gap-4 py-3 px-3 rounded-xl hover:bg-slate-700/40 transition-colors"
+                      className="group flex items-center gap-4 py-3 px-3 rounded-xl hover:bg-slate-200/40 dark:bg-slate-700/40 transition-colors"
                     >
                       {/* Timeline dot */}
                       <div className="relative flex-shrink-0">
                         <div className="w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-slate-800 ring-offset-1 ring-offset-slate-800" />
                         {idx < displayedContribs.length - 1 && (
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-6 bg-slate-700" />
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-6 bg-slate-200 dark:bg-slate-700" />
                         )}
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2">
-                            <span className="font-semibold text-slate-200">{formatCurrency(c.amount)}</span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-200">{formatCurrency(c.amount)}</span>
                             {c.note && (
-                              <span className="text-sm text-slate-400 truncate">{c.note}</span>
+                              <span className="text-sm text-slate-600 dark:text-slate-400 truncate">{c.note}</span>
                             )}
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">{formatRelative(c.date)} · {new Date(c.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
@@ -627,7 +627,7 @@ export default function GoalDetailPage() {
 
                         {/* Running total */}
                         <div className="hidden sm:block text-xs text-slate-500 text-right min-w-[80px]">
-                          <p className="font-medium text-slate-300">{formatCurrency(runningTotal)}</p>
+                          <p className="font-medium text-slate-700 dark:text-slate-300">{formatCurrency(runningTotal)}</p>
                           <p>total at this point</p>
                         </div>
 
@@ -642,7 +642,7 @@ export default function GoalDetailPage() {
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(null)}
-                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-600 transition-colors"
                           >
                             No
                           </button>
@@ -663,7 +663,7 @@ export default function GoalDetailPage() {
               {sortedContribs.length > 5 && (
                 <button
                   onClick={() => setShowAllHistory(!showAllHistory)}
-                  className="w-full mt-2 py-2 text-sm text-slate-400 hover:text-slate-200 font-medium flex items-center justify-center gap-1 transition-colors"
+                  className="w-full mt-2 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 font-medium flex items-center justify-center gap-1 transition-colors"
                 >
                   {showAllHistory ? (
                     <><ChevronUp size={16} /> Show less</>

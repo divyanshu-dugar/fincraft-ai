@@ -12,7 +12,7 @@ export default function GoalsHeader({ onNewGoal }) {
       className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-600 p-[1px] shadow-xl mb-10"
     >
       {/* Glassmorphism inner container */}
-      <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-3xl px-8 py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div className="relative bg-white dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl px-8 py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
         {/* Left Section */}
         <div className="flex items-center space-x-5">
           <motion.div
@@ -21,14 +21,14 @@ export default function GoalsHeader({ onNewGoal }) {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl ring-4 ring-white/10"
           >
-            <PiggyBank size={36} className="text-white" />
+            <PiggyBank size={36} className="text-slate-900 dark:text-white" />
           </motion.div>
 
           <div>
             <h1 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-white via-purple-300 to-pink-400 bg-clip-text text-transparent tracking-tight leading-snug">
               Your Savings Goals
             </h1>
-            <p className="text-slate-400 text-lg mt-2 max-w-xl">
+            <p className="text-slate-600 dark:text-slate-400 text-lg mt-2 max-w-xl">
               Stay on top of your progress, visualize your achievements, and make every dollar count.
             </p>
           </div>
@@ -41,7 +41,7 @@ export default function GoalsHeader({ onNewGoal }) {
           whileTap={{ scale: 0.97 }}
           className="mt-8 lg:mt-0 flex items-center space-x-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 text-white font-semibold shadow-lg hover:shadow-2xl transition-all duration-300"
         >
-          <Plus size={22} className="text-white" />
+          <Plus size={22} className="text-slate-900 dark:text-white" />
           <span>Create New Goal</span>
         </motion.button>
 

@@ -66,7 +66,7 @@ export default function Demo() {
   };
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-36 sm:py-48 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-36 sm:py-48 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -114,13 +114,13 @@ export default function Demo() {
             </span>
           </motion.div>
 
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
             Beautiful Interface,{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
               Powerful Features
             </span>
           </h2>
-          <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto font-light">
+          <p className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-light">
             Experience the future of personal finance with our stunning, intuitive dashboard.
           </p>
         </motion.div>
@@ -150,7 +150,7 @@ export default function Demo() {
                   className={`flex items-center gap-3 px-6 py-3 rounded-lg font-bold transition-all ${
                     activeDevice === device.id
                       ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30"
-                      : "bg-slate-800/50 text-slate-300 border border-cyan-400/20 hover:border-cyan-400/60"
+                      : "bg-slate-100/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border border-cyan-400/20 hover:border-cyan-400/60"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -169,7 +169,7 @@ export default function Demo() {
             className="relative group"
           >
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/60 transition-all"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/60 transition-all"
               whileHover={{ boxShadow: "0 0 50px rgba(6, 182, 212, 0.2)" }}
             />
 
@@ -195,9 +195,9 @@ export default function Demo() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 opacity-60" />
-                        <p className="font-bold text-white/60 text-sm">Dashboard</p>
+                        <p className="font-bold text-slate-900 dark:text-white/60 text-sm">Dashboard</p>
                       </div>
-                      <p className="text-white/40 text-xs">Welcome back to Fincraft</p>
+                      <p className="text-slate-900 dark:text-white/40 text-xs">Welcome back to Fincraft</p>
                     </motion.div>
 
                     {/* Stats Grid */}
@@ -220,8 +220,8 @@ export default function Demo() {
                           transition={{ delay: 0.6 + idx * 0.1 }}
                           className="bg-white/5 backdrop-blur rounded-lg p-3 border border-white/10"
                         >
-                          <p className="text-white/40 text-xs font-light mb-1">{stat.label}</p>
-                          <p className="text-white/80 font-bold text-sm">{stat.value}</p>
+                          <p className="text-slate-900 dark:text-white/40 text-xs font-light mb-1">{stat.label}</p>
+                          <p className="text-slate-900 dark:text-white/80 font-bold text-sm">{stat.value}</p>
                         </motion.div>
                       ))}
                     </motion.div>
@@ -233,7 +233,7 @@ export default function Demo() {
                     whileTap={{ scale: 0.9 }}
                     className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-xl shadow-cyan-500/40 hover:shadow-cyan-500/60 transition-all z-10"
                   >
-                    <Play className="w-7 h-7 text-white fill-white ml-1" />
+                    <Play className="w-7 h-7 text-slate-900 dark:text-white fill-white ml-1" />
                   </motion.button>
                 </div>
               </motion.div>
@@ -245,10 +245,10 @@ export default function Demo() {
                 transition={{ delay: 0.4 }}
                 className="mt-8"
               >
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {screenshots[activeDevice].title}
                 </h3>
-                <p className="text-slate-300 font-light">
+                <p className="text-slate-700 dark:text-slate-300 font-light">
                   {screenshots[activeDevice].description}
                 </p>
               </motion.div>
@@ -272,7 +272,7 @@ export default function Demo() {
               whileHover={{ y: -6 }}
             >
               <motion.div
-                className="absolute -inset-1 bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all"
+                className="absolute -inset-1 bg-gradient-to-br from-slate-100/30 dark:from-slate-800/30 to-white/30 dark:to-slate-900/30 backdrop-blur-xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all"
                 whileHover={{ boxShadow: "0 0 25px rgba(6, 182, 212, 0.15)" }}
               />
 
@@ -287,11 +287,11 @@ export default function Demo() {
                   <ChevronRight className="w-6 h-6 text-cyan-400" />
                 </motion.div>
 
-                <h4 className="text-lg font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3 group-hover:text-cyan-300 transition-colors">
                   {feature.title}
                 </h4>
 
-                <p className="text-slate-300 font-light text-sm leading-relaxed group-hover:text-slate-200 transition-colors">
+                <p className="text-slate-700 dark:text-slate-300 font-light text-sm leading-relaxed group-hover:text-slate-800 dark:text-slate-200 transition-colors">
                   {feature.description}
                 </p>
               </div>
@@ -307,7 +307,7 @@ export default function Demo() {
           transition={{ delay: 0.5, duration: 0.9 }}
           className="text-center"
         >
-          <p className="text-slate-300 text-lg mb-8 font-light">
+          <p className="text-slate-700 dark:text-slate-300 text-lg mb-8 font-light">
             Ready to see Fincraft in action?
           </p>
           <motion.button

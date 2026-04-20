@@ -47,7 +47,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen flex items-center">
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 min-h-screen flex items-center">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -98,7 +98,7 @@ export default function HeroSection() {
             {/* Heading */}
             <motion.h1
               variants={itemVariants}
-              className="text-6xl sm:text-7xl md:text-7xl font-bold text-white mb-8 leading-tight"
+              className="text-6xl sm:text-7xl md:text-7xl font-bold text-slate-900 dark:text-white mb-8 leading-tight"
             >
               Fincraft{" "}
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
@@ -109,7 +109,7 @@ export default function HeroSection() {
             {/* Subtitle */}
             <motion.p
               variants={itemVariants}
-              className="text-lg sm:text-xl text-slate-300 mb-10 max-w-xl leading-relaxed"
+              className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 mb-10 max-w-xl leading-relaxed"
             >
               Your personal finance coach. A complete financial ecosystem designed for modern wealth management.
             </motion.p>
@@ -121,7 +121,7 @@ export default function HeroSection() {
             >
               <Link
                 href="/dashboard"
-                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-white font-bold rounded-xl overflow-hidden"
+                className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-slate-900 dark:text-white font-bold rounded-xl overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl" />
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -141,16 +141,16 @@ export default function HeroSection() {
             {/* Stats */}
             <motion.div variants={itemVariants} className="flex gap-8 text-sm">
               <div className="border-l border-cyan-400/50 pl-4">
-                <div className="text-2xl font-bold text-white">100%</div>
-                <div className="text-slate-400">Secure & Private</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">100%</div>
+                <div className="text-slate-600 dark:text-slate-400">Secure & Private</div>
               </div>
               <div className="border-l border-cyan-400/50 pl-4">
-                <div className="text-2xl font-bold text-white">Real-time</div>
-                <div className="text-slate-400">Tracking</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">Real-time</div>
+                <div className="text-slate-600 dark:text-slate-400">Tracking</div>
               </div>
               <div className="border-l border-cyan-400/50 pl-4">
-                <div className="text-2xl font-bold text-white">AI</div>
-                <div className="text-slate-400">Insights</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">AI</div>
+                <div className="text-slate-600 dark:text-slate-400">Insights</div>
               </div>
             </motion.div>
           </motion.div>
@@ -167,19 +167,19 @@ export default function HeroSection() {
               variants={floatingVariants}
               initial="initial"
               animate="animate"
-              className="absolute top-0 right-0 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-cyan-400/20 shadow-2xl shadow-cyan-500/10"
+              className="absolute top-0 right-0 w-64 bg-gradient-to-br from-slate-100/80 dark:from-slate-800/80 to-white/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-cyan-400/20 shadow-2xl shadow-cyan-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-white" />
+                  <BarChart3 className="w-6 h-6 text-slate-900 dark:text-white" />
                 </div>
-                <span className="text-sm font-semibold text-slate-300">Expenses</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Expenses</span>
               </div>
               <div className="mb-2">
-                <div className="text-3xl font-bold text-white">$2,450</div>
-                <div className="text-sm text-slate-400">This month</div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">$2,450</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">This month</div>
               </div>
-              <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div className="h-full w-2/3 bg-gradient-to-r from-cyan-500 to-blue-600" />
               </div>
             </motion.div>
@@ -190,17 +190,17 @@ export default function HeroSection() {
               initial="initial"
               animate="animate"
               style={{ animationDelay: "0.5s" }}
-              className="absolute bottom-10 left-0 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-emerald-400/20 shadow-2xl shadow-emerald-500/10"
+              className="absolute bottom-10 left-0 w-64 bg-gradient-to-br from-slate-100/80 dark:from-slate-800/80 to-white/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-emerald-400/20 shadow-2xl shadow-emerald-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
+                  <TrendingUp className="w-6 h-6 text-slate-900 dark:text-white" />
                 </div>
-                <span className="text-sm font-semibold text-slate-300">Income</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Income</span>
               </div>
               <div className="mb-2">
-                <div className="text-3xl font-bold text-white">$5,200</div>
-                <div className="text-sm text-slate-400">This month</div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">$5,200</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">This month</div>
               </div>
               <div className="text-xs text-emerald-400 font-semibold">↑ 12% from last month</div>
             </motion.div>
@@ -211,19 +211,19 @@ export default function HeroSection() {
               initial="initial"
               animate="animate"
               style={{ animationDelay: "1s" }}
-              className="absolute top-1/2 right-1/4 w-64 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/20 shadow-2xl shadow-purple-500/10"
+              className="absolute top-1/2 right-1/4 w-64 bg-gradient-to-br from-slate-100/80 dark:from-slate-800/80 to-white/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-purple-400/20 shadow-2xl shadow-purple-500/10"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                  <PieChart className="w-6 h-6 text-white" />
+                  <PieChart className="w-6 h-6 text-slate-900 dark:text-white" />
                 </div>
-                <span className="text-sm font-semibold text-slate-300">Goals Progress</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Goals Progress</span>
               </div>
               <div className="mb-3">
-                <div className="text-2xl font-bold text-white">$8,500</div>
-                <div className="text-sm text-slate-400">of $15,000 saved</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white">$8,500</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">of $15,000 saved</div>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div className="h-full w-1/2 bg-gradient-to-r from-purple-500 to-pink-600" />
               </div>
             </motion.div>

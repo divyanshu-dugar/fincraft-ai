@@ -32,18 +32,18 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
   );
 
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-white">Monthly Breakdown</h2>
-          <p className="text-slate-400 text-sm">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Monthly Breakdown</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
             Income vs Expenses — month on month
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-700/50 hover:bg-slate-200 dark:bg-slate-700 rounded-lg transition-colors"
           >
             {collapsed ? (
               <>
@@ -56,7 +56,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
             )}
           </button>
           <select
-            className="px-2 py-1 text-xs rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 focus:outline-none"
+            className="px-2 py-1 text-xs rounded-lg bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border border-slate-600 focus:outline-none"
             value={monthsToShow}
             onChange={e => {
               const val = e.target.value;
@@ -85,7 +85,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
                 setCustomMonths(val);
                 setMonthsToShow(val);
               }}
-              className="w-16 px-2 py-1 text-xs rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 focus:outline-none"
+              className="w-16 px-2 py-1 text-xs rounded-lg bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border border-slate-600 focus:outline-none"
               placeholder="N months"
             />
           ) : null}
@@ -112,17 +112,17 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
 
       {rows.length === 0 ? (
         <div className="text-center py-10">
-          <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <CalendarRange className="w-6 h-6 text-slate-500" />
           </div>
-          <p className="text-white font-semibold text-sm mb-1">No monthly data yet</p>
+          <p className="text-slate-900 dark:text-white font-semibold text-sm mb-1">No monthly data yet</p>
           <p className="text-slate-500 text-xs max-w-xs mx-auto">Add expenses or income to see your month-by-month financial breakdown.</p>
         </div>
       ) : !collapsed && (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
+              <tr className="border-b border-slate-300 dark:border-slate-700">
                 <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Month
                 </th>
@@ -141,11 +141,11 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
               {rows.map((row, i) => (
                 <tr
                   key={row.month}
-                  className={`border-b border-slate-700/50 ${
-                    i % 2 === 0 ? "bg-slate-700/20" : ""
-                  } hover:bg-slate-700/40 transition-colors`}
+                  className={`border-b border-slate-300/50 dark:border-slate-700/50 ${
+                    i % 2 === 0 ? "bg-slate-200/20 dark:bg-slate-700/20" : ""
+                  } hover:bg-slate-200/40 dark:bg-slate-700/40 transition-colors`}
                 >
-                  <td className="py-3 px-4 text-sm font-medium text-slate-200">
+                  <td className="py-3 px-4 text-sm font-medium text-slate-800 dark:text-slate-200">
                     {formatMonth(row.month)}
                   </td>
                   <td className="py-3 px-4 text-sm text-right font-medium text-emerald-400">
@@ -161,7 +161,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
                           ? "text-emerald-400"
                           : row.variance < 0
                           ? "text-rose-400"
-                          : "text-slate-400"
+                          : "text-slate-600 dark:text-slate-400"
                       }`}
                     >
                       {row.variance > 0 ? (
@@ -180,7 +180,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-slate-600">
-                <td className="py-3 px-4 text-sm font-bold text-white">
+                <td className="py-3 px-4 text-sm font-bold text-slate-900 dark:text-white">
                   Total
                 </td>
                 <td className="py-3 px-4 text-sm text-right font-bold text-emerald-400">
@@ -196,7 +196,7 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
                         ? "text-emerald-400"
                         : totals.variance < 0
                         ? "text-rose-400"
-                        : "text-slate-400"
+                        : "text-slate-600 dark:text-slate-400"
                     }`}
                   >
                     {totals.variance > 0 ? (

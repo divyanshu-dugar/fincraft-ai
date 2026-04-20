@@ -12,7 +12,7 @@ export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
   ];
 
   return (
-    <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 shadow-sm rounded-2xl p-6 mb-10 transition-all duration-300 hover:shadow-lg">
+    <div className="relative bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 shadow-sm rounded-2xl p-6 mb-10 transition-all duration-300 hover:shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -20,8 +20,8 @@ export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
           Budget Filters
         </h2>
 
-        <div className="text-sm text-slate-400">
-          Showing <span className="font-semibold text-slate-200">{budgetsCount}</span> budgets
+        <div className="text-sm text-slate-600 dark:text-slate-400">
+          Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{budgetsCount}</span> budgets
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
               className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 border flex items-center gap-2 ${
                 filter === filterOption.value
                   ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40 shadow-sm"
-                  : "bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-700"
+                  : "bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border-slate-600 hover:bg-slate-200 dark:bg-slate-700"
               }`}
             >
               {Icon && <Icon size={16} />}
@@ -47,7 +47,7 @@ export default function BudgetFilters({ filter, setFilter, budgetsCount }) {
       </div>
 
       {/* Filter Descriptions */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-slate-400">
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-slate-500"></div>
           <span>All: All budgets created</span>

@@ -96,14 +96,14 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
   const unmatched = !row.category;
 
   return (
-    <div className={`rounded-2xl border ${unmatched ? "border-amber-500/30 bg-amber-500/10" : "border-slate-700 bg-slate-800/60"} overflow-hidden`}>
+    <div className={`rounded-2xl border ${unmatched ? "border-amber-500/30 bg-amber-500/10" : "border-slate-300 dark:border-slate-700 bg-slate-100/60 dark:bg-slate-800/60"} overflow-hidden`}>
       {/* card header */}
       <button
         type="button"
         onClick={() => setOpen(p => !p)}
         className="w-full flex items-center gap-3 px-5 py-4 text-left"
       >
-        <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 flex-shrink-0">
+        <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400 flex-shrink-0">
           {index + 1}
         </span>
 
@@ -111,13 +111,13 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
         <div className="flex-1 min-w-0">
           {row.category ? (
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-sm font-semibold text-slate-300 truncate">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate">
                 {row.category.parentIcon} {row.category.parentName}
               </span>
               {row.category.subcategoryName && (
                 <>
                   <span className="text-gray-300">›</span>
-                  <span className="text-sm font-bold text-white truncate">
+                  <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
                     {row.category.subcategoryIcon} {row.category.subcategoryName}
                   </span>
                 </>
@@ -131,7 +131,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
               </span>
             </div>
           )}
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             {row.date || "No date"} · ${row.amount || "0"}
           </p>
         </div>
@@ -144,7 +144,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
 
       {/* editable fields */}
       {open && (
-        <div className="px-5 pb-5 space-y-4 border-t border-slate-700 pt-4">
+        <div className="px-5 pb-5 space-y-4 border-t border-slate-300 dark:border-slate-700 pt-4">
           {/* ai suggestion hint */}
           {row.aiCategory && !row.category && (
             <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/30 px-4 py-3 text-xs">
@@ -164,7 +164,7 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
 
           {/* category picker */}
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Category <span className="text-rose-400">*</span></p>
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Category <span className="text-rose-400">*</span></p>
             <CategoryPicker
               tree={categoryTree}
               value={row.category}
@@ -178,17 +178,17 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
           <div className="grid grid-cols-2 gap-3">
             {/* date */}
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Date</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Date</p>
               <input
                 type="date"
                 value={row.date}
                 onChange={(e) => onChange(row._id, "date", e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-sm font-medium text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
             {/* amount */}
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Amount ($)</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Amount ($)</p>
               <input
                 type="number"
                 inputMode="decimal"
@@ -196,20 +196,20 @@ function EditableRowCard({ row, index, onChange, onDelete, categoryTree, onAddCa
                 min="0"
                 onWheel={(e) => e.currentTarget.blur()}
                 onChange={(e) => onChange(row._id, "amount", e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
           </div>
 
           {/* note */}
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Note</p>
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Note</p>
             <input
               type="text"
               value={row.note}
               onChange={(e) => onChange(row._id, "note", e.target.value)}
               placeholder="Optional note…"
-              className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+              className="w-full px-3 py-2 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
             />
           </div>
 
@@ -235,12 +235,12 @@ function CsvCategoryResolver({ names, mappings, onChange, categoryTree, onAddCat
       {names.map((name) => {
         const cat = mappings[name];
         return (
-          <div key={name} className={`rounded-2xl border p-4 ${cat ? "border-slate-700 bg-slate-800/60" : "border-amber-500/30 bg-amber-500/10"}`}>
+          <div key={name} className={`rounded-2xl border p-4 ${cat ? "border-slate-300 dark:border-slate-700 bg-slate-100/60 dark:bg-slate-800/60" : "border-amber-500/30 bg-amber-500/10"}`}>
             <div className="flex items-center gap-3 mb-3">
               {cat
                 ? <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                 : <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />}
-              <span className="text-sm font-bold text-slate-300">"{name}"</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">"{name}"</span>
               {cat ? (
                 <span className="ml-auto text-xs text-emerald-400 font-semibold">
                   → {cat.parentName}{cat.subcategoryName ? ` › ${cat.subcategoryName}` : ""}
@@ -567,24 +567,24 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 w-full max-w-2xl flex flex-col max-h-[92vh]"
+        className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-300 dark:border-slate-700 w-full max-w-2xl flex flex-col max-h-[92vh]"
       >
         {/* header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-300 dark:border-slate-700 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-white">{stepTitle}</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">{stepTitle}</h2>
             {step > 1 && step < 5 && (
-              <p className="text-xs text-slate-400 mt-0.5">Step {step} of 4</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Step {step} of 4</p>
             )}
           </div>
-          <button onClick={handleClose} className="p-2 rounded-xl hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-200">
+          <button onClick={handleClose} className="p-2 rounded-xl hover:bg-slate-200 dark:bg-slate-700 transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* step progress bar */}
         {step < 5 && (
-          <div className="h-0.5 bg-slate-700">
+          <div className="h-0.5 bg-slate-200 dark:bg-slate-700">
             <div className="h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
               style={{ width: `${((step - 1) / 3) * 100}%` }} />
           </div>
@@ -595,7 +595,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {/* ── Step 1: Choose upload type ────────────────────────────── */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-slate-400 mb-6">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
                 Import from a spreadsheet or extract expenses from a wallet/bank screenshot using AI.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -603,13 +603,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-slate-700 rounded-2xl p-6 text-left hover:border-blue-400/60 hover:bg-blue-500/10 transition-all group"
+                  className="border-2 border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-left hover:border-blue-400/60 hover:bg-blue-500/10 transition-all group"
                 >
                   <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-colors">
                     <FileText className="w-6 h-6 text-blue-400" />
                   </div>
-                  <h4 className="font-bold text-white mb-1">Upload CSV / Excel</h4>
-                  <p className="text-xs text-slate-400">Import from a spreadsheet file (.csv, .xlsx)</p>
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">Upload CSV / Excel</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Import from a spreadsheet file (.csv, .xlsx)</p>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -628,13 +628,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                     inp.onchange = (e) => handleFileSelect(e.target.files[0], "image");
                     inp.click();
                   }}
-                  className="border-2 border-slate-700 rounded-2xl p-6 text-left hover:border-emerald-400/60 hover:bg-emerald-500/10 transition-all group"
+                  className="border-2 border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-left hover:border-emerald-400/60 hover:bg-emerald-500/10 transition-all group"
                 >
                   <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/30 transition-colors">
                     <Upload className="w-6 h-6 text-emerald-400" />
                   </div>
-                  <h4 className="font-bold text-white mb-1">Scan Screenshot</h4>
-                  <p className="text-xs text-slate-400">AI extracts expenses from wallet or bank screenshots</p>
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">Scan Screenshot</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">AI extracts expenses from wallet or bank screenshots</p>
                 </button>
               </div>
 
@@ -650,11 +650,11 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           {/* ── Step 2: CSV column mapping ────────────────────────────── */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-slate-400 mb-5">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
                 Match your CSV columns to the expense fields. We auto-detected the best matches.
               </p>
               {importData.length > 10 && (
-                <p className="text-xs text-slate-400 mb-4">{importData.length} rows detected in file.</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">{importData.length} rows detected in file.</p>
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -664,13 +664,13 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                   { key: "note",     label: "Note",     req: false },
                 ].map(({ key, label, req }) => (
                   <div key={key}>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block mb-2">
                       {label} {req && <span className="text-rose-400">*</span>}
                     </label>
                     <select
                       value={mapping[key]}
                       onChange={(e) => setMapping((p) => ({ ...p, [key]: e.target.value }))}
-                      className="w-full border border-slate-600 bg-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                      className="w-full border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
                     >
                       <option value="">Select column…</option>
                       {csvHeaders.map((h) => <option key={h} value={h}>{h}</option>)}
@@ -690,11 +690,11 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                   ? <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
                   : <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />}
                 <div>
-                  <p className="text-sm font-bold text-white">
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">
                     {editableRows.length} expense{editableRows.length !== 1 ? "s" : ""} extracted
                     {unmatchedRowCount > 0 && ` · ${unmatchedRowCount} need a category`}
                   </p>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                     Review each expense below. Click a row to expand and edit.
                   </p>
                 </div>
@@ -713,7 +713,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
               ))}
 
               {editableRows.length === 0 && (
-                <div className="text-center py-12 text-slate-400">
+                <div className="text-center py-12 text-slate-600 dark:text-slate-400">
                   <p className="font-semibold">All rows deleted.</p>
                   <button onClick={() => setStep(1)} className="mt-2 text-sm text-blue-400 hover:underline">Start over</button>
                 </div>
@@ -723,8 +723,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
           {step === 3 && uploadType === "csv" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="text-sm text-slate-400 mb-5">
-                We found <strong className="text-white">{csvUniqNames.length}</strong> unique category name{csvUniqNames.length !== 1 ? "s" : ""} in your CSV.
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
+                We found <strong className="text-slate-900 dark:text-white">{csvUniqNames.length}</strong> unique category name{csvUniqNames.length !== 1 ? "s" : ""} in your CSV.
                 Map each to a category in your hierarchy — this mapping is applied to all matching rows.
               </p>
               {unmatchedCatCount > 0 && (
@@ -779,8 +779,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                   <div className="w-16 h-16 mx-auto mb-5 bg-emerald-500/20 rounded-2xl flex items-center justify-center">
                     <CheckCircle className="w-8 h-8 text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-1">Import complete!</h3>
-                  <p className="text-sm text-slate-400 mb-5">Closing automatically…</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Import complete!</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">Closing automatically…</p>
                   <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-left">
                     <p className="text-emerald-400 font-bold text-sm mb-1">
                       ✅ {importResults.importedCount} expense{importResults.importedCount !== 1 ? "s" : ""} saved
@@ -800,8 +800,8 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
                   <div className="w-16 h-16 mx-auto mb-5 bg-rose-500/20 rounded-2xl flex items-center justify-center">
                     <AlertCircle className="w-8 h-8 text-rose-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-1">No expenses imported</h3>
-                  <p className="text-sm text-slate-400 mb-5">Please check the issues below and try again.</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">No expenses imported</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">Please check the issues below and try again.</p>
                   {importResults.errors?.length > 0 && (
                     <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-left text-xs text-rose-400 space-y-1 max-h-40 overflow-y-auto">
                       {importResults.errors.map((e, i) => <p key={i}>• {e}</p>)}
@@ -818,12 +818,12 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
 
         {/* footer navigation */}
         {step < 5 && (
-          <div className="flex items-center justify-between gap-3 px-6 py-5 border-t border-slate-700 flex-shrink-0">
+          <div className="flex items-center justify-between gap-3 px-6 py-5 border-t border-slate-300 dark:border-slate-700 flex-shrink-0">
             {step > 1 ? (
               <button
                 onClick={() => setStep((p) => p - 1)}
                 disabled={loading}
-                className="px-5 py-2.5 text-sm font-bold text-slate-400 border border-slate-600 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all disabled:opacity-40"
+                className="px-5 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-400 border border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:bg-slate-700 transition-all disabled:opacity-40"
               >
                 Back
               </button>

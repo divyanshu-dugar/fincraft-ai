@@ -287,27 +287,27 @@ export default function EditBudget() {
   // ── render ────────────────────────────────────────────────────────────────
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
 
       {/* sticky header */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          <div className="h-5 w-px bg-slate-700" />
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Target className="w-4 h-4 text-white" />
+              <Target className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-none">Edit Budget</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5 truncate max-w-48">{budget?.name ?? '…'}</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Edit Budget</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5 truncate max-w-48">{budget?.name ?? '…'}</p>
             </div>
           </div>
         </div>
@@ -318,18 +318,18 @@ export default function EditBudget() {
 
           {/* ── status preview card ─────────────────────────────────────── */}
           {budget && (
-            <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-5">
+            <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-5">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-4 h-4 text-indigo-400" />
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Current Progress</p>
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Current Progress</p>
               </div>
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-semibold text-slate-300">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">
                   {fmt(spent)} <span className="text-slate-500 font-normal">spent</span>
                 </span>
-                <span className="font-black text-white">{Math.round(pct)}%</span>
+                <span className="font-black text-slate-900 dark:text-white">{Math.round(pct)}%</span>
               </div>
-              <div className="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden mb-2">
+              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden mb-2">
                 <div
                   className={`h-2.5 rounded-full transition-all duration-500 ${barClass}`}
                   style={{ width: `${Math.min(pct, 100)}%` }}
@@ -337,7 +337,7 @@ export default function EditBudget() {
               </div>
               <div className="flex items-center justify-between text-xs text-slate-500">
                 <span>{fmt(0)}</span>
-                <span className="font-semibold text-slate-400">
+                <span className="font-semibold text-slate-600 dark:text-slate-400">
                   {pct > 100
                     ? `Over by ${fmt(spent - (budget.amount ?? 0))}`
                     : `${fmt((budget.amount ?? 0) - spent)} remaining`}
@@ -348,12 +348,12 @@ export default function EditBudget() {
           )}
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-6">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm p-6">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
               Budget Amount <span className="text-rose-400">*</span>
             </label>
 
-            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
+            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-300 dark:border-slate-700 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
               <span className="text-4xl font-black text-slate-600 select-none">$</span>
               <input
                 type="number"
@@ -364,7 +364,7 @@ export default function EditBudget() {
                 placeholder="0"
                 min="0.01"
                 step="0.01"
-                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-400' : 'text-white'}`}
+                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-400' : 'text-slate-900 dark:text-white'}`}
                 style={{ minWidth: 0 }}
               />
               {isAmountSet && (
@@ -377,7 +377,7 @@ export default function EditBudget() {
             {errors.amount && <p className="text-xs text-rose-400 font-semibold -mt-3 mb-4">{errors.amount}</p>}
 
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick amounts</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Quick amounts</p>
               <div className="flex flex-wrap gap-2">
                 {quickAmounts.map((v) => (
                   <button
@@ -387,7 +387,7 @@ export default function EditBudget() {
                     className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-150 ${
                       Number(amount) === v
                         ? 'bg-slate-200 text-slate-900 border-slate-200 shadow-md'
-                        : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500 hover:bg-slate-700'
+                        : 'bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border-slate-600 hover:border-slate-500 hover:bg-slate-200 dark:bg-slate-700'
                     }`}
                   >
                     ${v.toLocaleString('en-US')}
@@ -398,11 +398,11 @@ export default function EditBudget() {
           </div>
 
           {/* ── details card ─────────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm divide-y divide-slate-700">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm divide-y divide-slate-700">
 
             {/* budget name */}
             <div className="px-6 py-5">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 Budget Name <span className="text-rose-400">*</span>
               </label>
               <input
@@ -410,14 +410,14 @@ export default function EditBudget() {
                 value={name}
                 onChange={(e) => { setName(e.target.value); clearErr('name'); }}
                 placeholder="e.g. Groceries, Entertainment…"
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all ${errors.name ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 placeholder-rose-400/50' : 'border-slate-600 bg-slate-700/50 text-slate-200 placeholder-slate-500 hover:bg-slate-700 focus:bg-slate-700'}`}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all ${errors.name ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 placeholder-rose-400/50' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 placeholder-slate-500 hover:bg-slate-200 dark:bg-slate-700 focus:bg-slate-200 dark:bg-slate-700'}`}
               />
               {errors.name && <p className="text-xs text-rose-400 font-semibold mt-1.5">{errors.name}</p>}
             </div>
 
             {/* category */}
             <div className="px-6 py-5">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
                 Category <span className="text-rose-400">*</span>
               </label>
@@ -434,7 +434,7 @@ export default function EditBudget() {
 
             {/* period selector */}
             <div className="px-6 py-5">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 Budget Period
               </label>
               <div className="grid grid-cols-3 gap-3">
@@ -446,10 +446,10 @@ export default function EditBudget() {
                     className={`px-3 py-3 rounded-xl border text-left transition-all ${
                       period === opt.value
                         ? 'border-indigo-400 bg-indigo-500/15 shadow-sm'
-                        : 'border-slate-600 hover:border-slate-500 hover:bg-slate-700/50'
+                        : 'border-slate-600 hover:border-slate-500 hover:bg-slate-200/50 dark:bg-slate-700/50'
                     }`}
                   >
-                    <p className={`text-sm font-bold leading-none ${period === opt.value ? 'text-indigo-300' : 'text-slate-300'}`}>
+                    <p className={`text-sm font-bold leading-none ${period === opt.value ? 'text-indigo-300' : 'text-slate-700 dark:text-slate-300'}`}>
                       {opt.label}
                     </p>
                     <p className={`text-xs mt-1 ${period === opt.value ? 'text-indigo-400' : 'text-slate-500'}`}>
@@ -462,7 +462,7 @@ export default function EditBudget() {
 
             {/* reference date + auto-calculated range */}
             <div className="px-6 py-5">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <CalendarDays className="w-3.5 h-3.5" />
                 Reference Date <span className="text-rose-400">*</span>
               </label>
@@ -470,7 +470,7 @@ export default function EditBudget() {
                 type="date"
                 value={refDate}
                 onChange={(e) => { setRefDate(e.target.value); setDateUserEdited(true); clearErr('refDate'); }}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all [color-scheme:dark] ${errors.refDate ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 'border-slate-600 bg-slate-700/50 text-slate-200 hover:bg-slate-700 focus:bg-slate-700'}`}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all [color-scheme:dark] ${errors.refDate ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:bg-slate-700 focus:bg-slate-200 dark:bg-slate-700'}`}
               />
               {errors.refDate && <p className="text-xs text-rose-400 font-semibold mt-1.5">{errors.refDate}</p>}
 
@@ -490,16 +490,16 @@ export default function EditBudget() {
           </div>
 
           {/* ── alert settings card ───────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm divide-y divide-slate-700">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm divide-y divide-slate-700">
 
             <div className="px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${notifications ? 'bg-indigo-500/20' : 'bg-slate-700'}`}>
-                  {notifications ? <Bell className="w-4 h-4 text-indigo-400" /> : <BellOff className="w-4 h-4 text-slate-400" />}
+                <div className={`p-2 rounded-xl ${notifications ? 'bg-indigo-500/20' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                  {notifications ? <Bell className="w-4 h-4 text-indigo-400" /> : <BellOff className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-200">Alert Notifications</p>
-                  <p className="text-xs text-slate-400">Get notified when you approach the limit</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Alert Notifications</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Get notified when you approach the limit</p>
                 </div>
               </div>
               <button
@@ -514,7 +514,7 @@ export default function EditBudget() {
             {notifications && (
               <div className="px-6 py-5">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Alert Threshold</label>
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Alert Threshold</label>
                   <span className="text-lg font-black text-indigo-400">{threshold}%</span>
                 </div>
 
@@ -528,9 +528,9 @@ export default function EditBudget() {
                   onWheel={(e) => e.currentTarget.blur()}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-xs text-slate-400 mt-1">
+                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mt-1">
                   <span>10%</span>
-                  <span className="text-slate-300 font-medium">Alert at {threshold}% usage</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">Alert at {threshold}% usage</span>
                   <span>100%</span>
                 </div>
 
@@ -543,7 +543,7 @@ export default function EditBudget() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                         threshold === v
                           ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'border-slate-600 text-slate-400 hover:border-slate-500'
+                          : 'border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-500'
                       }`}
                     >
                       {v}%
@@ -556,12 +556,12 @@ export default function EditBudget() {
             {/* fixed expense toggle */}
             <div className="px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${isFixedExpense ? 'bg-amber-500/20' : 'bg-slate-700'}`}>
-                  <Lock className={`w-4 h-4 ${isFixedExpense ? 'text-amber-400' : 'text-slate-400'}`} />
+                <div className={`p-2 rounded-xl ${isFixedExpense ? 'bg-amber-500/20' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                  <Lock className={`w-4 h-4 ${isFixedExpense ? 'text-amber-400' : 'text-slate-600 dark:text-slate-400'}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-200">Fixed Expense</p>
-                  <p className="text-xs text-slate-400">Only alert if spending exceeds the budget</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Fixed Expense</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Only alert if spending exceeds the budget</p>
                 </div>
               </div>
               <button
@@ -579,7 +579,7 @@ export default function EditBudget() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 py-3.5 rounded-2xl border border-slate-600 text-sm font-bold text-slate-300 hover:bg-slate-700 transition-colors"
+              className="flex-1 py-3.5 rounded-2xl border border-slate-600 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 transition-colors"
             >
               Cancel
             </button>
@@ -605,26 +605,26 @@ export default function EditBudget() {
     {/* ── Update scope modal (recurring budgets only) ───────────────────── */}
     {showScopeModal && pendingPayload && (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div className="w-full max-w-sm bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
+        <div className="w-full max-w-sm bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
               <Edit2 className="w-5 h-5 text-indigo-400" />
             </div>
             <div>
-              <p className="text-base font-bold text-white">Update Recurring Budget</p>
-              <p className="text-xs text-slate-400">{budget?.name}</p>
+              <p className="text-base font-bold text-slate-900 dark:text-white">Update Recurring Budget</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{budget?.name}</p>
             </div>
           </div>
 
-          <p className="text-sm text-slate-300">Which months should this change apply to?</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300">Which months should this change apply to?</p>
 
           <div className="flex flex-col gap-2">
             <button
               onClick={() => commitUpdate(pendingPayload, 'this')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-700/60 border border-slate-600 text-white text-sm font-bold hover:bg-slate-700 transition-colors text-left"
+              className="w-full px-4 py-3 rounded-xl bg-slate-200/60 dark:bg-slate-700/60 border border-slate-600 text-slate-900 dark:text-white text-sm font-bold hover:bg-slate-200 dark:bg-slate-700 transition-colors text-left"
             >
               This month only
-              <p className="text-xs font-normal text-slate-400 mt-0.5">Past and future months are unaffected.</p>
+              <p className="text-xs font-normal text-slate-600 dark:text-slate-400 mt-0.5">Past and future months are unaffected.</p>
             </button>
             <button
               onClick={() => commitUpdate(pendingPayload, 'future')}
@@ -644,7 +644,7 @@ export default function EditBudget() {
 
           <button
             onClick={() => setShowScopeModal(false)}
-            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-400 text-sm font-semibold hover:bg-slate-700/50 transition-colors"
+            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-600 dark:text-slate-400 text-sm font-semibold hover:bg-slate-200/50 dark:bg-slate-700/50 transition-colors"
           >
             Cancel
           </button>

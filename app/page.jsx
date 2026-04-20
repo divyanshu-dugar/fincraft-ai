@@ -11,7 +11,7 @@ import Footer from "@/components/home/Footer";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Hero Section */}
       <HeroSection />
 

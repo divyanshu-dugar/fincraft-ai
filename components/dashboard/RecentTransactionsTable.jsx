@@ -8,8 +8,8 @@ const PREVIEW_COUNT = 5;
 
 function TransactionRow({ t, formatCurrencyDetailed }) {
   return (
-    <tr className="border-b border-slate-700/50 last:border-0 hover:bg-slate-700/40 transition-colors">
-      <td className="py-3 px-4 text-sm text-slate-400 whitespace-nowrap">
+    <tr className="border-b border-slate-300/50 dark:border-slate-700/50 last:border-0 hover:bg-slate-200/40 dark:bg-slate-700/40 transition-colors">
+      <td className="py-3 px-4 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
         {new Date(t.date).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
@@ -17,7 +17,7 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
         })}
       </td>
       <td className="py-3 px-4">
-        <p className="font-medium text-slate-200 text-sm truncate max-w-[160px]">
+        <p className="font-medium text-slate-800 dark:text-slate-200 text-sm truncate max-w-[160px]">
           {t.note || "No description"}
         </p>
       </td>
@@ -27,7 +27,7 @@ function TransactionRow({ t, formatCurrencyDetailed }) {
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: t.category?.color || "#9CA3AF" }}
           />
-          <span className="text-sm text-slate-400 truncate max-w-[100px]">
+          <span className="text-sm text-slate-600 dark:text-slate-400 truncate max-w-[100px]">
             {t.category?.name || "Uncategorized"}
           </span>
         </div>
@@ -73,7 +73,7 @@ function FilterPills({ value, onChange }) {
           className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
             value === f
               ? pillStyle[f]
-              : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+              : "bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:bg-slate-700"
           }`}
         >
           {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -104,19 +104,19 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
 
   return (
     <>
-      <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
+      <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-lg p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Recent Transactions</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
               {allTransactions.length} transactions this period
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-700/50 hover:bg-slate-200 dark:bg-slate-700 rounded-lg transition-colors"
             >
               <Filter size={13} />
               Full View
@@ -145,7 +145,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
+              <tr className="border-b border-slate-300 dark:border-slate-700">
                 {["Date", "Description", "Category", "Type", "Amount"].map((h) => (
                   <th
                     key={h}
@@ -167,10 +167,10 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
 
           {allTransactions.length === 0 && (
             <div className="text-center py-12">
-              <div className="w-14 h-14 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-14 h-14 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <List className="w-7 h-7 text-slate-500" />
               </div>
-              <p className="text-white font-semibold text-sm mb-1">No transactions yet</p>
+              <p className="text-slate-900 dark:text-white font-semibold text-sm mb-1">No transactions yet</p>
               <p className="text-slate-500 text-xs max-w-xs mx-auto mb-4">Start tracking your finances by adding an expense or income entry.</p>
               <div className="flex items-center justify-center gap-3">
                 <a href="/expense/add" className="px-4 py-2 bg-rose-500/15 text-rose-400 text-xs font-semibold rounded-lg border border-rose-500/30 hover:bg-rose-500/25 transition-colors">+ Add Expense</a>
@@ -205,12 +205,12 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
       {/* Full-screen Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+          <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-300 dark:border-slate-700">
               <div>
-                <h2 className="text-xl font-bold text-white">All Transactions</h2>
-                <p className="text-slate-400 text-sm">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">All Transactions</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">
                   {allTransactions.length} total this period
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
             </div>
 
             {/* Modal filter bar */}
-            <div className="px-6 py-3 border-b border-slate-700 flex items-center gap-3">
+            <div className="px-6 py-3 border-b border-slate-300 dark:border-slate-700 flex items-center gap-3">
               <FilterPills value={filterType} onChange={setFilterType} />
               <span className="ml-auto text-xs text-slate-500">
                 {applyFilter(allTransactions, filterType).length} results
@@ -233,7 +233,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
             {/* Scrollable table */}
             <div className="overflow-y-auto flex-1">
               <table className="w-full">
-                <thead className="sticky top-0 bg-slate-800 border-b border-slate-700">
+                <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700">
                   <tr>
                     {["Date", "Description", "Category", "Type", "Amount"].map((h) => (
                       <th
@@ -261,7 +261,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
             </div>
 
             {/* Modal footer */}
-            <div className="px-6 py-4 border-t border-slate-700 flex items-center gap-2 justify-end bg-slate-900/50">
+            <div className="px-6 py-4 border-t border-slate-300 dark:border-slate-700 flex items-center gap-2 justify-end bg-white dark:bg-slate-900/50">
               <button
                 onClick={() => {
                   router.push("/expense/list");
@@ -282,7 +282,7 @@ export function RecentTransactionsTable({ dashboardData, formatCurrencyDetailed 
               </button>
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors"
               >
                 Close
               </button>

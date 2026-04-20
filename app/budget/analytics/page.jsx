@@ -108,23 +108,23 @@ const RANGE_PRESETS = [
 
 function SkeletonCard() {
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 animate-pulse">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300/50 dark:border-slate-700/50 p-6 animate-pulse">
       <div className="flex justify-between mb-4">
-        <div className="w-10 h-10 bg-slate-700 rounded-xl" />
-        <div className="w-20 h-5 bg-slate-700/50 rounded-full" />
+        <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-xl" />
+        <div className="w-20 h-5 bg-slate-200/50 dark:bg-slate-700/50 rounded-full" />
       </div>
-      <div className="h-7 bg-slate-700 rounded w-28 mb-2" />
-      <div className="h-3 bg-slate-700/50 rounded w-36 mb-1" />
+      <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded w-28 mb-2" />
+      <div className="h-3 bg-slate-200/50 dark:bg-slate-700/50 rounded w-36 mb-1" />
     </div>
   );
 }
 
 function ChartSkeleton() {
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-6 animate-pulse">
-      <div className="h-5 bg-slate-700 rounded w-48 mb-2" />
-      <div className="h-3 bg-slate-700/50 rounded w-72 mb-8" />
-      <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl" />
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300/50 dark:border-slate-700/50 p-6 animate-pulse">
+      <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-2" />
+      <div className="h-3 bg-slate-200/50 dark:bg-slate-700/50 rounded w-72 mb-8" />
+      <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-100 dark:to-slate-800/30 rounded-xl" />
     </div>
   );
 }
@@ -153,8 +153,8 @@ function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge, badgeTon
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${badgeColors}`}>{badge}</span>
         )}
       </div>
-      <p className="text-2xl font-bold text-white leading-tight truncate">{value}</p>
-      <p className="text-sm text-slate-400 mt-1">{label}</p>
+      <p className="text-2xl font-bold text-slate-900 dark:text-white leading-tight truncate">{value}</p>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{label}</p>
       {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
     </div>
   );
@@ -165,23 +165,23 @@ function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge, badgeTon
 function BudgetBarTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[200px]">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 truncate">{label}</p>
+    <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[200px]">
+      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3 truncate">{label}</p>
       <div className="space-y-1.5">
         {payload.map((item) => (
           <div key={item.dataKey} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill || item.color }} />
-              <span className="text-sm text-slate-300 truncate">{item.name}</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300 truncate">{item.name}</span>
             </div>
-            <span className="text-sm font-bold text-white whitespace-nowrap">{moneyExact(item.value)}</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">{moneyExact(item.value)}</span>
           </div>
         ))}
       </div>
       {payload.length >= 2 && payload[0] && payload[1] && (
-        <div className="mt-3 pt-3 border-t border-slate-700">
+        <div className="mt-3 pt-3 border-t border-slate-300 dark:border-slate-700">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Burn Rate</span>
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Burn Rate</span>
             <span className={`text-xs font-bold ${
               payload[1].value > payload[0].value ? "text-red-400" : "text-emerald-400"
             }`}>
@@ -199,8 +199,8 @@ function BurnRateTooltip({ active, payload, label }) {
   const pct = payload[0]?.value ?? 0;
   const cfg = pct > 100 ? STATUS_CONFIG.exceeded : pct >= 80 ? STATUS_CONFIG.almost_exceeded : STATUS_CONFIG.on_track;
   return (
-    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[180px]">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">{label}</p>
+    <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl p-4 min-w-[180px]">
+      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2 truncate">{label}</p>
       <p className={`text-2xl font-bold ${cfg.color}`}>{pct.toFixed(1)}%</p>
       <p className={`text-xs font-semibold mt-1 ${cfg.color}`}>{cfg.label}</p>
     </div>
@@ -448,20 +448,20 @@ export default function BudgetAnalyticsPage() {
   // ── render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
 
       {/* ── sticky page header ─────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20 flex-shrink-0">
-              <Activity className="w-5 h-5 text-white" />
+              <Activity className="w-5 h-5 text-slate-900 dark:text-white" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-bold bg-gradient-to-r from-white via-indigo-300 to-purple-400 bg-clip-text text-transparent leading-none">
                 Budget Analytics
               </h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5 truncate">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5 truncate">
                 {fmtDate(range.startDate)} → {fmtDate(range.endDate)}
                 &nbsp;·&nbsp;{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""}
               </p>
@@ -475,7 +475,7 @@ export default function BudgetAnalyticsPage() {
             <button
               onClick={exportCSV}
               disabled={!budgetRows.length}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 border border-slate-600 hover:bg-slate-700/50 hover:border-slate-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-600 hover:bg-slate-200/50 dark:bg-slate-700/50 hover:border-slate-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Download className="w-3.5 h-3.5" /> Export CSV
             </button>
@@ -492,7 +492,7 @@ export default function BudgetAnalyticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         {/* ── date range / presets ────────────────────────────────────────── */}
-        <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-4 flex flex-wrap items-center gap-4">
+        <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-4 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 flex-wrap">
             {RANGE_PRESETS.map((p) => (
               <button
@@ -501,7 +501,7 @@ export default function BudgetAnalyticsPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                   activePreset === p.label
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-600"
                 }`}
               >
                 {p.label}
@@ -511,21 +511,21 @@ export default function BudgetAnalyticsPage() {
 
           <div className="flex items-center gap-3 ml-auto flex-wrap">
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">From</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">From</label>
               <input
                 type="date"
                 value={range.startDate}
                 onChange={(e) => { setRange((r) => ({ ...r, startDate: e.target.value })); setActivePreset(""); }}
-                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-700/50 text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">To</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">To</label>
               <input
                 type="date"
                 value={range.endDate}
                 onChange={(e) => { setRange((r) => ({ ...r, endDate: e.target.value })); setActivePreset(""); }}
-                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-700/50 text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 border border-slate-600 rounded-xl text-sm bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -599,12 +599,12 @@ export default function BudgetAnalyticsPage() {
 
         {/* ── no data state ───────────────────────────────────────────────── */}
         {!isFirstLoad && stats && budgetRows.length === 0 && (
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-16 text-center">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-16 text-center">
             <div className="w-20 h-20 rounded-3xl bg-indigo-500/15 flex items-center justify-center mx-auto mb-6">
               <Wallet className="w-9 h-9 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No budgets found</h3>
-            <p className="text-slate-400 mb-5">There are no active budgets for the selected date range. Try adjusting the dates or create a new budget.</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No budgets found</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-5">There are no active budgets for the selected date range. Try adjusting the dates or create a new budget.</p>
             <a
               href="/budget/add"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
@@ -617,11 +617,11 @@ export default function BudgetAnalyticsPage() {
         {budgetRows.length > 0 && (
           <>
             {/* ── overall burn rate progress bar ─────────────────────────── */}
-            <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+            <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h2 className="text-base font-bold text-white">Overall Budget Utilization</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Total spent vs. total allocated for this period</p>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Overall Budget Utilization</h2>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Total spent vs. total allocated for this period</p>
                 </div>
                 <span className={`text-2xl font-black ${
                   (overallStats.overallPercentage ?? 0) > 100 ? "text-red-600"
@@ -631,7 +631,7 @@ export default function BudgetAnalyticsPage() {
                   {(overallStats.overallPercentage ?? 0).toFixed(1)}%
                 </span>
               </div>
-              <div className="h-5 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ease-out ${
                     (overallStats.overallPercentage ?? 0) > 100 ? "bg-gradient-to-r from-red-400 to-rose-500"
@@ -651,11 +651,11 @@ export default function BudgetAnalyticsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
               {/* Budget vs. Spending grouped bar chart */}
-              <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
-                <h2 className="text-base font-bold text-white mb-1">Budget vs. Spending by Category</h2>
-                <p className="text-xs text-slate-400 mb-6">Allocated budget (blue) compared to actual spending (status-colored)</p>
+              <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">Budget vs. Spending by Category</h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-6">Allocated budget (blue) compared to actual spending (status-colored)</p>
                 {isFirstLoad ? (
-                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl animate-pulse" />
+                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-100 dark:to-slate-800/30 rounded-xl animate-pulse" />
                 ) : (
                   <>
                   <ResponsiveContainer width="100%" height={320}>
@@ -700,9 +700,9 @@ export default function BudgetAnalyticsPage() {
                   <div className="flex items-center justify-center gap-5 mt-4 flex-wrap">
                     <div className="flex items-center gap-1.5">
                       <div className="w-3.5 h-3 rounded-sm bg-indigo-500" />
-                      <span className="text-xs font-semibold text-slate-400">Budget</span>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Budget</span>
                     </div>
-                    <div className="w-px h-4 bg-slate-700" />
+                    <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
                     <span className="text-xs text-slate-500 font-medium">Spent:</span>
                     {([["#10b981", "On track"], ["#f59e0b", "Near limit"], ["#f97316", "At limit"], ["#ef4444", "Exceeded"]]).map(([color, lbl]) => (
                       <div key={lbl} className="flex items-center gap-1.5">
@@ -716,11 +716,11 @@ export default function BudgetAnalyticsPage() {
               </div>
 
               {/* Burn rate per category */}
-              <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
-                <h2 className="text-base font-bold text-white mb-1">Burn Rate by Category</h2>
-                <p className="text-xs text-slate-400 mb-6">% of budget used — sorted by highest utilization. Dashed line = 80% threshold.</p>
+              <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">Burn Rate by Category</h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-6">% of budget used — sorted by highest utilization. Dashed line = 80% threshold.</p>
                 {isFirstLoad ? (
-                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-800/30 rounded-xl animate-pulse" />
+                  <div className="h-[320px] bg-gradient-to-b from-slate-700/50 to-slate-100 dark:to-slate-800/30 rounded-xl animate-pulse" />
                 ) : (
                   <ResponsiveContainer width="100%" height={320}>
                     <BarChart
@@ -761,18 +761,18 @@ export default function BudgetAnalyticsPage() {
             </div>
 
             {/* ── budget detail table ─────────────────────────────────────── */}
-            <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
-              <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-700/50">
+            <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
+              <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-300/50 dark:border-slate-700/50">
                 <div>
-                  <h2 className="text-base font-bold text-white">Budget Breakdown</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""} for this period</p>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Budget Breakdown</h2>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{budgetRows.length} budget{budgetRows.length !== 1 ? "s" : ""} for this period</p>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-slate-800/80">
+                    <tr className="bg-slate-100/80 dark:bg-slate-800/80">
                       {[
                         { key: "name",             label: "Budget Name"   },
                         { key: "category",         label: "Category"      },
@@ -785,7 +785,7 @@ export default function BudgetAnalyticsPage() {
                         <th
                           key={key}
                           onClick={() => handleSort(key)}
-                          className="px-4 py-3 text-left font-bold text-xs text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-200 whitespace-nowrap select-none"
+                          className="px-4 py-3 text-left font-bold text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-800 dark:text-slate-200 whitespace-nowrap select-none"
                         >
                           <span className="inline-flex items-center gap-1">
                             {label}
@@ -793,7 +793,7 @@ export default function BudgetAnalyticsPage() {
                           </span>
                         </th>
                       ))}
-                      <th className="px-4 py-3 text-left font-bold text-xs text-slate-400 uppercase tracking-wider whitespace-nowrap">Period</th>
+                      <th className="px-4 py-3 text-left font-bold text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Period</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-700/30">
@@ -803,29 +803,29 @@ export default function BudgetAnalyticsPage() {
                       return (
                         <tr
                           key={b._id ?? i}
-                          className="hover:bg-slate-700/30 transition-colors group"
+                          className="hover:bg-slate-200/30 dark:bg-slate-700/30 transition-colors group"
                         >
-                          <td className="px-4 py-3.5 font-semibold text-slate-200 whitespace-nowrap max-w-[160px] truncate">
+                          <td className="px-4 py-3.5 font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap max-w-[160px] truncate">
                             {b.name}
                           </td>
                           <td className="px-4 py-3.5 whitespace-nowrap">
                             <span className="flex items-center gap-2">
                               {b.category?.icon && <span>{b.category.icon}</span>}
-                              <span className="text-slate-300">{b.category?.name ?? "—"}</span>
+                              <span className="text-slate-700 dark:text-slate-300">{b.category?.name ?? "—"}</span>
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 font-semibold text-white whitespace-nowrap">
+                          <td className="px-4 py-3.5 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
                             {moneyExact(b.proportionalBudget ?? b.amount)}
                           </td>
                           <td className="px-4 py-3.5 font-semibold whitespace-nowrap">
                             <span className={cfg.color}>{moneyExact(b.currentSpent ?? 0)}</span>
                           </td>
-                          <td className="px-4 py-3.5 text-slate-400 whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 whitespace-nowrap">
                             {moneyExact(b.remaining ?? 0)}
                           </td>
                           <td className="px-4 py-3.5 whitespace-nowrap min-w-[140px]">
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+                              <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all"
                                   style={{ width: `${pct}%`, backgroundColor: cfg.bar }}
@@ -842,7 +842,7 @@ export default function BudgetAnalyticsPage() {
                               {cfg.label}
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 text-slate-400 text-xs whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap">
                             {fmtDate(b.startDate)} → {fmtDate(b.endDate)}
                           </td>
                         </tr>
@@ -853,7 +853,7 @@ export default function BudgetAnalyticsPage() {
               </div>
 
               {sortedRows.length > 10 && (
-                <div className="px-6 py-3 border-t border-slate-700">
+                <div className="px-6 py-3 border-t border-slate-300 dark:border-slate-700">
                   <button
                     onClick={() => setShowAllBudgets((p) => !p)}
                     className="flex items-center gap-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
@@ -867,15 +867,15 @@ export default function BudgetAnalyticsPage() {
         )}
 
         {/* ── alert history ───────────────────────────────────────────────── */}
-        <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
-          <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-700/50">
+        <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 overflow-hidden">
+          <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-300/50 dark:border-slate-700/50">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-500/15 rounded-xl">
                 <Bell className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Alert History</h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Alert History</h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                   {alerts.length} total · {unreadCount} unread
                 </p>
               </div>
@@ -885,13 +885,13 @@ export default function BudgetAnalyticsPage() {
           {alertsLoading ? (
             <div className="p-8 space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 bg-slate-700/50 rounded-xl animate-pulse" />
+                <div key={i} className="h-16 bg-slate-200/50 dark:bg-slate-700/50 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : alerts.length === 0 ? (
             <div className="py-16 text-center">
               <BellOff className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400 font-medium">No alerts yet</p>
+              <p className="text-slate-600 dark:text-slate-400 font-medium">No alerts yet</p>
               <p className="text-slate-500 text-sm mt-1">Alerts appear when budgets approach or exceed their limits.</p>
             </div>
           ) : (
@@ -903,7 +903,7 @@ export default function BudgetAnalyticsPage() {
                   <div
                     key={alert._id}
                     className={`flex items-start gap-4 px-6 py-4 transition-colors ${
-                      !alert.isRead ? "bg-amber-500/10" : "hover:bg-slate-700/30"
+                      !alert.isRead ? "bg-amber-500/10" : "hover:bg-slate-200/30 dark:bg-slate-700/30"
                     }`}
                   >
                     <div className={`p-2 rounded-xl flex-shrink-0 ${cfg.bg} border ${cfg.border}`}>
@@ -912,8 +912,8 @@ export default function BudgetAnalyticsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div>
-                        <p className="text-sm font-semibold text-slate-200">{alert.message}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{alert.message}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                             {fmtRelative(alert.createdAt)} ·{" "}
                             <span className={`font-semibold ${cfg.color}`}>{cfg.label}</span>
                             {" · "}{(alert.percentage ?? 0).toFixed(1)}% used
@@ -933,7 +933,7 @@ export default function BudgetAnalyticsPage() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden w-48">
+                      <div className="mt-2 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden w-48">
                         <div
                           className={`h-full rounded-full ${
                             (alert.percentage ?? 0) > 100 ? "bg-red-400"
@@ -952,7 +952,7 @@ export default function BudgetAnalyticsPage() {
               })}
 
               {alerts.length > 8 && (
-                <div className="px-6 py-3 border-t border-slate-700">
+                <div className="px-6 py-3 border-t border-slate-300 dark:border-slate-700">
                   <button
                     onClick={() => setShowAllAlerts((p) => !p)}
                     className="flex items-center gap-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"

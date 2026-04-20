@@ -101,7 +101,7 @@ export default function BudgetStats({ stats, formatCurrency }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 hover:shadow-xl transition-all duration-300"
+            className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 hover:shadow-xl transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-xl bg-${stat.color}-100`}>
@@ -116,10 +116,10 @@ export default function BudgetStats({ stats, formatCurrency }) {
               )}
             </div>
 
-            <h3 className="text-2xl font-bold text-white mb-1">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
               {stat.value}
             </h3>
-            <p className="text-sm text-slate-400">{stat.description}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{stat.description}</p>
           </motion.div>
         ))}
       </div>
@@ -130,7 +130,7 @@ export default function BudgetStats({ stats, formatCurrency }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6"
+          className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -154,26 +154,26 @@ export default function BudgetStats({ stats, formatCurrency }) {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                   Overall Budget Usage
                 </h3>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
                   Across all active budgets
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
                 {overallPercentage.toFixed(1)}%
               </div>
-              <div className="text-sm text-slate-400">
+              <div className="text-sm text-slate-600 dark:text-slate-400">
                 {formatCurrency(totalSpent)} of {formatCurrency(totalBudget)}
               </div>
             </div>
           </div>
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-slate-400 mb-2">
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
               <span>Spending Progress</span>
               <span
                 className={`font-semibold ${
@@ -191,7 +191,7 @@ export default function BudgetStats({ stats, formatCurrency }) {
                   : "On Track"}
               </span>
             </div>
-            <div className="w-full bg-slate-700 rounded-full h-3">
+            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
               <div
                 className={`h-3 rounded-full transition-all duration-500 ${
                   overallPercentage >= 100

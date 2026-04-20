@@ -67,7 +67,7 @@ export default function Comparison() {
   };
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -113,13 +113,13 @@ export default function Comparison() {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
             Why Choose{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
               Fincraft AI
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-light">
+          <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-light">
             See how we compare to other financial management platforms.
           </p>
         </motion.div>
@@ -136,7 +136,7 @@ export default function Comparison() {
             className="min-w-full relative group"
           >
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/40 transition-all duration-300"
+              className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-2xl border border-cyan-400/20 group-hover:border-cyan-400/40 transition-all duration-300"
               whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.15)" }}
             />
 
@@ -144,7 +144,7 @@ export default function Comparison() {
               <table className="w-full text-sm">
                 <thead>
                   <tr>
-                    <th className="text-left py-4 px-2 sm:px-4 font-bold text-white text-xs sm:text-sm">Features</th>
+                    <th className="text-left py-4 px-2 sm:px-4 font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Features</th>
                     {competitors.map((comp) => (
                       <th key={comp.name} className="text-center py-4 px-1 sm:px-3">
                         <motion.div
@@ -175,7 +175,7 @@ export default function Comparison() {
                     >
                       <td className="py-4 px-2 sm:px-4">
                         <div className="flex flex-col">
-                          <span className="font-bold text-white text-xs sm:text-sm">{feature.name}</span>
+                          <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{feature.name}</span>
                           <span className="text-xs text-slate-600 mt-0.5">{feature.category}</span>
                         </div>
                       </td>
@@ -193,7 +193,7 @@ export default function Comparison() {
                               </div>
                             ) : (
                               <div className="flex justify-center">
-                                <div className="w-6 h-6 rounded-md bg-slate-700/30 border border-slate-600/50 flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-md bg-slate-200/30 dark:bg-slate-700/30 border border-slate-600/50 flex items-center justify-center">
                                   <X className="w-4 h-4 text-slate-500" />
                                 </div>
                               </div>
@@ -238,14 +238,14 @@ export default function Comparison() {
               whileHover={{ y: -8 }}
             >
               <motion.div
-                className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/60 transition-all"
+                className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/60 transition-all"
                 whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
               />
               <div className="relative p-6 sm:p-8">
-                <h3 className="text-lg font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 group-hover:text-cyan-300 transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">{item.description}</p>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-light leading-relaxed">{item.description}</p>
               </div>
             </motion.div>
           ))}
@@ -259,7 +259,7 @@ export default function Comparison() {
           transition={{ delay: 0.5 }}
           className="text-center"
         >
-          <p className="text-slate-300 text-base sm:text-lg mb-6 font-light">
+          <p className="text-slate-700 dark:text-slate-300 text-base sm:text-lg mb-6 font-light">
             Ready to experience the difference?
           </p>
           <motion.button

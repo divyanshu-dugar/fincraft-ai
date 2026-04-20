@@ -48,7 +48,7 @@ function IconSelect({ value, onChange }) {
         {value || '💰'}
       </button>
       {open && (
-        <div className="absolute top-12 left-0 z-50 bg-slate-800 rounded-xl shadow-xl border border-slate-700 p-2 grid grid-cols-7 gap-1 w-60">
+        <div className="absolute top-12 left-0 z-50 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-700 p-2 grid grid-cols-7 gap-1 w-60">
           {ICON_OPTIONS.map((ic) => (
             <button key={ic} type="button" onClick={() => { onChange(ic); setOpen(false); }}
               className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:bg-emerald-500/15 transition-colors ${value === ic ? 'bg-emerald-500/20 ring-2 ring-emerald-400' : ''}`}>
@@ -77,7 +77,7 @@ function ColorSelect({ value, onChange }) {
         title="Pick color"
       />
       {open && (
-        <div className="absolute top-11 left-0 z-50 bg-slate-800 rounded-xl shadow-xl border border-slate-700 p-2 grid grid-cols-4 gap-1.5 w-44">
+        <div className="absolute top-11 left-0 z-50 bg-slate-100 dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-700 p-2 grid grid-cols-4 gap-1.5 w-44">
           {COLOR_PALETTE.map((c) => (
             <button key={c} type="button"
               onClick={() => { onChange(c); setOpen(false); }}
@@ -103,13 +103,13 @@ function InlineForm({ initial = {}, onSave, onCancel, loading, placeholder = 'Ca
       <ColorSelect value={color} onChange={setColor} />
       <input type="text" value={name} onChange={(e) => setName(e.target.value)}
         placeholder={placeholder} autoFocus
-        className="flex-1 px-3 py-2.5 rounded-xl border border-slate-600 text-sm font-medium text-slate-200 bg-slate-700/50 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-slate-500 transition-all" />
+        className="flex-1 px-3 py-2.5 rounded-xl border border-slate-600 text-sm font-medium text-slate-800 dark:text-slate-200 bg-slate-200/50 dark:bg-slate-700/50 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-slate-500 transition-all" />
       <button type="submit" disabled={!name.trim() || loading}
         className="p-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40 transition-all">
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
       </button>
       <button type="button" onClick={onCancel}
-        className="p-2.5 rounded-xl border border-slate-600 text-slate-400 hover:bg-slate-700 transition-all">
+        className="p-2.5 rounded-xl border border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:bg-slate-700 transition-all">
         <X className="w-4 h-4" />
       </button>
     </form>
@@ -121,21 +121,21 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="bg-slate-800/95 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        className="bg-slate-100/95 dark:bg-slate-800/95 rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex items-start gap-4 mb-5">
           <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-6 h-6 text-rose-400" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-lg">Delete Category</h3>
-            <p className="text-sm text-slate-400 mt-1">
+            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Delete Category</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
               Are you sure you want to delete <strong>{item.icon} {item.name}</strong>? This cannot be undone.
             </p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3">
           <button onClick={onCancel} disabled={loading}
-            className="px-5 py-2.5 text-sm font-semibold text-slate-300 border border-slate-600 rounded-xl hover:bg-slate-700 transition-all disabled:opacity-40">
+            className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-600 rounded-xl hover:bg-slate-200 dark:bg-slate-700 transition-all disabled:opacity-40">
             Cancel
           </button>
           <button onClick={onConfirm} disabled={loading}
@@ -156,7 +156,7 @@ function CategoryCard({ cat, onEdit, onDelete }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="group flex items-center gap-4 px-5 py-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 hover:border-cyan-400/30 transition-all"
+      className="group flex items-center gap-4 px-5 py-4 rounded-2xl bg-slate-100/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 hover:border-cyan-400/30 transition-all"
     >
       <span
         className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
@@ -164,7 +164,7 @@ function CategoryCard({ cat, onEdit, onDelete }) {
       >
         {cat.icon || '💰'}
       </span>
-      <span className="flex-1 text-sm font-semibold text-slate-200 min-w-0 truncate">{cat.name}</span>
+      <span className="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200 min-w-0 truncate">{cat.name}</span>
       <div
         className="w-3 h-3 rounded-full flex-shrink-0"
         style={{ backgroundColor: cat.color || '#10b981' }}
@@ -278,7 +278,7 @@ export default function IncomeCategoryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
       {/* delete modal */}
       <AnimatePresence>
         {deleteTarget && (
@@ -292,15 +292,15 @@ export default function IncomeCategoryPage() {
       </AnimatePresence>
 
       {/* ── sticky header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Tags className="w-4 h-4 text-white" />
+              <Tags className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-none">Income Categories</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5">{categories.length} categor{categories.length === 1 ? 'y' : 'ies'}</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Income Categories</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5">{categories.length} categor{categories.length === 1 ? 'y' : 'ies'}</p>
             </div>
           </div>
           <div className="ml-auto">
@@ -324,9 +324,9 @@ export default function IncomeCategoryPage() {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="bg-slate-800/60 rounded-2xl border border-emerald-500/30 shadow-sm p-5"
+              className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-emerald-500/30 shadow-sm p-5"
             >
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">New Category</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">New Category</p>
               <InlineForm
                 onSave={handleAdd}
                 onCancel={() => setAdding(false)}
@@ -338,17 +338,17 @@ export default function IncomeCategoryPage() {
         </AnimatePresence>
 
         {/* ── search ────────────────────────────────────────────────────────── */}
-        <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/60 rounded-2xl border border-slate-700">
+        <div className="flex items-center gap-2 px-4 py-3 bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300 dark:border-slate-700">
           <Search className="w-4 h-4 text-slate-500 flex-shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search categories…"
-            className="flex-1 text-sm outline-none bg-transparent text-slate-200 placeholder-slate-500"
+            className="flex-1 text-sm outline-none bg-transparent text-slate-800 dark:text-slate-200 placeholder-slate-500"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="text-slate-500 hover:text-slate-300">
+            <button onClick={() => setSearch('')} className="text-slate-500 hover:text-slate-700 dark:text-slate-300">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -359,10 +359,10 @@ export default function IncomeCategoryPage() {
           <CategoryListSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
               <Tags className="w-7 h-7 text-slate-600" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
               {search ? 'No matching categories' : 'No categories yet'}
             </h3>
             <p className="text-sm text-slate-500 max-w-xs mx-auto">
@@ -387,9 +387,9 @@ export default function IncomeCategoryPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="bg-slate-800/60 rounded-2xl border border-blue-500/30 shadow-sm p-5"
+                    className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-blue-500/30 shadow-sm p-5"
                   >
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Edit Category</p>
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">Edit Category</p>
                     <InlineForm
                       initial={cat}
                       onSave={handleEdit}

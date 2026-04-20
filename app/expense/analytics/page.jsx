@@ -97,24 +97,24 @@ function categoryLabel(cat) {
 // ─── skeleton pieces ─────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 animate-pulse">
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 animate-pulse">
       <div className="flex justify-between mb-4">
-        <div className="w-10 h-10 bg-slate-700 rounded-xl" />
-        <div className="w-16 h-5 bg-slate-700 rounded-full" />
+        <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-xl" />
+        <div className="w-16 h-5 bg-slate-200 dark:bg-slate-700 rounded-full" />
       </div>
-      <div className="h-7 bg-slate-700 rounded w-32 mb-2" />
-      <div className="h-3 bg-slate-700/60 rounded w-20 mb-1" />
-      <div className="h-3 bg-slate-700/60 rounded w-24" />
+      <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded w-32 mb-2" />
+      <div className="h-3 bg-slate-200/60 dark:bg-slate-700/60 rounded w-20 mb-1" />
+      <div className="h-3 bg-slate-200/60 dark:bg-slate-700/60 rounded w-24" />
     </div>
   );
 }
 
 function ChartSkeleton() {
   return (
-    <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 animate-pulse">
-      <div className="h-5 bg-slate-700 rounded w-48 mb-2" />
-      <div className="h-3 bg-slate-700/60 rounded w-72 mb-8" />
-      <div className="h-[340px] bg-slate-700/40 rounded-xl" />
+    <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-6 animate-pulse">
+      <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-2" />
+      <div className="h-3 bg-slate-200/60 dark:bg-slate-700/60 rounded w-72 mb-8" />
+      <div className="h-[340px] bg-slate-200/40 dark:bg-slate-700/40 rounded-xl" />
     </div>
   );
 }
@@ -144,8 +144,8 @@ function KPICard({ icon: Icon, label, value, sub, tone = "blue", badge }) {
           </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-white leading-tight truncate">{value}</p>
-      <p className="text-sm text-slate-400 mt-1">{label}</p>
+      <p className="text-2xl font-bold text-slate-900 dark:text-white leading-tight truncate">{value}</p>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{label}</p>
       {sub ? <p className="text-xs text-slate-500 mt-1">{sub}</p> : null}
     </div>
   );
@@ -178,14 +178,14 @@ function AnomalyAlert({ anomalies }) {
           </p>
           <div className="space-y-2">
             {shown.map((row, i) => (
-              <div key={i} className="flex items-center gap-3 bg-slate-800/80 rounded-xl px-4 py-2.5 text-sm border border-rose-500/20">
+              <div key={i} className="flex items-center gap-3 bg-slate-100/80 dark:bg-slate-800/80 rounded-xl px-4 py-2.5 text-sm border border-rose-500/20">
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${row.anomaly?.severity === "high" ? "bg-rose-500" : "bg-amber-500"}`} />
-                <span className="font-semibold text-white truncate">
+                <span className="font-semibold text-slate-900 dark:text-white truncate">
                   {row.parentIcon && `${row.parentIcon} `}{row.parentName ? `${row.parentName} › ` : ""}{row.categoryIcon || ""} {row.category}
                 </span>
-                <span className="text-slate-400 text-xs flex-shrink-0">{fmtMonth(row.month)}</span>
+                <span className="text-slate-600 dark:text-slate-400 text-xs flex-shrink-0">{fmtMonth(row.month)}</span>
                 {row.anomaly?.reason && (
-                  <span className="text-slate-400 text-xs hidden md:block truncate flex-1">{row.anomaly.reason}</span>
+                  <span className="text-slate-600 dark:text-slate-400 text-xs hidden md:block truncate flex-1">{row.anomaly.reason}</span>
                 )}
                 <span className="ml-auto font-bold text-rose-400 flex-shrink-0">{money(row.amount)}</span>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
@@ -208,23 +208,23 @@ function ChartTooltip({ active, payload, label }) {
   const sorted = [...payload].filter((p) => (p.value || 0) > 0).sort((a, b) => (b.value || 0) - (a.value || 0));
   const total = sorted.reduce((s, p) => s + (p.value || 0), 0);
   return (
-    <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 min-w-[200px] max-w-[260px]">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{fmtMonth(label)}</p>
+    <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl p-4 min-w-[200px] max-w-[260px]">
+      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">{fmtMonth(label)}</p>
       <div className="space-y-1.5">
         {sorted.map((item) => (
           <div key={item.dataKey} className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color || item.fill || item.stroke }} />
-              <span className="text-sm text-slate-400 truncate">{item.dataKey}</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400 truncate">{item.dataKey}</span>
             </div>
-            <span className="text-sm font-bold text-white whitespace-nowrap">{money(item.value)}</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">{money(item.value)}</span>
           </div>
         ))}
       </div>
       {sorted.length > 1 && (
-        <div className="mt-3 pt-3 border-t border-slate-700 flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total</span>
-          <span className="text-sm font-bold text-white">{money(total)}</span>
+        <div className="mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Total</span>
+          <span className="text-sm font-bold text-slate-900 dark:text-white">{money(total)}</span>
         </div>
       )}
     </div>
@@ -238,7 +238,7 @@ function CategoryLegend({ groups, depth, total, expanded, onToggle, formatMoney 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Breakdown</p>
+        <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Breakdown</p>
         <span className="text-xs text-slate-500 font-medium">{itemCount} {depth === 'parent' ? 'categories' : 'subcategories'}</span>
       </div>
 
@@ -252,11 +252,11 @@ function CategoryLegend({ groups, depth, total, expanded, onToggle, formatMoney 
                 <div className="flex items-center gap-2.5 mb-1.5">
                   <span className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: item.color }} />
                   {item.icon && <span className="text-sm flex-shrink-0">{item.icon}</span>}
-                  <span className="text-sm font-semibold text-slate-200 truncate flex-1">{item.name}</span>
-                  <span className="text-sm font-bold text-white flex-shrink-0 tabular-nums">{formatMoney(item.total)}</span>
-                  <span className="text-xs text-slate-400 font-bold flex-shrink-0 w-10 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate flex-1">{item.name}</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white flex-shrink-0 tabular-nums">{formatMoney(item.total)}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 font-bold flex-shrink-0 w-10 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
                 </div>
-                <div className="ml-[22px] h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div className="ml-[22px] h-1.5 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pctVal}%`, backgroundColor: item.color }} />
                 </div>
               </div>
@@ -270,29 +270,29 @@ function CategoryLegend({ groups, depth, total, expanded, onToggle, formatMoney 
             const pctVal = total > 0 ? (group.total / total * 100) : 0;
             const isOpen = expanded[group.name] ?? (gi < 3);
             return (
-              <div key={group.name} className="rounded-xl border border-slate-700/40 bg-slate-800/30 overflow-hidden">
+              <div key={group.name} className="rounded-xl border border-slate-300/40 dark:border-slate-700/40 bg-slate-100/30 dark:bg-slate-800/30 overflow-hidden">
                 <button
                   onClick={() => onToggle(group.name)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-700/20 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-200/20 dark:bg-slate-700/20 transition-colors"
                 >
                   <span className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: group.color }} />
                   {group.icon && <span className="text-sm flex-shrink-0">{group.icon}</span>}
-                  <span className="text-sm font-semibold text-slate-200 truncate flex-1 text-left">{group.name}</span>
-                  <span className="text-xs font-bold text-white flex-shrink-0 tabular-nums">{formatMoney(group.total)}</span>
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate flex-1 text-left">{group.name}</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-white flex-shrink-0 tabular-nums">{formatMoney(group.total)}</span>
                   <span className="text-[10px] text-slate-500 font-bold flex-shrink-0 w-9 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
                   <ChevronDown className={`w-3 h-3 text-slate-500 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-slate-700/30 px-3 py-2.5 space-y-2">
+                  <div className="border-t border-slate-300/30 dark:border-slate-700/30 px-3 py-2.5 space-y-2">
                     {group.children.map((child) => {
                       const childPct = group.total > 0 ? (child.value / group.total * 100) : 0;
                       return (
                         <div key={child.name} className="flex items-center gap-2 pl-1">
                           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: child.color }} />
                           {child.icon && <span className="text-xs flex-shrink-0">{child.icon}</span>}
-                          <span className="text-xs text-slate-400 truncate flex-1">{child.name}</span>
-                          <span className="text-xs font-bold text-slate-300 flex-shrink-0 tabular-nums">{formatMoney(child.value)}</span>
-                          <div className="w-14 h-1 bg-slate-700/50 rounded-full overflow-hidden flex-shrink-0">
+                          <span className="text-xs text-slate-600 dark:text-slate-400 truncate flex-1">{child.name}</span>
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex-shrink-0 tabular-nums">{formatMoney(child.value)}</span>
+                          <div className="w-14 h-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden flex-shrink-0">
                             <div className="h-full rounded-full" style={{ width: `${childPct}%`, backgroundColor: child.color }} />
                           </div>
                         </div>
@@ -327,9 +327,9 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
   const spikeCount = rows.filter((r) => r.anomaly?.isSpike).length;
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/50 overflow-hidden">
+    <div className="rounded-2xl border border-slate-300/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/50 overflow-hidden">
       {/* ── category header (always visible) ── */}
-      <div className="flex items-center hover:bg-slate-700/30 transition-colors group">
+      <div className="flex items-center hover:bg-slate-200/30 dark:bg-slate-700/30 transition-colors group">
         <button
           onClick={() => setOpen((p) => !p)}
           className="flex-1 flex items-center gap-4 px-5 py-4 text-left min-w-0"
@@ -343,7 +343,7 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
                   {category.parentIcon} {category.parentName} ›
                 </span>
               )}
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-slate-900 dark:text-white">
                 {category.categoryIcon} {category.categoryName}
               </span>
               {spikeCount > 0 && (
@@ -355,20 +355,20 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
           </div>
 
           {/* summary chips */}
-          <div className="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-slate-400">
-            <span className="font-bold text-white">{money(totalSpend)}</span>
+          <div className="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-slate-600 dark:text-slate-400">
+            <span className="font-bold text-slate-900 dark:text-white">{money(totalSpend)}</span>
             <span>total</span>
             {bestMonth && (
               <>
                 <span className="text-slate-600">·</span>
-                <span>peak: <span className="font-semibold text-slate-300">{fmtMonth(bestMonth.month)}</span></span>
+                <span>peak: <span className="font-semibold text-slate-700 dark:text-slate-300">{fmtMonth(bestMonth.month)}</span></span>
               </>
             )}
           </div>
 
           {/* chevron */}
           <ChevronDown
-            className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-slate-600 dark:text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -393,7 +393,7 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
 
       {/* ── months grid (expandable) ── */}
       {open && (
-        <div className="border-t border-slate-700/50 px-5 py-4">
+        <div className="border-t border-slate-300/50 dark:border-slate-700/50 px-5 py-4">
           {/* month column headers */}
           <div
             className="grid gap-2 mb-2"
@@ -401,7 +401,7 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
           >
             {months.map((m) => (
               <div key={m} className="text-center">
-                <span className="inline-block px-2 py-1 rounded-lg bg-slate-700/60 text-xs font-bold text-slate-300">
+                <span className="inline-block px-2 py-1 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-300">
                   {fmtMonth(m)}
                 </span>
               </div>
@@ -420,10 +420,10 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
                 <div
                   key={m}
                   className={`rounded-xl px-2 py-2.5 text-center ${
-                    isSpike ? "bg-rose-500/10 ring-1 ring-rose-500/30" : "bg-slate-700/30"
+                    isSpike ? "bg-rose-500/10 ring-1 ring-rose-500/30" : "bg-slate-200/30 dark:bg-slate-700/30"
                   }`}
                 >
-                  <p className="text-sm font-bold text-white truncate">
+                  <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                     {row ? money(row.amount) : <span className="text-slate-600">—</span>}
                   </p>
                   {/* change pct badge */}
@@ -460,7 +460,7 @@ function CategoryMoMCard({ category, rows, months, defaultOpen = false, range })
               const pctWidth = row ? Math.min((row.amount / (totalSpend || 1)) * months.length * 100, 100) : 0;
               return (
                 <div key={m} className="flex items-center justify-center px-1">
-                  <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-1 rounded-full"
                       style={{ width: `${pctWidth}%`, backgroundColor: color }}
@@ -822,20 +822,20 @@ export default function ExpenseAnalyticsPage() {
 
   // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
 
       {/* ── sticky page header ───────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 flex-shrink-0">
-              <Activity className="w-5 h-5 text-white" />
+              <Activity className="w-5 h-5 text-slate-900 dark:text-white" />
             </div>
             <div className="min-w-0">
               <h1 className="text-xl font-bold bg-gradient-to-r from-white via-blue-300 to-indigo-400 bg-clip-text text-transparent leading-none">
                 Expense Analytics
               </h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5 truncate">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5 truncate">
                 {fmtMonth(range.startMonth)} → {fmtMonth(range.endMonth)}
                 &nbsp;·&nbsp;{activeCategories.length} categor{activeCategories.length === 1 ? "y" : "ies"}
                 {isRefreshing ? " · Refreshing…" : ""}
@@ -849,7 +849,7 @@ export default function ExpenseAnalyticsPage() {
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all ${
                 showFilters
                   ? "bg-blue-500/20 border-blue-400/60 text-blue-300"
-                  : "bg-slate-800 border-slate-600 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
+                  : "bg-slate-100 dark:bg-slate-800 border-slate-600 text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
@@ -864,7 +864,7 @@ export default function ExpenseAnalyticsPage() {
             <button
               onClick={exportCSV}
               disabled={!hasData || isFirstLoad}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-600 bg-slate-800 text-sm font-semibold text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-600 bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Export CSV</span>
@@ -877,10 +877,10 @@ export default function ExpenseAnalyticsPage() {
 
         {/* ── controls ─────────────────────────────────────────────────────── */}
         {showFilters && (
-        <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 animate-in slide-in-from-top-2 duration-200">
+        <div className="bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2 mb-5">
-            <Filter className="w-4 h-4 text-slate-400" />
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Filters & Date range</h2>
+            <Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            <h2 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Filters & Date range</h2>
             {selectedCategoryIds.length > 0 && (
               <span className="ml-1 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold">
                 {selectedCategoryIds.length} selected
@@ -892,7 +892,7 @@ export default function ExpenseAnalyticsPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-5">
             {/* quick presets */}
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Quick range</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Quick range</p>
               <div className="flex gap-2">
                 {PRESETS.map((p) => (
                   <button
@@ -901,7 +901,7 @@ export default function ExpenseAnalyticsPage() {
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
                       activePreset === p.label
                         ? "border-blue-400 bg-blue-500/20 text-blue-300 shadow-sm shadow-blue-500/20"
-                        : "border-slate-600 bg-slate-700/50 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
+                        : "border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10"
                     }`}
                   >
                     {p.label}
@@ -912,25 +912,25 @@ export default function ExpenseAnalyticsPage() {
 
             {/* start month */}
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Start month</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Start month</p>
               <input
                 type="month"
                 value={range.startMonth}
                 max={range.endMonth}
                 onChange={(e) => { setRange((p) => ({ ...p, startMonth: e.target.value })); setActivePreset(null); }}
-                className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                className="w-full rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
               />
             </div>
 
             {/* end month */}
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">End month</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">End month</p>
               <input
                 type="month"
                 value={range.endMonth}
                 min={range.startMonth}
                 onChange={(e) => { setRange((p) => ({ ...p, endMonth: e.target.value })); setActivePreset(null); }}
-                className="w-full rounded-xl border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                className="w-full rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 px-3 py-2 text-sm font-medium text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
               />
             </div>
 
@@ -947,13 +947,13 @@ export default function ExpenseAnalyticsPage() {
             </div>
           </div>
 
-          <div className="border-t border-slate-700/50 pt-5">
+          <div className="border-t border-slate-300/50 dark:border-slate-700/50 pt-5">
             {/* header row */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Tags className="w-4 h-4 text-slate-400" />
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Categories</p>
-                <span className="text-xs text-slate-400">
+                <Tags className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Categories</p>
+                <span className="text-xs text-slate-600 dark:text-slate-400">
                   {selectedCategoryIds.length ? `${selectedCategoryIds.length} of ${availableCategories.length}` : "All"}
                 </span>
               </div>
@@ -967,7 +967,7 @@ export default function ExpenseAnalyticsPage() {
                 <span className="text-slate-600 select-none">|</span>
                 <button
                   onClick={() => setSelectedCategoryIds([])}
-                  className="text-xs font-semibold text-slate-500 hover:text-slate-300 hover:underline"
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:underline"
                 >
                   Clear
                 </button>
@@ -982,12 +982,12 @@ export default function ExpenseAnalyticsPage() {
                 value={categorySearch}
                 onChange={(e) => setCategorySearch(e.target.value)}
                 placeholder="Search categories…"
-                className="w-full pl-8 pr-4 py-2 rounded-xl border border-slate-600 bg-slate-700/50 text-sm text-slate-200 placeholder-slate-500 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                className="w-full pl-8 pr-4 py-2 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-500 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
               />
               {categorySearch && (
                 <button
                   onClick={() => setCategorySearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-300 text-xs font-bold"
                 >
                   ✕
                 </button>
@@ -996,9 +996,9 @@ export default function ExpenseAnalyticsPage() {
 
             {/* grouped category list */}
             {availableCategories.length === 0 ? (
-              <p className="text-sm text-slate-400 italic">No expense categories found. Create some first.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 italic">No expense categories found. Create some first.</p>
             ) : groupedCategories.length === 0 ? (
-              <p className="text-sm text-slate-400 italic">No categories match your search.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 italic">No categories match your search.</p>
             ) : (
               <div className="space-y-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                 {groupedCategories.map((group) => {
@@ -1007,15 +1007,15 @@ export default function ExpenseAnalyticsPage() {
                   const allSelected = groupSelected === group.items.length;
                   const someSelected = groupSelected > 0 && !allSelected;
                   return (
-                    <div key={group.parentName} className="rounded-xl border border-slate-700/60 bg-slate-900/40 overflow-hidden">
+                    <div key={group.parentName} className="rounded-xl border border-slate-300/60 dark:border-slate-700/60 bg-white dark:bg-slate-900/40 overflow-hidden">
                       {/* group header */}
-                      <div className="flex items-center justify-between px-3 py-2 bg-slate-800/60">
+                      <div className="flex items-center justify-between px-3 py-2 bg-slate-100/60 dark:bg-slate-800/60">
                         <button
                           onClick={() => toggleGroup(group.parentName)}
                           className="flex items-center gap-2 flex-1 min-w-0 text-left"
                         >
                           {group.parentIcon && <span className="text-sm flex-shrink-0">{group.parentIcon}</span>}
-                          <span className="text-xs font-bold text-slate-300 truncate">{group.parentName}</span>
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{group.parentName}</span>
                           <span className="text-xs text-slate-500 flex-shrink-0">
                             ({group.items.length})
                           </span>
@@ -1042,7 +1042,7 @@ export default function ExpenseAnalyticsPage() {
                             }
                           }}
                           className={`ml-3 text-xs font-semibold flex-shrink-0 transition-colors ${
-                            allSelected ? "text-slate-500 hover:text-slate-300" : "text-blue-400 hover:text-blue-300"
+                            allSelected ? "text-slate-500 hover:text-slate-700 dark:text-slate-300" : "text-blue-400 hover:text-blue-300"
                           }`}
                         >
                           {allSelected ? "Deselect" : "Select all"}
@@ -1061,8 +1061,8 @@ export default function ExpenseAnalyticsPage() {
                                 onClick={() => toggleCategory(cat._id)}
                                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all ${
                                   isActive
-                                    ? "border-transparent text-white shadow-sm"
-                                    : "border-slate-600 bg-slate-700/50 text-slate-300 hover:border-slate-400 hover:text-white"
+                                    ? "border-transparent text-slate-900 dark:text-white shadow-sm"
+                                    : "border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:border-slate-400 hover:text-slate-900 dark:text-white"
                                 }`}
                                 style={isActive ? { backgroundColor: color } : undefined}
                               >
@@ -1147,12 +1147,12 @@ export default function ExpenseAnalyticsPage() {
           </>
         ) : !hasData && !error ? (
           /* empty state */
-          <div className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-16 text-center">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 p-16 text-center">
             <div className="w-16 h-16 bg-blue-500/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
               <BarChart3 className="w-8 h-8 text-blue-400" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">No expense data in this range</h3>
-            <p className="text-sm text-slate-400 max-w-sm mx-auto mb-6">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No expense data in this range</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mx-auto mb-6">
               No expenses were logged in the selected period. Try adjusting the date range or removing category filters.
             </p>
             <div className="flex justify-center gap-3 flex-wrap">
@@ -1160,7 +1160,7 @@ export default function ExpenseAnalyticsPage() {
                 <button
                   key={p.label}
                   onClick={() => applyPreset(p.months)}
-                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-600 bg-slate-700/50 text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all"
+                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all"
                 >
                   Try last {p.label}
                 </button>
@@ -1173,12 +1173,12 @@ export default function ExpenseAnalyticsPage() {
             <AnomalyAlert anomalies={data.anomalies} />
 
             {/* ── charts card ────────────────────────────────────────────── */}
-            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+            <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
               {/* header */}
               <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
                 <div>
-                  <h2 className="text-lg font-bold text-white">Spending by category</h2>
-                  <p className="text-sm text-slate-400 mt-0.5">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">Spending by category</h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
                     {categoryDepth === 'parent' ? 'Aggregated by main category' : 'Detailed subcategory breakdown'}
                     {chartView === 'bar' && anomalyMonths.size > 0 && (
                       <span className="ml-2 text-rose-500 font-semibold">
@@ -1190,7 +1190,7 @@ export default function ExpenseAnalyticsPage() {
 
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                   {/* depth toggle */}
-                  <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5">
+                  <div className="flex items-center bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-1 gap-0.5">
                     {[
                       { key: "parent", label: "Main" },
                       { key: "sub",    label: "Sub" },
@@ -1201,7 +1201,7 @@ export default function ExpenseAnalyticsPage() {
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           categoryDepth === v.key
                             ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/20"
-                            : "text-slate-400 hover:text-slate-300"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"
                         }`}
                       >
                         {v.label}
@@ -1210,7 +1210,7 @@ export default function ExpenseAnalyticsPage() {
                   </div>
 
                   {/* chart type toggle */}
-                  <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5">
+                  <div className="flex items-center bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-1 gap-0.5">
                     {[
                       { key: "pie",  icon: PieChartIcon, label: "Pie"  },
                       { key: "bar",  icon: BarChart3,     label: "Bar"  },
@@ -1219,7 +1219,7 @@ export default function ExpenseAnalyticsPage() {
                         key={v.key}
                         onClick={() => setChartView(v.key)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          chartView === v.key ? "bg-slate-600 text-white" : "text-slate-400 hover:text-slate-300"
+                          chartView === v.key ? "bg-slate-600 text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"
                         }`}
                       >
                         <v.icon className="w-3.5 h-3.5" />
@@ -1269,18 +1269,18 @@ export default function ExpenseAnalyticsPage() {
                               const item = payload[0];
                               const pctVal = pieTotal > 0 ? ((item.value / pieTotal) * 100).toFixed(1) : '0';
                               return (
-                                <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 min-w-[180px] shadow-xl">
+                                <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl p-4 min-w-[180px] shadow-xl">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.payload?.color || item.color }} />
-                                    <span className="text-sm font-bold text-white">{item.name}</span>
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</span>
                                   </div>
                                   <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-slate-400">Amount</span>
-                                    <span className="text-sm font-bold text-white">{money(item.value)}</span>
+                                    <span className="text-sm text-slate-600 dark:text-slate-400">Amount</span>
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{money(item.value)}</span>
                                   </div>
                                   <div className="flex items-center justify-between gap-4 mt-1">
-                                    <span className="text-sm text-slate-400">Share</span>
-                                    <span className="text-sm font-bold text-white">{pctVal}%</span>
+                                    <span className="text-sm text-slate-600 dark:text-slate-400">Share</span>
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{pctVal}%</span>
                                   </div>
                                 </div>
                               );
@@ -1332,7 +1332,7 @@ export default function ExpenseAnalyticsPage() {
                   {/* center stat inside donut */}
                   {chartView === 'pie' && (
                     <div className="text-center -mt-4 mb-2 lg:mb-0">
-                      <p className="text-2xl font-bold text-white tabular-nums">{money(pieTotal)}</p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{money(pieTotal)}</p>
                       <p className="text-xs text-slate-500 font-medium">Total spend</p>
                     </div>
                   )}
@@ -1353,19 +1353,19 @@ export default function ExpenseAnalyticsPage() {
             </div>
 
             {/* ── month-on-month category comparison ─────────────────────── */}
-            <div className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+            <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
               {/* section header */}
               <button
                 onClick={() => setMomSectionOpen((p) => !p)}
-                className="w-full flex items-center justify-between gap-4 px-6 py-5 hover:bg-slate-700/20 transition-colors"
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 hover:bg-slate-200/20 dark:bg-slate-700/20 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 flex-shrink-0">
                     <GitCompare className="w-4 h-4" />
                   </div>
                   <div className="text-left min-w-0">
-                    <h2 className="text-lg font-bold text-white leading-tight">Month-on-Month Category Comparison</h2>
-                    <p className="text-sm text-slate-400 mt-0.5 leading-tight">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Month-on-Month Category Comparison</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5 leading-tight">
                       Each category's spend across months — see exactly where costs are rising or falling
                     </p>
                   </div>
@@ -1374,12 +1374,12 @@ export default function ExpenseAnalyticsPage() {
                   <span className="hidden sm:inline text-xs font-semibold text-slate-500">
                     {categoryMoMGroups.length} categor{categoryMoMGroups.length !== 1 ? "ies" : "y"} · {data.months.length} month{data.months.length !== 1 ? "s" : ""}
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${momSectionOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`w-4 h-4 text-slate-600 dark:text-slate-400 transition-transform duration-200 ${momSectionOpen ? "rotate-180" : ""}`} />
                 </div>
               </button>
 
               {momSectionOpen && (
-                <div className="border-t border-slate-700/50 px-6 py-5">
+                <div className="border-t border-slate-300/50 dark:border-slate-700/50 px-6 py-5">
                   {/* legend hint */}
                   <div className="flex flex-wrap gap-x-5 gap-y-1.5 mb-5 text-xs text-slate-500">
                     <span className="flex items-center gap-1.5">
@@ -1418,7 +1418,7 @@ export default function ExpenseAnalyticsPage() {
                       />
                     ))}
                     {categoryMoMGroups.length === 0 && (
-                      <p className="text-sm text-slate-400 text-center py-6">No data available for the selected filters.</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 text-center py-6">No data available for the selected filters.</p>
                     )}
                   </div>
                 </div>

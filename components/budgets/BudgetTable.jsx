@@ -143,7 +143,7 @@ const getBudgetStatus = (budget) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-slate-800/60 rounded-3xl border border-cyan-400/20 overflow-hidden mb-8"
+      className="bg-slate-100/60 dark:bg-slate-800/60 rounded-3xl border border-cyan-400/20 overflow-hidden mb-8"
     >
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -157,7 +157,7 @@ const getBudgetStatus = (budget) => {
           </colgroup>
 
           <thead>
-            <tr className="border-b border-slate-700/60 bg-gradient-to-r from-slate-800/80 to-slate-800/50">
+            <tr className="border-b border-slate-300/60 dark:border-slate-700/60 bg-gradient-to-r from-slate-100/80 dark:from-slate-800/80 to-slate-100 dark:to-slate-800/50">
               {[
                 "Budget Name",
                 "Category",
@@ -168,7 +168,7 @@ const getBudgetStatus = (budget) => {
               ].map((header, index) => (
                 <th
                   key={header}
-                  className="px-6 py-4 text-left text-xs font-semibold uppercase text-slate-400 tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-semibold uppercase text-slate-600 dark:text-slate-400 tracking-wider"
                 >
                   <div className="flex items-center gap-2">
                     {header}
@@ -202,12 +202,12 @@ const getBudgetStatus = (budget) => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-slate-700/30 last:border-b-0`}
+                    className={`group bg-gradient-to-r ${rowBgColor} ${hoverGradient} transition-all duration-300 border-b border-slate-300/30 dark:border-slate-700/30 last:border-b-0`}
                   >
                     {/* Budget Name */}
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-slate-200 group-hover:text-white transition-colors">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:text-white transition-colors">
                           {budget.name}
                         </span>
                         <div className="flex items-center gap-2 mt-1">
@@ -225,7 +225,7 @@ const getBudgetStatus = (budget) => {
                             </span>
                           )}
                           {!budget.isActive && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-slate-700/50 text-slate-400 border border-slate-600">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 border border-slate-600">
                               Inactive
                             </span>
                           )}
@@ -237,7 +237,7 @@ const getBudgetStatus = (budget) => {
                     <td className="px-6 py-5">
                       <motion.span
                         whileHover={{ scale: 1.05 }}
-                        className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white shadow-lg transition-all duration-200 group-hover:shadow-xl"
+                        className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white shadow-lg transition-all duration-200 group-hover:shadow-xl"
                         style={{
                           backgroundColor: categoryColor,
                           background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`,
@@ -252,13 +252,13 @@ const getBudgetStatus = (budget) => {
                     <td className="px-6 py-5">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-slate-400">Spent</span>
-                          <span className="font-medium text-slate-200">
+                          <span className="text-slate-600 dark:text-slate-400">Spent</span>
+                          <span className="font-medium text-slate-800 dark:text-slate-200">
                             {formatCurrency(currentSpent)} /{" "}
                             {formatCurrency(budget.amount)}
                           </span>
                         </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2.5">
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
                           <div
                             className={`h-2.5 rounded-full transition-all duration-500 ${
                               percentage >= 100
@@ -280,10 +280,10 @@ const getBudgetStatus = (budget) => {
                     {/* Amount */}
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-lg font-bold text-white group-hover:text-slate-100 transition-colors">
+                        <span className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-slate-100 transition-colors">
                           {formatCurrency(budget.amount)}
                         </span>
-                        <span className="text-sm text-slate-400 capitalize">
+                        <span className="text-sm text-slate-600 dark:text-slate-400 capitalize">
                           {budget.period}
                         </span>
                       </div>
@@ -291,12 +291,12 @@ const getBudgetStatus = (budget) => {
 
                     {/* Period */}
                     <td className="px-6 py-5">
-                      <div className="flex flex-col text-sm text-slate-400">
-                        <span className="font-medium text-slate-300">
+                      <div className="flex flex-col text-sm text-slate-600 dark:text-slate-400">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">
                           {formatDate(budget.startDate)}
                         </span>
                         <span className="text-slate-500">to</span>
-                        <span className="font-medium text-slate-300">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">
                           {formatDate(budget.endDate)}
                         </span>
                       </div>
@@ -311,10 +311,10 @@ const getBudgetStatus = (budget) => {
                           onClick={() =>
                             router.push(`/budget/edit/${budget._id}`)
                           }
-                          className="p-2.5 bg-slate-700/50 text-purple-400 rounded-xl border border-purple-500/30 hover:bg-purple-500/15 hover:border-purple-400/50 transition-all duration-200 group/btn"
+                          className="p-2.5 bg-slate-200/50 dark:bg-slate-700/50 text-purple-400 rounded-xl border border-purple-500/30 hover:bg-purple-500/15 hover:border-purple-400/50 transition-all duration-200 group/btn"
                         >
                           <Pencil size={18} />
-                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-slate-900 dark:text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                             Edit
                           </span>
                         </motion.button>
@@ -323,10 +323,10 @@ const getBudgetStatus = (budget) => {
                           whileHover={{ scale: 1.1, y: -1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => deleteBudget(budget._id)}
-                          className="p-2.5 bg-slate-700/50 text-rose-400 rounded-xl border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-400/50 transition-all duration-200 group/btn"
+                          className="p-2.5 bg-slate-200/50 dark:bg-slate-700/50 text-rose-400 rounded-xl border border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-400/50 transition-all duration-200 group/btn"
                         >
                           <Trash2 size={18} />
-                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-slate-900 dark:text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
                             Delete
                           </span>
                         </motion.button>
@@ -345,11 +345,11 @@ const getBudgetStatus = (budget) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-slate-800/80 px-8 py-6 border-t border-slate-700/60"
+        className="bg-slate-100/80 dark:bg-slate-800/80 px-8 py-6 border-t border-slate-300/60 dark:border-slate-700/60"
       >
         <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-400">
-            Showing <span className="font-semibold text-slate-200">{budgets.length}</span>{" "}
+          <div className="text-sm text-slate-600 dark:text-slate-400">
+            Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{budgets.length}</span>{" "}
             budgets
             {budgets.some((b) => !b.isActive) && (
               <span className="ml-2 text-amber-400">

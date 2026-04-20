@@ -70,7 +70,7 @@ export default function UseCases() {
   };
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-24 sm:py-32 lg:py-40 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -116,13 +116,13 @@ export default function UseCases() {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
             Who Gets{" "}
             <span className="bg-gradient-to-r from-cyan-400 through-blue-400 to-purple-400 bg-clip-text text-transparent">
               Personalized Guidance
             </span>
           </h2>
-          <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto font-light">
+          <p className="text-lg sm:text-xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-light">
             Every person's financial journey is unique. Discover how Fincraft AI provides personalized guidance tailored to your specific situation.
           </p>
         </motion.div>
@@ -144,7 +144,7 @@ export default function UseCases() {
                 whileHover={{ y: -8 }}
               >
                 <motion.div
-                  className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all duration-300"
+                  className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-cyan-400/20 group-hover:border-cyan-400/50 transition-all duration-300"
                   whileHover={{ boxShadow: "0 0 40px rgba(6, 182, 212, 0.2)" }}
                 />
 
@@ -153,14 +153,14 @@ export default function UseCases() {
                     whileHover={{ scale: 1.15, rotate: 12 }}
                     className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${useCase.color} flex items-center justify-center mb-6 shadow-xl`}
                   >
-                    <Icon className="w-8 h-8 text-white" />
+                    <Icon className="w-8 h-8 text-slate-900 dark:text-white" />
                   </motion.div>
 
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-cyan-300 transition-colors">
                     {useCase.title}
                   </h3>
                   <p className="text-cyan-400 font-semibold text-xs mb-4">{useCase.subtitle}</p>
-                  <p className="text-slate-300 leading-relaxed mb-6 font-light text-sm group-hover:text-slate-200 transition-colors">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6 font-light text-sm group-hover:text-slate-800 dark:text-slate-200 transition-colors">
                     {useCase.description}
                   </p>
 
@@ -178,7 +178,7 @@ export default function UseCases() {
                           whileHover={{ scale: 1.2 }}
                           className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400"
                         />
-                        <span className="text-slate-300">{stat}</span>
+                        <span className="text-slate-700 dark:text-slate-300">{stat}</span>
                       </motion.div>
                     ))}
                   </div>

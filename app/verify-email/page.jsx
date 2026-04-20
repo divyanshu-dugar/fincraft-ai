@@ -34,7 +34,7 @@ function VerifyEmailContent() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 flex items-center justify-center px-4">
       {/* Background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 left-1/4 w-96 h-96 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full blur-3xl opacity-10" />
@@ -48,7 +48,7 @@ function VerifyEmailContent() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="relative">
-          <div className="absolute -inset-1 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-slate-700/50" />
+          <div className="absolute -inset-1 bg-gradient-to-br from-slate-100/50 dark:from-slate-800/50 to-white/50 dark:to-slate-900/50 backdrop-blur-2xl rounded-3xl border border-slate-300/50 dark:border-slate-700/50" />
           <div className="relative p-10 text-center space-y-6">
 
             {/* Icon */}
@@ -61,25 +61,25 @@ function VerifyEmailContent() {
               }
               className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl mx-auto border ${
                 status === 'loading'
-                  ? 'bg-slate-800/60 border-slate-600/40'
+                  ? 'bg-slate-100/60 dark:bg-slate-800/60 border-slate-600/40'
                   : status === 'success'
                   ? 'bg-emerald-500/20 border-emerald-400/40'
                   : 'bg-red-500/20 border-red-400/40'
               }`}
             >
-              {status === 'loading' && <Loader2 className="w-10 h-10 text-slate-400" />}
+              {status === 'loading' && <Loader2 className="w-10 h-10 text-slate-600 dark:text-slate-400" />}
               {status === 'success' && <CheckCircle className="w-10 h-10 text-emerald-400" />}
               {status === 'error'   && <XCircle   className="w-10 h-10 text-red-400" />}
             </motion.div>
 
             {/* Heading */}
             <div>
-              <h1 className="text-2xl font-black text-white mb-2">
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2">
                 {status === 'loading' && 'Verifying your email…'}
                 {status === 'success' && 'Email verified!'}
                 {status === 'error'   && 'Verification failed'}
               </h1>
-              <p className="text-slate-300 text-sm leading-relaxed">{message}</p>
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{message}</p>
             </div>
 
             {/* Actions */}
@@ -88,7 +88,7 @@ function VerifyEmailContent() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full relative py-3 px-4 rounded-xl font-bold text-lg text-white overflow-hidden"
+                  className="w-full relative py-3 px-4 rounded-xl font-bold text-lg text-slate-900 dark:text-white overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl" />
                   <span className="relative">Sign In to Fincraft AI</span>
@@ -129,7 +129,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-slate-600 border-t-emerald-400 rounded-full animate-spin" />
       </div>
     }>

@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar"
 import RouteGuard from "@/components/RouteGuard";
 import OAuthProviders from "@/components/OAuthProviders";
 import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +28,12 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <OAuthProviders>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <OAuthProviders>
           <RouteGuard>
             <Navbar />
             <Toaster
@@ -54,6 +56,7 @@ export default function RootLayout({ children }) {
             </main>
           </RouteGuard>
         </OAuthProviders>
+        </ThemeProvider>
       </body>
     </html>
   );

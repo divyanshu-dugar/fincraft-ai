@@ -86,7 +86,7 @@ function ProgressBar({ pct }) {
     pct >= 100 ? "bg-orange-500" :
     pct >= 80  ? "bg-amber-500" : "bg-indigo-500";
   return (
-    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
       <div className={`h-2 rounded-full transition-all duration-500 ${barClass}`} style={{ width: `${clamped}%` }} />
     </div>
   );
@@ -256,24 +256,24 @@ export default function BudgetList() {
   // ── render ────────────────────────────────────────────────────────────────
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
 
       {/* sticky page header */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Target className="w-4 h-4 text-white" />
+              <Target className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-none">Budgets</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5">Track your spending limits</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Budgets</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5">Track your spending limits</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => router.push("/budget/analytics")}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-600 text-slate-400 text-xs font-semibold hover:bg-slate-700/50 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-600 text-slate-600 dark:text-slate-400 text-xs font-semibold hover:bg-slate-200/50 dark:bg-slate-700/50 transition-colors"
             >
               <BarChart2 className="w-3.5 h-3.5" /> Analytics
             </button>
@@ -290,7 +290,7 @@ export default function BudgetList() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
 
         {/* ── month header bar ─────────────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-indigo-900/30 to-slate-800/80 border border-indigo-500/20 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-100/80 dark:from-slate-800/80 via-indigo-900/30 to-slate-100 dark:to-slate-800/80 border border-indigo-500/20 shadow-sm">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute left-1/4 top-0 w-56 h-56 bg-indigo-500/5 rounded-full -translate-y-1/2" />
             <div className="absolute right-1/4 bottom-0 w-40 h-40 bg-purple-500/5 rounded-full translate-y-1/2" />
@@ -301,7 +301,7 @@ export default function BudgetList() {
             {view === "month" ? (
               <button
                 onClick={() => changeMonth(-1)}
-                className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -311,16 +311,16 @@ export default function BudgetList() {
             <div className="flex-1 flex flex-col items-center min-w-0">
               {view === "month" ? (
                 <>
-                  <p className="text-lg font-black text-white tracking-tight leading-none">
+                  <p className="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">
                     {MONTH_NAMES[currentMonth]} {currentYear}
                   </p>
                   {monthStats && !loading && (
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap justify-center">
-                      <span className="text-xs text-slate-400 font-medium">
+                      <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                         {fmt(monthStats.totalBudget)} budgeted
                       </span>
                       <span className="text-slate-600">·</span>
-                      <span className="text-xs text-slate-400 font-medium">
+                      <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                         {fmt(monthStats.totalSpent)} spent
                       </span>
                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${pillClass}`}>
@@ -334,7 +334,7 @@ export default function BudgetList() {
                 </>
               ) : (
                 <>
-                  <p className="text-lg font-black text-white tracking-tight leading-none">Yearly Budgets</p>
+                  <p className="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">Yearly Budgets</p>
                   <p className="text-xs text-slate-500 mt-1">Long-running budgets spanning the full year</p>
                 </>
               )}
@@ -353,7 +353,7 @@ export default function BudgetList() {
               {view === "month" && (
                 <button
                   onClick={() => changeMonth(1)}
-                  className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                  className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -370,7 +370,7 @@ export default function BudgetList() {
             className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
               view === "month"
                 ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20"
-                : "bg-slate-800/60 text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-200"
+                : "bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-800 dark:text-slate-200"
             }`}
           >
             Monthly
@@ -380,7 +380,7 @@ export default function BudgetList() {
             className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
               view === "other"
                 ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20"
-                : "bg-slate-800/60 text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-200"
+                : "bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-600 hover:border-slate-500 hover:text-slate-800 dark:text-slate-200"
             }`}
           >
             Yearly
@@ -389,15 +389,15 @@ export default function BudgetList() {
           {/* status sub-filters — monthly view only */}
           {view === "month" && (
             <>
-              <div className="w-px h-5 bg-slate-700 mx-1 hidden sm:block" />
+              <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
               {STATUS_FILTERS.map(({ key, label, dot }) => (
                 <button
                   key={key}
                   onClick={() => setStatusFilter(key)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
                     statusFilter === key
-                      ? "bg-slate-700 text-white border-slate-600 shadow-sm"
-                      : "bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200"
+                      ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-600 shadow-sm"
+                      : "bg-slate-100/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:border-slate-500 hover:text-slate-800 dark:text-slate-200"
                   }`}
                 >
                   {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />}
@@ -410,7 +410,7 @@ export default function BudgetList() {
 
         {/* ── alert banner ──────────────────────────────────────────────────── */}
         {alerts.length > 0 && (
-          <div className="bg-slate-800/60 rounded-2xl border border-amber-500/30 shadow-sm overflow-hidden">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-amber-500/30 shadow-sm overflow-hidden">
             <div
               role="button"
               tabIndex={0}
@@ -444,11 +444,11 @@ export default function BudgetList() {
                   <div key={alert._id} className="flex items-center justify-between px-6 py-3 bg-amber-500/10">
                     <div className="flex items-center gap-3">
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${alert.type === "budget_exceeded" ? "bg-rose-400" : "bg-amber-400"}`} />
-                      <p className="text-sm text-slate-300">{alert.message}</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-300">{alert.message}</p>
                     </div>
                     <button
                       onClick={() => markRead(alert._id)}
-                      className="ml-4 text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+                      className="ml-4 text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors flex-shrink-0"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -476,15 +476,15 @@ export default function BudgetList() {
               };
               const { pill, text } = accentMap[accent];
               return (
-                <div key={label} className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm px-5 py-4">
+                <div key={label} className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 shadow-sm px-5 py-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">{label}</p>
                     <div className={`w-8 h-8 rounded-xl ${pill} flex items-center justify-center`}>
                       <Icon className={`w-4 h-4 ${text}`} />
                     </div>
                   </div>
-                  <p className="text-xl font-black text-white">
-                    {value}{unit ? <span className="text-sm font-semibold text-slate-400 ml-1">{unit}</span> : ""}
+                  <p className="text-xl font-black text-slate-900 dark:text-white">
+                    {value}{unit ? <span className="text-sm font-semibold text-slate-600 dark:text-slate-400 ml-1">{unit}</span> : ""}
                   </p>
                 </div>
               );
@@ -496,16 +496,16 @@ export default function BudgetList() {
         {loading ? (
           <CardGridSkeleton count={6} />
         ) : filteredBudgets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-slate-800/60 rounded-2xl border border-cyan-400/20">
-            <div className="w-16 h-16 rounded-2xl bg-slate-700 flex items-center justify-center mb-4">
-              <CircleOff className="w-7 h-7 text-slate-400" />
+          <div className="flex flex-col items-center justify-center py-20 bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20">
+            <div className="w-16 h-16 rounded-2xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center mb-4">
+              <CircleOff className="w-7 h-7 text-slate-600 dark:text-slate-400" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
               {view === "month"
                 ? `No budgets for ${MONTH_NAMES[currentMonth]} ${currentYear}`
                 : "No yearly budgets yet"}
             </h3>
-            <p className="text-sm text-slate-400 mb-6">
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
               {view === "month"
                 ? statusFilter !== "all"
                   ? "Try the \"All\" filter to see every budget for this month."
@@ -534,24 +534,24 @@ export default function BudgetList() {
               return (
                 <div
                   key={budget._id}
-                  className="bg-slate-800/60 rounded-2xl border border-cyan-400/20 hover:border-cyan-400/40 hover:shadow-md transition-all p-5 flex flex-col gap-4"
+                  className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-400/20 hover:border-cyan-400/40 hover:shadow-md transition-all p-5 flex flex-col gap-4"
                 >
                   {/* top row */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-xl flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xl flex-shrink-0">
                         {catIcon}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <p className="text-base font-bold text-white truncate">{budget.name}</p>
+                          <p className="text-base font-bold text-slate-900 dark:text-white truncate">{budget.name}</p>
                           {budget.isRecurring && (
                             <span title="Recurring budget" className="flex-shrink-0">
                               <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 truncate">{catName}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{catName}</p>
                         <p className="text-sm font-bold text-indigo-300 mt-0.5">{fmt(budget.amount)}<span className="text-xs font-semibold text-slate-500"> / {budget.period}</span></p>
                       </div>
                     </div>
@@ -561,8 +561,8 @@ export default function BudgetList() {
                   {/* progress */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-semibold text-slate-400">{Math.min(Math.round(pct), 100)}% used</span>
-                      <span className="text-xs font-semibold text-slate-400">
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{Math.min(Math.round(pct), 100)}% used</span>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                         {/* Show proportional cap for this period; if same as full amount, omit the fraction */}
                         {budget.proportionalBudget && Math.abs(budget.proportionalBudget - budget.amount) > 1
                           ? <>{fmt(budget.proportionalBudget)} <span className="text-slate-600">of {fmt(budget.amount)}</span></>
@@ -589,7 +589,7 @@ export default function BudgetList() {
                   </div>
 
                   {/* footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-700">
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-300 dark:border-slate-700">
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                       <span>{fmtDate(budget.startDate)}</span>
                       <span>→</span>
@@ -629,20 +629,20 @@ export default function BudgetList() {
     {/* ── Delete confirmation modal ─────────────────────────────────────── */}
     {deleteModal && (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div className="w-full max-w-sm bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
+        <div className="w-full max-w-sm bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-700 shadow-2xl p-6 flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
               <Trash2 className="w-5 h-5 text-rose-400" />
             </div>
             <div>
-              <p className="text-base font-bold text-white">Delete Budget</p>
-              <p className="text-xs text-slate-400">{deleteModal.budget.name}</p>
+              <p className="text-base font-bold text-slate-900 dark:text-white">Delete Budget</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{deleteModal.budget.name}</p>
             </div>
           </div>
 
           {deleteModal.budget.isRecurring ? (
             <>
-              <p className="text-sm text-slate-300">This is a recurring budget. What would you like to delete?</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300">This is a recurring budget. What would you like to delete?</p>
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => performDelete(deleteModal.budget, false)}
@@ -662,7 +662,7 @@ export default function BudgetList() {
             </>
           ) : (
             <>
-              <p className="text-sm text-slate-300">This will permanently delete the budget. This cannot be undone.</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300">This will permanently delete the budget. This cannot be undone.</p>
               <button
                 onClick={() => performDelete(deleteModal.budget, false)}
                 className="w-full px-4 py-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-sm font-bold hover:bg-rose-500/30 transition-colors"
@@ -674,7 +674,7 @@ export default function BudgetList() {
 
           <button
             onClick={() => setDeleteModal(null)}
-            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-400 text-sm font-semibold hover:bg-slate-700/50 transition-colors"
+            className="w-full px-4 py-2 rounded-xl border border-slate-600 text-slate-600 dark:text-slate-400 text-sm font-semibold hover:bg-slate-200/50 dark:bg-slate-700/50 transition-colors"
           >
             Cancel
           </button>

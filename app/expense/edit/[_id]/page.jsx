@@ -226,25 +226,25 @@ const EditExpense = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
       {/* ── sticky header ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          <div className="h-5 w-px bg-slate-700" />
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <IndianRupee className="w-4 h-4 text-white" />
+              <IndianRupee className="w-4 h-4 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white leading-none">Edit Expense</h1>
-              <p className="text-xs text-slate-400 leading-none mt-0.5">Update your record</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Edit Expense</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5">Update your record</p>
             </div>
           </div>
 
@@ -252,7 +252,7 @@ const EditExpense = () => {
           <button
             type="button"
             onClick={() => setConfirmDelete(true)}
-            className="ml-auto p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/15 transition-all"
+            className="ml-auto p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-rose-400 hover:bg-rose-500/15 transition-all"
             title="Delete expense"
           >
             <Trash2 className="w-4 h-4" />
@@ -264,12 +264,12 @@ const EditExpense = () => {
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
           {/* ── amount hero card ─────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-slate-700 p-6">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300 dark:border-slate-700 p-6">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
               Amount <span className="text-rose-400">*</span>
             </label>
 
-            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-700/50 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
+            <div className={`flex items-center gap-3 mb-5 pb-5 border-b border-slate-300/50 dark:border-slate-700/50 transition-all duration-200 ${isAmountSet ? 'opacity-100' : 'opacity-70'}`}>
               <CurrencyBadge value={currency} onChange={setCurrency} currencies={currencies} size="lg" />
               <input
                 type="number"
@@ -280,7 +280,7 @@ const EditExpense = () => {
                 placeholder="0"
                 min="0"
                 step="1"
-                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-500' : 'text-white'}`}
+                className={`flex-1 text-5xl font-black tracking-tight bg-transparent outline-none placeholder:text-slate-700 ${errors.amount ? 'text-rose-500' : 'text-slate-900 dark:text-white'}`}
                 style={{ minWidth: 0 }}
               />
               {isAmountSet && (
@@ -293,7 +293,7 @@ const EditExpense = () => {
             {errors.amount && <p className="text-xs text-rose-500 font-semibold -mt-3 mb-4">{errors.amount}</p>}
 
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick select</p>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Quick select</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_AMOUNTS.map((v) => (
                   <button
@@ -302,8 +302,8 @@ const EditExpense = () => {
                     onClick={() => { setAmount(v.toString()); clearError('amount'); }}
                     className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-150 ${
                       Number(amount) === v
-                        ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                        : 'bg-slate-700/50 text-slate-300 border-slate-600 hover:border-slate-500'
+                        ? 'bg-gray-900 text-slate-900 dark:text-white border-gray-900 shadow-md'
+                        : 'bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border-slate-600 hover:border-slate-500'
                     }`}
                   >
                     {currencyObj.symbol}{v.toLocaleString('en-US')}
@@ -314,11 +314,11 @@ const EditExpense = () => {
           </div>
 
           {/* ── details card ──────────────────────────────────────────────── */}
-          <div className="bg-slate-800/60 rounded-2xl border border-slate-700 divide-y divide-slate-700/50">
+          <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-2xl border border-slate-300 dark:border-slate-700 divide-y divide-slate-700/50">
 
             {/* category */}
             <div className="px-6 py-5">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
                 Category <span className="text-rose-400">*</span>
               </label>
@@ -335,7 +335,7 @@ const EditExpense = () => {
 
             {/* date */}
             <div className="px-6 py-5">
-              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label htmlFor="date" className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <CalendarDays className="w-3.5 h-3.5" />
                 Date <span className="text-rose-400">*</span>
               </label>
@@ -344,7 +344,7 @@ const EditExpense = () => {
                 type="date"
                 value={date}
                 onChange={(e) => { setDate(e.target.value); clearError('date'); }}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-blue-400/20 focus:border-blue-400 bg-slate-700/50 ${
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium text-slate-800 dark:text-slate-200 [color-scheme:dark] outline-none transition-all focus:ring-2 focus:ring-blue-400/20 focus:border-blue-400 bg-slate-200/50 dark:bg-slate-700/50 ${
                   errors.date ? 'border-rose-400 ring-2 ring-rose-400/20' : 'border-slate-600'
                 }`}
               />
@@ -353,7 +353,7 @@ const EditExpense = () => {
 
             {/* note */}
             <div className="px-6 py-5">
-              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label htmlFor="note" className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
                 <NotebookPen className="w-3.5 h-3.5" />
                 Note
                 <span className="ml-auto font-normal normal-case tracking-normal text-slate-600">{note.length}/500</span>
@@ -364,7 +364,7 @@ const EditExpense = () => {
                 onChange={(e) => setNote(e.target.value.slice(0, 500))}
                 rows={3}
                 placeholder="What was this expense for?"
-                className="w-full px-4 py-3 border border-slate-600 bg-slate-700/50 rounded-xl text-sm font-medium text-slate-200 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-400/20 focus:border-blue-400 transition-all resize-none"
+                className="w-full px-4 py-3 border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 rounded-xl text-sm font-medium text-slate-800 dark:text-slate-200 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-400/20 focus:border-blue-400 transition-all resize-none"
               />
             </div>
           </div>
@@ -375,7 +375,7 @@ const EditExpense = () => {
               type="button"
               onClick={() => router.back()}
               disabled={saving}
-              className="flex-1 px-6 py-3.5 rounded-xl border border-slate-600 bg-slate-800 text-sm font-bold text-slate-300 hover:bg-slate-700 transition-all disabled:opacity-40"
+              className="flex-1 px-6 py-3.5 rounded-xl border border-slate-600 bg-slate-100 dark:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 transition-all disabled:opacity-40"
             >
               Cancel
             </button>
@@ -403,14 +403,14 @@ const EditExpense = () => {
       {/* ── delete confirmation overlay ───────────────────────────────────── */}
       {confirmDelete && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 w-full max-w-sm p-6">
+          <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-300 dark:border-slate-700 w-full max-w-sm p-6">
             <div className="flex items-start gap-4 mb-5">
               <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-6 h-6 text-rose-400" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Delete Expense</h3>
-                <p className="text-sm text-slate-400 mt-1">
+                <h3 className="font-bold text-slate-900 dark:text-white text-lg">Delete Expense</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                   This action cannot be undone. Are you sure you want to delete this expense?
                 </p>
               </div>
@@ -418,7 +418,7 @@ const EditExpense = () => {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-slate-300 border border-slate-600 bg-slate-800 rounded-xl hover:bg-slate-700 transition-all"
+                className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:bg-slate-700 transition-all"
               >
                 Cancel
               </button>

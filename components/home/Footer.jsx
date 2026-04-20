@@ -64,7 +64,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
+    <footer className="relative bg-gradient-to-b from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -101,10 +101,10 @@ export default function Footer() {
             />
 
             <div className="relative p-10 sm:p-12 text-center">
-              <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                 Stay Updated
               </h3>
-              <p className="text-slate-300 text-lg mb-10 font-light">
+              <p className="text-slate-700 dark:text-slate-300 text-lg mb-10 font-light">
                 Get the latest updates, tips, and financial insights delivered to your inbox.
               </p>
 
@@ -115,7 +115,7 @@ export default function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="flex-1 px-6 py-4 rounded-xl bg-slate-800/50 border border-cyan-400/30 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition-colors"
+                  className="flex-1 px-6 py-4 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-cyan-400/30 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition-colors"
                 />
                 <motion.button
                   type="submit"
@@ -144,7 +144,7 @@ export default function Footer() {
           >
             {Object.entries(footerLinks).map(([category, links]) => (
               <motion.div key={category} variants={itemVariants}>
-                <h4 className="font-bold text-white text-lg mb-6">
+                <h4 className="font-bold text-slate-900 dark:text-white text-lg mb-6">
                   {category}
                 </h4>
                 <ul className="space-y-4">
@@ -156,7 +156,7 @@ export default function Footer() {
                     >
                       <a
                         href={link.href}
-                        className="text-slate-300 hover:text-cyan-300 transition-colors font-light"
+                        className="text-slate-700 dark:text-slate-300 hover:text-cyan-300 transition-colors font-light"
                       >
                         {link.label}
                       </a>
@@ -180,7 +180,7 @@ export default function Footer() {
                 <h1 className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
                   Fincraft AI
                 </h1>
-                <p className="text-slate-400 font-light">
+                <p className="text-slate-600 dark:text-slate-400 font-light">
                   Your personal finance operating system.
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function Footer() {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.2, y: -4 }}
                       whileTap={{ scale: 0.9 }}
-                      className="w-12 h-12 rounded-lg bg-slate-800/50 border border-cyan-400/30 flex items-center justify-center text-slate-300 hover:text-cyan-300 hover:border-cyan-400/60 transition-colors"
+                      className="w-12 h-12 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-cyan-400/30 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-cyan-300 hover:border-cyan-400/60 transition-colors"
                       aria-label={social.label}
                     >
                       <Icon className="w-6 h-6" />

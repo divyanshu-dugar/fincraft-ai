@@ -63,7 +63,7 @@ export default function BulkActionsBar({
       className="fixed bottom-0 left-0 right-0 z-50"
     >
       <div className="max-w-4xl mx-auto px-4 pb-4">
-        <div className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl shadow-emerald-500/10 p-4">
+        <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl shadow-emerald-500/10 p-4">
           {/* Main bar */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -72,7 +72,7 @@ export default function BulkActionsBar({
               </span>
               <button
                 onClick={onClearSelection}
-                className="text-slate-400 hover:text-white text-xs underline underline-offset-2 transition-colors"
+                className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white text-xs underline underline-offset-2 transition-colors"
               >
                 Clear
               </button>
@@ -88,7 +88,7 @@ export default function BulkActionsBar({
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   activeAction === "recategorize"
                     ? "bg-indigo-500/30 border border-indigo-400/60 text-indigo-200"
-                    : "bg-slate-700/60 border border-slate-600/60 text-slate-300 hover:bg-indigo-500/20 hover:border-indigo-400/40 hover:text-indigo-200"
+                    : "bg-slate-200/60 dark:bg-slate-700/60 border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:bg-indigo-500/20 hover:border-indigo-400/40 hover:text-indigo-200"
                 } disabled:opacity-50`}
               >
                 <Tag size={15} />
@@ -104,7 +104,7 @@ export default function BulkActionsBar({
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   activeAction === "editDate"
                     ? "bg-amber-500/30 border border-amber-400/60 text-amber-200"
-                    : "bg-slate-700/60 border border-slate-600/60 text-slate-300 hover:bg-amber-500/20 hover:border-amber-400/40 hover:text-amber-200"
+                    : "bg-slate-200/60 dark:bg-slate-700/60 border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:bg-amber-500/20 hover:border-amber-400/40 hover:text-amber-200"
                 } disabled:opacity-50`}
               >
                 <Calendar size={15} />
@@ -135,15 +135,15 @@ export default function BulkActionsBar({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="pt-4 mt-4 border-t border-slate-700/60 flex items-center gap-3">
-                  <label className="text-sm text-slate-400 whitespace-nowrap">
+                <div className="pt-4 mt-4 border-t border-slate-300/60 dark:border-slate-700/60 flex items-center gap-3">
+                  <label className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
                     Move to:
                   </label>
                   <div className="relative flex-1 max-w-sm">
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full appearance-none bg-slate-800 border border-slate-600 text-white text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-emerald-500 transition-colors"
+                      className="w-full appearance-none bg-slate-100 dark:bg-slate-800 border border-slate-600 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-emerald-500 transition-colors"
                     >
                       <option value="">Select category...</option>
                       {categories.map((cat) => (
@@ -154,7 +154,7 @@ export default function BulkActionsBar({
                     </select>
                     <ChevronDown
                       size={14}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 pointer-events-none"
                     />
                   </div>
                   <motion.button
@@ -168,7 +168,7 @@ export default function BulkActionsBar({
                   </motion.button>
                   <button
                     onClick={() => { setActiveAction(null); setSelectedCategory(""); }}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
                   >
                     <X size={16} />
                   </button>
@@ -184,15 +184,15 @@ export default function BulkActionsBar({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="pt-4 mt-4 border-t border-slate-700/60 flex items-center gap-3">
-                  <label className="text-sm text-slate-400 whitespace-nowrap">
+                <div className="pt-4 mt-4 border-t border-slate-300/60 dark:border-slate-700/60 flex items-center gap-3">
+                  <label className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
                     New date:
                   </label>
                   <input
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-slate-800 border border-slate-600 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors [color-scheme:dark]"
+                    className="bg-slate-100 dark:bg-slate-800 border border-slate-600 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors [color-scheme:dark]"
                   />
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -205,7 +205,7 @@ export default function BulkActionsBar({
                   </motion.button>
                   <button
                     onClick={() => { setActiveAction(null); setSelectedDate(""); }}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
                   >
                     <X size={16} />
                   </button>

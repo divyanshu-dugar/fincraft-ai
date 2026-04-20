@@ -132,7 +132,7 @@ export default function BudgetAlertsBell() {
         className={`relative p-2 rounded-lg border transition-all duration-200 ${
           open
             ? 'text-amber-300 border-amber-400/50 bg-amber-400/10'
-            : 'text-slate-400 border-transparent hover:text-amber-300 hover:border-amber-400/30 hover:bg-amber-400/10'
+            : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-amber-300 hover:border-amber-400/30 hover:bg-amber-400/10'
         }`}
         aria-label={`Budget alerts${hasUnread ? ` (${unreadCount} unread)` : ''}`}
       >
@@ -163,13 +163,13 @@ export default function BudgetAlertsBell() {
             animate={{ opacity: 1, y: 0,  scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-80 bg-gradient-to-br from-slate-800/98 to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-80 bg-gradient-to-br from-slate-100/98 dark:from-slate-800/98 to-white/98 dark:to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden z-50"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/60">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-300/60 dark:border-slate-700/60">
               <div className="flex items-center gap-2">
                 <BellRing className="w-4 h-4 text-amber-400" />
-                <span className="text-sm font-bold text-white">Budget Alerts</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">Budget Alerts</span>
                 {hasUnread && (
                   <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-bold">
                     {unreadCount} new
@@ -180,14 +180,14 @@ export default function BudgetAlertsBell() {
                 {hasUnread && (
                   <button
                     onClick={markAllRead}
-                    className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors px-2 py-1 rounded-lg hover:bg-cyan-400/10"
+                    className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-cyan-300 transition-colors px-2 py-1 rounded-lg hover:bg-cyan-400/10"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setOpen(false)}
-                  className="p-1 text-slate-500 hover:text-slate-300 rounded-lg hover:bg-slate-700/60 transition-colors"
+                  className="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200/60 dark:bg-slate-700/60 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -203,7 +203,7 @@ export default function BudgetAlertsBell() {
               ) : alerts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-2">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500/60" />
-                  <p className="text-slate-400 text-sm font-medium">All budgets on track</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">All budgets on track</p>
                   <p className="text-slate-600 text-xs">No alerts yet</p>
                 </div>
               ) : (
@@ -212,8 +212,8 @@ export default function BudgetAlertsBell() {
                   return (
                     <div
                       key={alert._id}
-                      className={`relative flex gap-3 px-4 py-3 border-b border-slate-700/40 last:border-0 transition-colors ${
-                        alert.isRead ? 'opacity-50' : 'bg-slate-800/40'
+                      className={`relative flex gap-3 px-4 py-3 border-b border-slate-300/40 dark:border-slate-700/40 last:border-0 transition-colors ${
+                        alert.isRead ? 'opacity-50' : 'bg-slate-100/40 dark:bg-slate-800/40'
                       }`}
                     >
                       {/* Type icon */}
@@ -228,10 +228,10 @@ export default function BudgetAlertsBell() {
                           <span className="text-[10px] text-slate-600">·</span>
                           <span className="text-[10px] text-slate-500">{timeAgo(alert.createdAt)}</span>
                         </div>
-                        <p className="text-xs text-slate-200 leading-relaxed">{alert.message}</p>
+                        <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">{alert.message}</p>
 
                         {/* Progress bar */}
-                        <div className="mt-2 h-1.5 rounded-full bg-slate-700/60 overflow-hidden">
+                        <div className="mt-2 h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-700/60 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all ${
                               alert.percentage > 100 ? 'bg-red-500' :
@@ -263,10 +263,10 @@ export default function BudgetAlertsBell() {
 
             {/* Footer */}
             {alerts.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-slate-700/40 flex items-center justify-between gap-2">
+              <div className="px-4 py-2.5 border-t border-slate-300/40 dark:border-slate-700/40 flex items-center justify-between gap-2">
                 <button
                   onClick={checkAndFetch}
-                  className="text-[11px] text-slate-400 hover:text-cyan-300 transition-colors"
+                  className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-cyan-300 transition-colors"
                 >
                   Refresh
                 </button>
@@ -274,7 +274,7 @@ export default function BudgetAlertsBell() {
                   {alerts.some((a) => a.isRead) && (
                     <button
                       onClick={() => clearAlerts(false)}
-                      className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors px-2 py-1 rounded-lg hover:bg-amber-400/10"
+                      className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-amber-300 transition-colors px-2 py-1 rounded-lg hover:bg-amber-400/10"
                       title="Delete read alerts from database"
                     >
                       <Trash2 className="w-3 h-3" /> Clear read
@@ -282,7 +282,7 @@ export default function BudgetAlertsBell() {
                   )}
                   <button
                     onClick={() => clearAlerts(true)}
-                    className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-rose-300 transition-colors px-2 py-1 rounded-lg hover:bg-rose-400/10"
+                    className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-rose-300 transition-colors px-2 py-1 rounded-lg hover:bg-rose-400/10"
                     title="Delete all alerts from database"
                   >
                     <Trash2 className="w-3 h-3" /> Clear all

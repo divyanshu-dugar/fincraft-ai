@@ -68,7 +68,7 @@ function InlineCategoryPicker({ tree = [], value, onChange, error }) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-300 mb-2">
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
         Category <span className="text-red-400">*</span>
       </label>
 
@@ -84,7 +84,7 @@ function InlineCategoryPicker({ tree = [], value, onChange, error }) {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 ${
                 isActive
                   ? 'bg-indigo-500/25 border-indigo-400/70 text-indigo-200'
-                  : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                  : 'bg-slate-100/60 dark:bg-slate-800/60 border-slate-300/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:border-slate-500 hover:text-slate-800 dark:text-slate-200'
               }`}
             >
               <span>{parent.icon || '📁'}</span>
@@ -123,7 +123,7 @@ function InlineCategoryPicker({ tree = [], value, onChange, error }) {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 ${
                         isSelected
                           ? 'bg-indigo-600/30 border-indigo-400 text-white'
-                          : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:border-indigo-400/50 hover:text-slate-200'
+                          : 'bg-slate-100/60 dark:bg-slate-800/60 border-slate-300/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:border-indigo-400/50 hover:text-slate-800 dark:text-slate-200'
                       }`}
                     >
                       <span>{sub.icon || '💰'}</span>
@@ -148,7 +148,7 @@ function InlineCategoryPicker({ tree = [], value, onChange, error }) {
           <button
             type="button"
             onClick={() => { onChange(null); setSelectedParent(null); }}
-            className="ml-auto text-slate-500 hover:text-slate-300 transition-colors"
+            className="ml-auto text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors"
           >
             <X size={13} />
           </button>
@@ -339,10 +339,10 @@ export default function QuickBudgetSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-700/60 rounded-t-3xl shadow-2xl px-5 pt-5 pb-8 max-h-[90dvh] overflow-y-auto"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-300/60 dark:border-slate-700/60 rounded-t-3xl shadow-2xl px-5 pt-5 pb-8 max-h-[90dvh] overflow-y-auto"
           >
             {/* Drag handle */}
-            <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-5" />
+            <div className="w-10 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-5" />
 
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -351,7 +351,7 @@ export default function QuickBudgetSheet({
                   <Wallet size={18} className="text-indigo-400" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white leading-tight">Set a Budget</h2>
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Set a Budget</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {fmtDisplay(dateRange.startDate)} – {fmtDisplay(dateRange.endDate)}
                   </p>
@@ -359,7 +359,7 @@ export default function QuickBudgetSheet({
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 transition-colors"
               >
                 <X size={18} />
               </button>
@@ -371,14 +371,14 @@ export default function QuickBudgetSheet({
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
                   <Check size={32} className="text-emerald-400" strokeWidth={3} />
                 </div>
-                <p className="text-white font-semibold text-lg">Budget created!</p>
+                <p className="text-slate-900 dark:text-white font-semibold text-lg">Budget created!</p>
               </div>
             ) : (
               <div className="space-y-5">
 
                 {/* Budget name */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Budget Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -386,8 +386,8 @@ export default function QuickBudgetSheet({
                     value={name}
                     onChange={(e) => { setName(e.target.value); clearErr('name'); }}
                     placeholder="e.g. Monthly Groceries"
-                    className={`w-full bg-slate-800/80 border rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition-all ${
-                      errors.name ? 'border-red-500/60' : 'border-slate-700/60'
+                    className={`w-full bg-slate-100/80 dark:bg-slate-800/80 border rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition-all ${
+                      errors.name ? 'border-red-500/60' : 'border-slate-300/60 dark:border-slate-700/60'
                     }`}
                   />
                   {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
@@ -395,7 +395,7 @@ export default function QuickBudgetSheet({
 
                 {/* Period */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Period</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Period</label>
                   <div className="grid grid-cols-3 gap-2">
                     {PERIOD_OPTIONS.map((opt) => (
                       <button
@@ -405,7 +405,7 @@ export default function QuickBudgetSheet({
                         className={`py-2.5 rounded-xl text-sm font-semibold border transition-all duration-150 ${
                           period === opt.value
                             ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-300'
-                            : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                            : 'bg-slate-100/60 dark:bg-slate-800/60 border-slate-300/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:border-slate-500 hover:text-slate-800 dark:text-slate-200'
                         }`}
                       >
                         {opt.label}
@@ -424,7 +424,7 @@ export default function QuickBudgetSheet({
 
                 {/* Amount */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Budget Limit (USD) <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
@@ -436,8 +436,8 @@ export default function QuickBudgetSheet({
                       value={amount}
                       onChange={(e) => { setAmount(e.target.value); clearErr('amount'); }}
                       placeholder="0"
-                      className={`w-full bg-slate-800/80 border rounded-xl pl-8 pr-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition-all ${
-                        errors.amount ? 'border-red-500/60' : 'border-slate-700/60'
+                      className={`w-full bg-slate-100/80 dark:bg-slate-800/80 border rounded-xl pl-8 pr-4 py-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 transition-all ${
+                        errors.amount ? 'border-red-500/60' : 'border-slate-300/60 dark:border-slate-700/60'
                       }`}
                     />
                   </div>
@@ -450,7 +450,7 @@ export default function QuickBudgetSheet({
                         key={q}
                         type="button"
                         onClick={() => { setAmount(String(q)); clearErr('amount'); }}
-                        className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs hover:border-indigo-400/60 hover:text-indigo-300 transition-colors"
+                        className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs hover:border-indigo-400/60 hover:text-indigo-300 transition-colors"
                       >
                         ${q.toLocaleString()}
                       </button>
@@ -468,15 +468,15 @@ export default function QuickBudgetSheet({
                 </div>
 
                 {/* Recurring toggle */}
-                <div className="bg-slate-800/60 rounded-xl border border-slate-700/60 divide-y divide-slate-700/60">
+                <div className="bg-slate-100/60 dark:bg-slate-800/60 rounded-xl border border-slate-300/60 dark:border-slate-700/60 divide-y divide-slate-700/60">
                   <div className="px-4 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-1.5 rounded-lg ${isRecurring ? 'bg-indigo-500/20' : 'bg-slate-700'}`}>
+                      <div className={`p-1.5 rounded-lg ${isRecurring ? 'bg-indigo-500/20' : 'bg-slate-200 dark:bg-slate-700'}`}>
                         <RefreshCw size={14} className={isRecurring ? 'text-indigo-400' : 'text-slate-400'} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-200">Repeat Budget</p>
-                        <p className="text-xs text-slate-400">Auto-renew each {period} period</p>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Repeat Budget</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">Auto-renew each {period} period</p>
                       </div>
                     </div>
                     <button
@@ -490,7 +490,7 @@ export default function QuickBudgetSheet({
 
                   {isRecurring && (
                     <div className="px-4 py-3.5">
-                      <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
                         Repeat Until <span className="text-slate-500 font-normal">(optional)</span>
                       </label>
                       <input
@@ -498,7 +498,7 @@ export default function QuickBudgetSheet({
                         value={repeatUntil}
                         onChange={(e) => setRepeatUntil(e.target.value)}
                         min={dateRange.endDate || undefined}
-                        className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 [color-scheme:dark]"
+                        className="w-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-300/60 dark:border-slate-700/60 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 [color-scheme:dark]"
                       />
                       <p className="text-xs text-indigo-400 mt-1.5">
                         Leaves blank to repeat forever.
@@ -519,7 +519,7 @@ export default function QuickBudgetSheet({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 py-3 rounded-xl border border-slate-700 text-slate-400 text-sm font-semibold hover:border-slate-500 hover:text-slate-200 transition-colors"
+                    className="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold hover:border-slate-500 hover:text-slate-800 dark:text-slate-200 transition-colors"
                   >
                     Cancel
                   </button>

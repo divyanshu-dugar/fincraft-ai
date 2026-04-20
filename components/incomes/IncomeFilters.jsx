@@ -18,7 +18,7 @@ export default function IncomeFilters({
     return categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase()));
   }, [categories, search]);
   return (
-    <div className="relative bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 mb-10 transition-all duration-300">
+    <div className="relative bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6 mb-10 transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold bg-gradient-to-r from-cyan-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
@@ -31,7 +31,7 @@ export default function IncomeFilters({
             setSelectedCategory("all");
             onCustomRangeReset?.();
           }}
-          className="text-sm text-slate-400 hover:text-cyan-400 transition-colors"
+          className="text-sm text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-colors"
         >
           Reset Filters
         </button>
@@ -41,7 +41,7 @@ export default function IncomeFilters({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* 🏷 Category Filter with Search */}
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 flex items-center">
             <Tag className="w-4 h-4 mr-2 text-emerald-400" />
             Category
           </label>
@@ -51,14 +51,14 @@ export default function IncomeFilters({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search categories..."
-              className="pl-9 pr-3 py-2 text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200 w-full"
+              className="pl-9 pr-3 py-2 text-slate-800 dark:text-slate-200 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200 w-full"
             />
-            <Search className="absolute left-2 top-2.5 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-2 top-2.5 w-4 h-4 text-slate-600 dark:text-slate-400" />
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2.5 text-slate-200 border border-slate-600 rounded-xl bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
+            className="px-4 py-2.5 text-slate-800 dark:text-slate-200 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
           >
             <option value="all">All Categories</option>
             {filteredCategories?.map((category) => (
@@ -71,7 +71,7 @@ export default function IncomeFilters({
 
         {/* 📅 Start Date */}
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 flex items-center">
             <Calendar className="w-4 h-4 mr-2 text-emerald-400" />
             Start Date
           </label>
@@ -82,13 +82,13 @@ export default function IncomeFilters({
               setDateRange({ ...dateRange, startDate: e.target.value });
               onCustomRangeApply?.();
             }}
-            className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
+            className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all duration-200"
           />
         </div>
 
         {/* 📆 End Date */}
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 flex items-center">
             <Calendar className="w-4 h-4 mr-2 text-teal-400" />
             End Date
           </label>
@@ -99,7 +99,7 @@ export default function IncomeFilters({
               setDateRange({ ...dateRange, endDate: e.target.value });
               onCustomRangeApply?.();
             }}
-            className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-700/50 text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-teal-400 focus:border-transparent outline-none transition-all duration-200"
+            className="px-4 py-2.5 border border-slate-600 rounded-xl bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 [color-scheme:dark] focus:ring-2 focus:ring-teal-400 focus:border-transparent outline-none transition-all duration-200"
           />
         </div>
       </div>

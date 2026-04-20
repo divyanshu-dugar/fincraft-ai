@@ -357,7 +357,7 @@ const IncomeList = () => {
   if (loading) return <ListPageSkeleton accentFrom="from-green-600" accentVia="via-emerald-600" accentTo="to-teal-700" />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 🌟 Enhanced Hero Section */}
         <motion.header
@@ -366,7 +366,7 @@ const IncomeList = () => {
           className="relative overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 rounded-3xl shadow-2xl p-8 mb-10"
         >
           <div className="relative z-10">
-            <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-2xl mb-4">
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white drop-shadow-2xl mb-4">
               Income Tracker
             </h1>
 
@@ -384,7 +384,7 @@ const IncomeList = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/income/recurring")}
-                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
+                className="px-8 py-4 border-2 border-white/80 text-slate-900 dark:text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
               >
                 <Repeat size={20} />
                 Recurring
@@ -393,7 +393,7 @@ const IncomeList = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/income/analytics")}
-                className="px-8 py-4 border-2 border-white/80 text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
+                className="px-8 py-4 border-2 border-white/80 text-slate-900 dark:text-white font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex items-center gap-2"
               >
                 <PieChart size={20} />
                 View Analytics
@@ -418,7 +418,7 @@ const IncomeList = () => {
           transition={{ delay: 0.1 }}
           className="relative overflow-hidden rounded-2xl border border-emerald-400/20 mb-5"
         >
-          <div className="bg-gradient-to-r from-slate-900 via-emerald-900/60 to-teal-900/60 px-5 py-4">
+          <div className="bg-gradient-to-r from-white dark:from-slate-900 via-emerald-900/60 to-teal-900/60 px-5 py-4">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(16,185,129,0.25),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(20,184,166,0.2),transparent_45%)]" />
             <div className="relative flex items-center gap-3">
 
@@ -428,7 +428,7 @@ const IncomeList = () => {
               {/* Center: big month + total + count */}
               <div className="flex-1 text-center">
                 {!isCustomRange ? (
-                  <h2 className="text-2xl font-black text-white tracking-tight">
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                     {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
                   </h2>
                 ) : (
@@ -439,7 +439,7 @@ const IncomeList = () => {
                   </h2>
                 )}
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <span className="text-base font-bold text-white">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
+                  <span className="text-base font-bold text-slate-900 dark:text-white">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
                   <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
                     {incomes.length} income{incomes.length !== 1 ? "s" : ""}
                   </span>
@@ -514,7 +514,7 @@ const IncomeList = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => changeMonth(-1)}
-        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
+        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200 dark:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
         aria-label="Previous month"
       >
         <ChevronLeft size={22} strokeWidth={2.5} />
@@ -528,7 +528,7 @@ const IncomeList = () => {
           currentYear === todayUTC.getUTCFullYear() &&
           currentMonth === todayUTC.getUTCMonth()
         }
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-300 hover:text-white hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200 dark:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Next month"
       >
         <ChevronRight size={22} strokeWidth={2.5} />
@@ -536,12 +536,12 @@ const IncomeList = () => {
 
       {/* Sticky total bar (hidden when bulk selection active) */}
       {incomes.length > 0 && selectedIds.size === 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-700/60 px-6 py-3 flex items-center justify-between shadow-2xl">
-          <span className="text-sm text-slate-400 font-medium">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-300/60 dark:border-slate-700/60 px-6 py-3 flex items-center justify-between shadow-2xl">
+          <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">
             {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
             <span className="ml-2 text-slate-500">· {incomes.length} income{incomes.length !== 1 ? "s" : ""}</span>
           </span>
-          <span className="text-lg font-black text-white">{formatCurrency(incomes.reduce((s, e) => s + e.amount, 0))}</span>
+          <span className="text-lg font-black text-slate-900 dark:text-white">{formatCurrency(incomes.reduce((s, e) => s + e.amount, 0))}</span>
         </div>
       )}
 
