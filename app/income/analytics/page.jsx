@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
+  Cell,
+  Pie,
+  PieChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -31,7 +29,7 @@ import {
   Filter,
   GitCompare,
   SlidersHorizontal,
-  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
   Minus,
   RefreshCw,
   Search,
@@ -227,6 +225,38 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
+// ─── income category legend panel ───────────────────────────────────────────
+function IncomeLegend({ items, total, formatMoney }) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Breakdown</p>
+        <span className="text-xs text-slate-500 font-medium">{items.length} categories</span>
+      </div>
+      <div className="space-y-3">
+        {items.map((item) => {
+          const pctVal = total > 0 ? (item.value / total * 100) : 0;
+          return (
+            <div key={item.name}>
+              <div className="flex items-center gap-2.5 mb-1.5">
+                <span className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: item.color }} />
+                {item.icon && <span className="text-sm flex-shrink-0">{item.icon}</span>}
+                <span className="text-sm font-semibold text-slate-200 truncate flex-1">{item.name}</span>
+                <span className="text-sm font-bold text-white flex-shrink-0 tabular-nums">{formatMoney(item.value)}</span>
+                <span className="text-xs text-slate-400 font-bold flex-shrink-0 w-10 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
+              </div>
+              <div className="ml-[22px] h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pctVal}%`, backgroundColor: item.color }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── month-on-month per-category card ────────────────────────────────────────
 function CategoryMoMCard({ category, rows, months, defaultOpen = false, range }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -406,7 +436,7 @@ export default function IncomeAnalyticsPage() {
   const [activePreset,        setActivePreset]        = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-  const [chartView,           setChartView]           = useState("bar");
+  const [chartView,           setChartView]           = useState("pie"); // "pie" | "bar"
   const [sortKey,             setSortKey]             = useState("amount");
   const [sortDir,             setSortDir]             = useState("desc");
   const [showAllRows,         setShowAllRows]         = useState(false);
@@ -474,18 +504,26 @@ export default function IncomeAnalyticsPage() {
     };
   }, [filteredTableRows, data.summary]);
 
-  const lineChartData = useMemo(() => {
-    const map = new Map(data.months.map((m) => [m, { month: m }]));
-    for (const series of data.chart.trendLines || []) {
-      if (selectedCategoryIds.length && !categoryIdSet.has(series.categoryId)) continue;
-      for (const point of series.data) {
-        const row = map.get(point.month) || { month: point.month };
-        row[series.category] = point.amount;
-        map.set(point.month, row);
+  const pieChartData = useMemo(() => {
+    const catTotals = new Map();
+    for (const row of filteredTableRows) {
+      const key = row.categoryId;
+      const existing = catTotals.get(key);
+      if (!existing) {
+        catTotals.set(key, {
+          name: row.category,
+          value: row.amount,
+          color: row.categoryColor || COLORS[catTotals.size % COLORS.length],
+          icon: row.categoryIcon || '',
+        });
+      } else {
+        existing.value += row.amount;
       }
     }
-    return data.months.map((m) => map.get(m) || { month: m });
-  }, [data.chart.trendLines, data.months, selectedCategoryIds, categoryIdSet]);
+    return Array.from(catTotals.values()).sort((a, b) => b.value - a.value);
+  }, [filteredTableRows]);
+
+  const pieTotal = pieChartData.reduce((s, d) => s + d.value, 0);
 
   const anomalyMonths = useMemo(() => new Set(data.anomalies.map((r) => r.month)), [data.anomalies]);
 
@@ -916,8 +954,8 @@ export default function IncomeAnalyticsPage() {
                 <div>
                   <h2 className="text-lg font-bold text-white">Income by category</h2>
                   <p className="text-sm text-slate-400 mt-0.5">
-                    Month-on-month breakdown
-                    {anomalyMonths.size > 0 && (
+                    Category breakdown across selected period
+                    {chartView === 'bar' && anomalyMonths.size > 0 && (
                       <span className="ml-2 text-amber-500 font-semibold">
                         — dashed lines mark anomaly months
                       </span>
@@ -925,17 +963,16 @@ export default function IncomeAnalyticsPage() {
                   </p>
                 </div>
 
-                {/* view toggle */}
+                {/* chart type toggle */}
                 <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5 flex-shrink-0">
                   {[
-                    { key: "bar",  icon: BarChart3,       label: "Bar"  },
-                    { key: "line", icon: LineChartIcon,   label: "Line" },
-                    { key: "area", icon: Activity,        label: "Area" },
+                    { key: "pie",  icon: PieChartIcon, label: "Pie"  },
+                    { key: "bar",  icon: BarChart3,     label: "Bar"  },
                   ].map((v) => (
                     <button
                       key={v.key}
                       onClick={() => setChartView(v.key)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         chartView === v.key ? "bg-slate-600 text-white" : "text-slate-400 hover:text-slate-300"
                       }`}
                     >
@@ -946,104 +983,108 @@ export default function IncomeAnalyticsPage() {
                 </div>
               </div>
 
-              {/* too-many-categories hint for bar */}
+              {/* too-many hint */}
               {chartView === "bar" && activeCategories.length > 8 && (
                 <p className="mb-3 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl">
                   Tip: bar charts are clearest with fewer than 8 categories. Use the category filter above to narrow down.
                 </p>
               )}
 
-              <div className="h-[380px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  {chartView === "bar" ? (
-                    <BarChart data={data.chart.groupedBars} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => (
-                        <Bar
-                          key={cat.categoryId}
-                          dataKey={cat.categoryName}
-                          fill={categoryColor(data.categories, cat.categoryId)}
-                          radius={[4, 4, 0, 0]}
-                          maxBarSize={44}
-                        />
-                      ))}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine
-                          key={month}
-                          x={month}
-                          stroke="#fcd34d"
-                          strokeWidth={1.5}
-                          strokeDasharray="5 4"
-                        />
-                      ))}
-                    </BarChart>
-                  ) : chartView === "line" ? (
-                    <LineChart data={lineChartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => (
-                        <Line
-                          key={cat.categoryId}
-                          type="monotone"
-                          dataKey={cat.categoryName}
-                          stroke={categoryColor(data.categories, cat.categoryId)}
-                          strokeWidth={2.5}
-                          dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-                          activeDot={{ r: 6, strokeWidth: 0 }}
-                          connectNulls
-                        />
-                      ))}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine key={month} x={month} stroke="#fcd34d" strokeWidth={1.5} strokeDasharray="5 4" />
-                      ))}
-                    </LineChart>
-                  ) : (
-                    /* area */
-                    <AreaChart data={lineChartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <defs>
-                        {activeCategories.map((cat) => {
-                          const color = categoryColor(data.categories, cat.categoryId);
-                          return (
-                            <linearGradient key={cat.categoryId} id={`igrad-${cat.categoryId}`} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%"  stopColor={color} stopOpacity={0.25} />
-                              <stop offset="95%" stopColor={color} stopOpacity={0.02} />
-                            </linearGradient>
-                          );
-                        })}
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => {
-                        const color = categoryColor(data.categories, cat.categoryId);
-                        return (
-                          <Area
-                            key={cat.categoryId}
-                            type="monotone"
-                            dataKey={cat.categoryName}
-                            stroke={color}
-                            strokeWidth={2.5}
-                            fill={`url(#igrad-${cat.categoryId})`}
-                            activeDot={{ r: 6, strokeWidth: 0 }}
-                            connectNulls
+              {/* chart + legend side-by-side */}
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* chart */}
+                <div className="flex-1 min-w-0">
+                  <div className={chartView === 'pie' ? 'h-[360px]' : 'h-[380px]'} style={{ width: '100%' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chartView === "pie" ? (
+                        <PieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={70}
+                            outerRadius={140}
+                            paddingAngle={3}
+                            dataKey="value"
+                            nameKey="name"
+                            stroke="#0f172a"
+                            strokeWidth={2}
+                            animationBegin={0}
+                            animationDuration={600}
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (!active || !payload?.length) return null;
+                              const item = payload[0];
+                              const pctVal = pieTotal > 0 ? ((item.value / pieTotal) * 100).toFixed(1) : '0';
+                              return (
+                                <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 min-w-[180px] shadow-xl">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.payload?.color || item.color }} />
+                                    <span className="text-sm font-bold text-white">{item.name}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-slate-400">Amount</span>
+                                    <span className="text-sm font-bold text-white">{money(item.value)}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4 mt-1">
+                                    <span className="text-sm text-slate-400">Share</span>
+                                    <span className="text-sm font-bold text-white">{pctVal}%</span>
+                                  </div>
+                                </div>
+                              );
+                            }}
                           />
-                        );
-                      })}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine key={month} x={month} stroke="#fcd34d" strokeWidth={1.5} strokeDasharray="5 4" />
-                      ))}
-                    </AreaChart>
+                        </PieChart>
+                      ) : (
+                        <BarChart data={data.chart.groupedBars} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                          <XAxis {...xAxisProps} />
+                          <YAxis {...yAxisProps} />
+                          <Tooltip content={<ChartTooltip />} />
+                          {activeCategories.map((cat) => (
+                            <Bar
+                              key={cat.categoryId}
+                              dataKey={cat.categoryName}
+                              fill={categoryColor(data.categories, cat.categoryId)}
+                              radius={[4, 4, 0, 0]}
+                              maxBarSize={44}
+                            />
+                          ))}
+                          {Array.from(anomalyMonths).map((month) => (
+                            <ReferenceLine
+                              key={month}
+                              x={month}
+                              stroke="#fcd34d"
+                              strokeWidth={1.5}
+                              strokeDasharray="5 4"
+                            />
+                          ))}
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                  {/* total stat below donut */}
+                  {chartView === 'pie' && (
+                    <div className="text-center -mt-4 mb-2 lg:mb-0">
+                      <p className="text-2xl font-bold text-white tabular-nums">{money(pieTotal)}</p>
+                      <p className="text-xs text-slate-500 font-medium">Total income</p>
+                    </div>
                   )}
-                </ResponsiveContainer>
+                </div>
+
+                {/* legend panel */}
+                <div className="w-full lg:w-72 xl:w-80 lg:max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+                  <IncomeLegend
+                    items={pieChartData}
+                    total={pieTotal}
+                    formatMoney={money}
+                  />
+                </div>
               </div>
             </div>
 
