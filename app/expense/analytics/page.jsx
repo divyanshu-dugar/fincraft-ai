@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
+  Cell,
+  Pie,
+  PieChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -31,7 +29,7 @@ import {
   Filter,
   GitCompare,
   SlidersHorizontal,
-  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
   Minus,
   RefreshCw,
   Search,
@@ -233,6 +231,84 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
+// ─── category legend panel ────────────────────────────────────────────────────
+function CategoryLegend({ groups, depth, total, expanded, onToggle, formatMoney }) {
+  if (!groups.length) return null;
+  const itemCount = depth === 'parent' ? groups.length : groups.reduce((s, g) => s + g.children.length, 0);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Breakdown</p>
+        <span className="text-xs text-slate-500 font-medium">{itemCount} {depth === 'parent' ? 'categories' : 'subcategories'}</span>
+      </div>
+
+      {depth === 'parent' ? (
+        /* ── flat parent list ── */
+        <div className="space-y-3">
+          {groups.map((item) => {
+            const pctVal = total > 0 ? (item.total / total * 100) : 0;
+            return (
+              <div key={item.name}>
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <span className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: item.color }} />
+                  {item.icon && <span className="text-sm flex-shrink-0">{item.icon}</span>}
+                  <span className="text-sm font-semibold text-slate-200 truncate flex-1">{item.name}</span>
+                  <span className="text-sm font-bold text-white flex-shrink-0 tabular-nums">{formatMoney(item.total)}</span>
+                  <span className="text-xs text-slate-400 font-bold flex-shrink-0 w-10 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
+                </div>
+                <div className="ml-[22px] h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pctVal}%`, backgroundColor: item.color }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* ── grouped sub list with collapsible parents ── */
+        <div className="space-y-2">
+          {groups.map((group, gi) => {
+            const pctVal = total > 0 ? (group.total / total * 100) : 0;
+            const isOpen = expanded[group.name] ?? (gi < 3);
+            return (
+              <div key={group.name} className="rounded-xl border border-slate-700/40 bg-slate-800/30 overflow-hidden">
+                <button
+                  onClick={() => onToggle(group.name)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-700/20 transition-colors"
+                >
+                  <span className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: group.color }} />
+                  {group.icon && <span className="text-sm flex-shrink-0">{group.icon}</span>}
+                  <span className="text-sm font-semibold text-slate-200 truncate flex-1 text-left">{group.name}</span>
+                  <span className="text-xs font-bold text-white flex-shrink-0 tabular-nums">{formatMoney(group.total)}</span>
+                  <span className="text-[10px] text-slate-500 font-bold flex-shrink-0 w-9 text-right tabular-nums">{pctVal.toFixed(0)}%</span>
+                  <ChevronDown className={`w-3 h-3 text-slate-500 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isOpen && (
+                  <div className="border-t border-slate-700/30 px-3 py-2.5 space-y-2">
+                    {group.children.map((child) => {
+                      const childPct = group.total > 0 ? (child.value / group.total * 100) : 0;
+                      return (
+                        <div key={child.name} className="flex items-center gap-2 pl-1">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: child.color }} />
+                          {child.icon && <span className="text-xs flex-shrink-0">{child.icon}</span>}
+                          <span className="text-xs text-slate-400 truncate flex-1">{child.name}</span>
+                          <span className="text-xs font-bold text-slate-300 flex-shrink-0 tabular-nums">{formatMoney(child.value)}</span>
+                          <div className="w-14 h-1 bg-slate-700/50 rounded-full overflow-hidden flex-shrink-0">
+                            <div className="h-full rounded-full" style={{ width: `${childPct}%`, backgroundColor: child.color }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── month-on-month per-category card ────────────────────────────────────────
 function CategoryMoMCard({ category, rows, months, defaultOpen = false, range }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -417,7 +493,9 @@ export default function ExpenseAnalyticsPage() {
   const [activePreset,        setActivePreset]        = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-  const [chartView,           setChartView]           = useState("bar"); // "bar" | "line" | "area"
+  const [chartView,           setChartView]           = useState("pie"); // "pie" | "bar"
+  const [categoryDepth,       setCategoryDepth]       = useState("parent"); // "parent" | "sub"
+  const [legendExpanded,      setLegendExpanded]      = useState({});
   const [sortKey,             setSortKey]             = useState("amount");
   const [sortDir,             setSortDir]             = useState("desc");
   const [showAllRows,         setShowAllRows]         = useState(false);
@@ -487,18 +565,91 @@ export default function ExpenseAnalyticsPage() {
     };
   }, [filteredTableRows, data.summary]);
 
-  const lineChartData = useMemo(() => {
-    const map = new Map(data.months.map((m) => [m, { month: m }]));
-    for (const series of data.chart.trendLines || []) {
-      if (selectedCategoryIds.length && !categoryIdSet.has(series.categoryId)) continue;
-      for (const point of series.data) {
-        const row = map.get(point.month) || { month: point.month };
-        row[series.category] = point.amount;
-        map.set(point.month, row);
+  // ── parent-level aggregation ──────────────────────────────────────────────
+  const pieDataParent = useMemo(() => {
+    const totals = new Map();
+    for (const row of filteredTableRows) {
+      const parent = row.parentName || row.category;
+      const existing = totals.get(parent);
+      if (!existing) {
+        totals.set(parent, {
+          name: parent,
+          value: row.amount,
+          icon: row.parentIcon || row.categoryIcon || '',
+        });
+      } else {
+        existing.value += row.amount;
       }
     }
-    return data.months.map((m) => map.get(m) || { month: m });
-  }, [data.chart.trendLines, data.months, selectedCategoryIds, categoryIdSet]);
+    const sorted = Array.from(totals.values()).sort((a, b) => b.value - a.value);
+    return sorted.map((item, i) => ({ ...item, color: COLORS[i % COLORS.length] }));
+  }, [filteredTableRows]);
+
+  // ── sub-level aggregation ────────────────────────────────────────────────
+  const pieDataSub = useMemo(() => {
+    const totals = new Map();
+    for (const row of filteredTableRows) {
+      const key = row.categoryId;
+      const existing = totals.get(key);
+      if (!existing) {
+        totals.set(key, {
+          name: row.category,
+          value: row.amount,
+          color: row.categoryColor || COLORS[totals.size % COLORS.length],
+          parent: row.parentName || row.category,
+          parentIcon: row.parentIcon || row.categoryIcon || '',
+          icon: row.categoryIcon || '',
+        });
+      } else {
+        existing.value += row.amount;
+      }
+    }
+    return Array.from(totals.values()).sort((a, b) => b.value - a.value);
+  }, [filteredTableRows]);
+
+  // ── active data based on depth ───────────────────────────────────────────
+  const activePieData = categoryDepth === 'parent' ? pieDataParent : pieDataSub;
+  const pieTotal = activePieData.reduce((s, d) => s + d.value, 0);
+
+  // ── legend groups (subcategories organized under parents) ────────────────
+  const legendGroups = useMemo(() => {
+    const groups = new Map();
+    for (const item of pieDataSub) {
+      const parent = item.parent;
+      if (!groups.has(parent)) {
+        const parentItem = pieDataParent.find((p) => p.name === parent);
+        groups.set(parent, {
+          name: parent,
+          icon: item.parentIcon,
+          color: parentItem?.color || COLORS[groups.size % COLORS.length],
+          total: parentItem?.value || 0,
+          children: [],
+        });
+      }
+      groups.get(parent).children.push(item);
+    }
+    return Array.from(groups.values()).sort((a, b) => b.total - a.total);
+  }, [pieDataSub, pieDataParent]);
+
+  // ── bar data aggregated by parent ────────────────────────────────────────
+  const barDataParent = useMemo(() => {
+    const subParentMap = new Map();
+    for (const row of filteredTableRows) {
+      subParentMap.set(row.category, row.parentName || row.category);
+    }
+    return (data.chart.groupedBars || []).map((monthRow) => {
+      const newRow = { month: monthRow.month };
+      for (const [key, value] of Object.entries(monthRow)) {
+        if (key === 'month') continue;
+        const parent = subParentMap.get(key) || key;
+        newRow[parent] = (newRow[parent] || 0) + (value || 0);
+      }
+      return newRow;
+    });
+  }, [data.chart.groupedBars, filteredTableRows]);
+
+  const toggleLegendGroup = (name) =>
+    setLegendExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
 
   const anomalyMonths = useMemo(() => new Set(data.anomalies.map((r) => r.month)), [data.anomalies]);
 
@@ -1037,8 +1188,8 @@ export default function ExpenseAnalyticsPage() {
                 <div>
                   <h2 className="text-lg font-bold text-white">Spending by category</h2>
                   <p className="text-sm text-slate-400 mt-0.5">
-                    Month-on-month breakdown
-                    {anomalyMonths.size > 0 && (
+                    {categoryDepth === 'parent' ? 'Aggregated by main category' : 'Detailed subcategory breakdown'}
+                    {chartView === 'bar' && anomalyMonths.size > 0 && (
                       <span className="ml-2 text-rose-500 font-semibold">
                         — dashed lines mark anomaly months
                       </span>
@@ -1046,125 +1197,167 @@ export default function ExpenseAnalyticsPage() {
                   </p>
                 </div>
 
-                {/* view toggle */}
-                <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5 flex-shrink-0">
-                  {[
-                    { key: "bar",  icon: BarChart3,       label: "Bar"  },
-                    { key: "line", icon: LineChartIcon,   label: "Line" },
-                    { key: "area", icon: Activity,        label: "Area" },
-                  ].map((v) => (
-                    <button
-                      key={v.key}
-                      onClick={() => setChartView(v.key)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
-                        chartView === v.key ? "bg-slate-600 text-white" : "text-slate-400 hover:text-slate-300"
-                      }`}
-                    >
-                      <v.icon className="w-3.5 h-3.5" />
-                      {v.label}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                  {/* depth toggle */}
+                  <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5">
+                    {[
+                      { key: "parent", label: "Main" },
+                      { key: "sub",    label: "Sub" },
+                    ].map((v) => (
+                      <button
+                        key={v.key}
+                        onClick={() => setCategoryDepth(v.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          categoryDepth === v.key
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/20"
+                            : "text-slate-400 hover:text-slate-300"
+                        }`}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* chart type toggle */}
+                  <div className="flex items-center bg-slate-700/50 rounded-xl p-1 gap-0.5">
+                    {[
+                      { key: "pie",  icon: PieChartIcon, label: "Pie"  },
+                      { key: "bar",  icon: BarChart3,     label: "Bar"  },
+                    ].map((v) => (
+                      <button
+                        key={v.key}
+                        onClick={() => setChartView(v.key)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          chartView === v.key ? "bg-slate-600 text-white" : "text-slate-400 hover:text-slate-300"
+                        }`}
+                      >
+                        <v.icon className="w-3.5 h-3.5" />
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* too-many-categories hint for bar */}
-              {chartView === "bar" && activeCategories.length > 8 && (
+              {/* too-many hint */}
+              {chartView === "bar" && categoryDepth === 'sub' && activeCategories.length > 8 && (
                 <p className="mb-3 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl">
                   Tip: bar charts are clearest with fewer than 8 categories. Use the category filter above to narrow down.
                 </p>
               )}
 
-              <div className="h-[380px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  {chartView === "bar" ? (
-                    <BarChart data={data.chart.groupedBars} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => (
-                        <Bar
-                          key={cat.categoryId}
-                          dataKey={cat.categoryName}
-                          fill={categoryColor(data.categories, cat.categoryId)}
-                          radius={[4, 4, 0, 0]}
-                          maxBarSize={44}
-                        />
-                      ))}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine
-                          key={month}
-                          x={month}
-                          stroke="#fca5a5"
-                          strokeWidth={1.5}
-                          strokeDasharray="5 4"
-                        />
-                      ))}
-                    </BarChart>
-                  ) : chartView === "line" ? (
-                    <LineChart data={lineChartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => (
-                        <Line
-                          key={cat.categoryId}
-                          type="monotone"
-                          dataKey={cat.categoryName}
-                          stroke={categoryColor(data.categories, cat.categoryId)}
-                          strokeWidth={2.5}
-                          dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-                          activeDot={{ r: 6, strokeWidth: 0 }}
-                          connectNulls
-                        />
-                      ))}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine key={month} x={month} stroke="#fca5a5" strokeWidth={1.5} strokeDasharray="5 4" />
-                      ))}
-                    </LineChart>
-                  ) : (
-                    /* area */
-                    <AreaChart data={lineChartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                      <defs>
-                        {activeCategories.map((cat) => {
-                          const color = categoryColor(data.categories, cat.categoryId);
-                          return (
-                            <linearGradient key={cat.categoryId} id={`grad-${cat.categoryId}`} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%"  stopColor={color} stopOpacity={0.25} />
-                              <stop offset="95%" stopColor={color} stopOpacity={0.02} />
-                            </linearGradient>
-                          );
-                        })}
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis {...xAxisProps} />
-                      <YAxis {...yAxisProps} />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-                      {activeCategories.map((cat) => {
-                        const color = categoryColor(data.categories, cat.categoryId);
-                        return (
-                          <Area
-                            key={cat.categoryId}
-                            type="monotone"
-                            dataKey={cat.categoryName}
-                            stroke={color}
-                            strokeWidth={2.5}
-                            fill={`url(#grad-${cat.categoryId})`}
-                            activeDot={{ r: 6, strokeWidth: 0 }}
-                            connectNulls
+              {/* chart + legend side-by-side */}
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* chart */}
+                <div className="flex-1 min-w-0">
+                  <div className={chartView === 'pie' ? 'h-[360px]' : 'h-[380px]'} style={{ width: '100%' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chartView === "pie" ? (
+                        <PieChart>
+                          <Pie
+                            data={activePieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={70}
+                            outerRadius={categoryDepth === 'parent' ? 140 : 130}
+                            paddingAngle={categoryDepth === 'parent' ? 3 : 1.5}
+                            dataKey="value"
+                            nameKey="name"
+                            stroke="#0f172a"
+                            strokeWidth={2}
+                            animationBegin={0}
+                            animationDuration={600}
+                          >
+                            {activePieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (!active || !payload?.length) return null;
+                              const item = payload[0];
+                              const pctVal = pieTotal > 0 ? ((item.value / pieTotal) * 100).toFixed(1) : '0';
+                              return (
+                                <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 min-w-[180px] shadow-xl">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.payload?.color || item.color }} />
+                                    <span className="text-sm font-bold text-white">{item.name}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-slate-400">Amount</span>
+                                    <span className="text-sm font-bold text-white">{money(item.value)}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4 mt-1">
+                                    <span className="text-sm text-slate-400">Share</span>
+                                    <span className="text-sm font-bold text-white">{pctVal}%</span>
+                                  </div>
+                                </div>
+                              );
+                            }}
                           />
-                        );
-                      })}
-                      {Array.from(anomalyMonths).map((month) => (
-                        <ReferenceLine key={month} x={month} stroke="#fca5a5" strokeWidth={1.5} strokeDasharray="5 4" />
-                      ))}
-                    </AreaChart>
+                        </PieChart>
+                      ) : (
+                        <BarChart
+                          data={categoryDepth === 'parent' ? barDataParent : data.chart.groupedBars}
+                          margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                          <XAxis {...xAxisProps} />
+                          <YAxis {...yAxisProps} />
+                          <Tooltip content={<ChartTooltip />} />
+                          {categoryDepth === 'parent'
+                            ? pieDataParent.map((p, i) => (
+                                <Bar
+                                  key={p.name}
+                                  dataKey={p.name}
+                                  fill={p.color || COLORS[i % COLORS.length]}
+                                  radius={[4, 4, 0, 0]}
+                                  maxBarSize={48}
+                                />
+                              ))
+                            : activeCategories.map((cat) => (
+                                <Bar
+                                  key={cat.categoryId}
+                                  dataKey={cat.categoryName}
+                                  fill={categoryColor(data.categories, cat.categoryId)}
+                                  radius={[4, 4, 0, 0]}
+                                  maxBarSize={44}
+                                />
+                              ))
+                          }
+                          {Array.from(anomalyMonths).map((month) => (
+                            <ReferenceLine
+                              key={month}
+                              x={month}
+                              stroke="#fca5a5"
+                              strokeWidth={1.5}
+                              strokeDasharray="5 4"
+                            />
+                          ))}
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                  {/* center stat inside donut */}
+                  {chartView === 'pie' && (
+                    <div className="text-center -mt-4 mb-2 lg:mb-0">
+                      <p className="text-2xl font-bold text-white tabular-nums">{money(pieTotal)}</p>
+                      <p className="text-xs text-slate-500 font-medium">Total spend</p>
+                    </div>
                   )}
-                </ResponsiveContainer>
+                </div>
+
+                {/* legend panel */}
+                <div className="w-full lg:w-72 xl:w-80 lg:max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+                  <CategoryLegend
+                    groups={legendGroups}
+                    depth={categoryDepth}
+                    total={pieTotal}
+                    expanded={legendExpanded}
+                    onToggle={toggleLegendGroup}
+                    formatMoney={money}
+                  />
+                </div>
               </div>
             </div>
 
