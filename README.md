@@ -1,5 +1,3 @@
-
-Refinements List
 <details>
 <summary>Refinements List</summary>
 # Fincraft — SaaS-Level Improvements Roadmap
