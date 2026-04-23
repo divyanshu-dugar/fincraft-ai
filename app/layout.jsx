@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar"
 import RouteGuard from "@/components/RouteGuard";
 import OAuthProviders from "@/components/OAuthProviders";
+import AppShell from "@/components/AppShell";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -33,7 +33,6 @@ export default function RootLayout({ children }) {
       >
         <OAuthProviders>
           <RouteGuard>
-            <Navbar />
             <Toaster
               position="top-right"
               toastOptions={{
@@ -49,9 +48,9 @@ export default function RootLayout({ children }) {
                 error:   { iconTheme: { primary: '#f87171', secondary: '#1e293b' } },
               }}
             />
-            <main className="min-h-screen">
+            <AppShell>
               {children}
-            </main>
+            </AppShell>
           </RouteGuard>
         </OAuthProviders>
       </body>

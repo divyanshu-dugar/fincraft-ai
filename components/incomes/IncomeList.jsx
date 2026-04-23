@@ -357,7 +357,7 @@ const IncomeList = () => {
   if (loading) return <ListPageSkeleton accentFrom="from-green-600" accentVia="via-emerald-600" accentTo="to-teal-700" />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 🌟 Enhanced Hero Section */}
         <motion.header
@@ -416,21 +416,38 @@ const IncomeList = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-emerald-400/20 mb-5"
+          className="sticky top-0 z-30 overflow-hidden rounded-2xl border border-emerald-400/20 mb-5"
         >
-          <div className="bg-gradient-to-r from-white dark:from-slate-900 via-emerald-900/60 to-teal-900/60 px-5 py-4">
+          <div className="bg-gradient-to-r from-slate-900 via-emerald-900 to-teal-900 px-5 py-4">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(16,185,129,0.25),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(20,184,166,0.2),transparent_45%)]" />
             <div className="relative flex items-center gap-3">
 
-              {/* Spacer to balance Filters on the right */}
-              <div className="shrink-0 w-[80px]" />
-
-              {/* Center: big month + total + count */}
+              {/* Center: month nav + total + count */}
               <div className="flex-1 text-center">
                 {!isCustomRange ? (
-                  <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
-                  </h2>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="p-1.5 rounded-lg bg-white/10 border border-white/20 text-emerald-100 hover:bg-white/25 hover:text-white transition-all"
+                      aria-label="Previous month"
+                    >
+                      <ChevronLeft size={18} strokeWidth={2.5} />
+                    </button>
+                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight min-w-[200px]">
+                      {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+                    </h2>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      disabled={
+                        currentYear === todayUTC.getUTCFullYear() &&
+                        currentMonth === todayUTC.getUTCMonth()
+                      }
+                      className="p-1.5 rounded-lg bg-white/10 border border-white/20 text-emerald-100 hover:bg-white/25 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Next month"
+                    >
+                      <ChevronRight size={18} strokeWidth={2.5} />
+                    </button>
+                  </div>
                 ) : (
                   <h2 className="text-lg font-bold text-emerald-100">
                     {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
@@ -439,8 +456,8 @@ const IncomeList = () => {
                   </h2>
                 )}
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <span className="text-base font-bold text-slate-900 dark:text-white">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
-                  <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
+                  <span className="text-base font-bold text-white">{formatCurrency(incomes.reduce((s, i) => s + i.amount, 0))}</span>
+                  <span className="inline-flex items-center rounded-full bg-white/15 text-emerald-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25">
                     {incomes.length} income{incomes.length !== 1 ? "s" : ""}
                   </span>
                 </div>
@@ -449,7 +466,7 @@ const IncomeList = () => {
               {/* Filters — shrinks to content */}
               <button
                 onClick={() => setShowFilters((prev) => !prev)}
-                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm ${
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 ${
                   showFilters
                     ? "bg-emerald-500/30 border-emerald-400/60 text-emerald-200"
                     : "bg-white/10 border-white/20 text-emerald-100 hover:bg-white/20 hover:text-white"
@@ -509,30 +526,7 @@ const IncomeList = () => {
         )}
       </div>
 
-      {/* Floating month nav arrows */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.92 }}
-        onClick={() => changeMonth(-1)}
-        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
-        aria-label="Previous month"
-      >
-        <ChevronLeft size={22} strokeWidth={2.5} />
-      </motion.button>
 
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.92 }}
-        onClick={() => changeMonth(1)}
-        disabled={
-          currentYear === todayUTC.getUTCFullYear() &&
-          currentMonth === todayUTC.getUTCMonth()
-        }
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-        aria-label="Next month"
-      >
-        <ChevronRight size={22} strokeWidth={2.5} />
-      </motion.button>
 
       {/* Sticky total bar (hidden when bulk selection active) */}
       {incomes.length > 0 && selectedIds.size === 0 && (

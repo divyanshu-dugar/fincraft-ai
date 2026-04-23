@@ -415,7 +415,7 @@ export default function BudgetAnalyticsPage() {
   const exportCSV = () => {
     const headers = ["Category", "Budget", "Spent", "Remaining", "Burn Rate %", "Status"];
     const rows = sortedRows.map((b) => [
-      b.category?.name ?? b.name,
+      `"${b.category?.name ?? b.name}"`,
       (b.proportionalBudget ?? b.amount).toFixed(2),
       (b.currentSpent ?? 0).toFixed(2),
       (b.remaining ?? 0).toFixed(2),
@@ -423,10 +423,15 @@ export default function BudgetAnalyticsPage() {
       STATUS_CONFIG[b.status]?.label ?? b.status,
     ]);
     const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.href = url;
     a.download = `budget-analytics-${range.startDate}-to-${range.endDate}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // ── burn-rate bar fill (per cell) ──────────────────────────────────────────
@@ -448,7 +453,7 @@ export default function BudgetAnalyticsPage() {
   // ── render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pb-6">
 
       {/* ── sticky page header ─────────────────────────────────────────────── */}
       <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50 shadow-sm">

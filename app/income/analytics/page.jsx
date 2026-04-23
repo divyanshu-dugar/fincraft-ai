@@ -710,14 +710,19 @@ export default function IncomeAnalyticsPage() {
   const exportCSV = () => {
     const headers = ["Month", "Category", "Amount", "Change %", "Moving Average", "Anomaly"];
     const rows = sortedTableRows.map((r) => [
-      r.month, r.category, r.amount.toFixed(2), r.changePct?.toFixed(2) ?? "",
-      r.movingAverage.toFixed(2), r.anomaly?.isSpike ? `Spike (${r.anomaly.severity})` : "Normal",
+      r.month, `"${r.category}"`, (r.amount ?? 0).toFixed(2), (r.changePct ?? 0).toFixed(2),
+      (r.movingAverage ?? 0).toFixed(2), r.anomaly?.isSpike ? `Spike (${r.anomaly.severity})` : "Normal",
     ]);
     const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.href = url;
     a.download = `income-analytics-${range.startMonth}-to-${range.endMonth}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // ─── shared axis props ────────────────────────────────────────────────────────
@@ -738,7 +743,7 @@ export default function IncomeAnalyticsPage() {
 
   // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pb-6">
 
       {/* ── sticky page header ───────────────────────────────────────────────── */}
       <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50">

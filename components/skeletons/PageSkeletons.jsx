@@ -6,7 +6,7 @@
  */
 export function ListPageSkeleton({ accentFrom = "from-blue-600", accentVia = "via-indigo-600", accentTo = "to-purple-700" }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18 animate-pulse">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-6 animate-pulse">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero header */}
         <div className={`relative overflow-hidden bg-gradient-to-br ${accentFrom} ${accentVia} ${accentTo} rounded-3xl shadow-2xl p-8 mb-10 opacity-60`}>
@@ -59,7 +59,7 @@ export function ListPageSkeleton({ accentFrom = "from-blue-600", accentVia = "vi
  */
 export function EditFormSkeleton({ accentColor = "bg-blue-500" }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18 animate-pulse">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-6 animate-pulse">
       {/* Sticky header */}
       <div className="sticky top-0 z-40 bg-white dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-300/50 dark:border-slate-700/50">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
@@ -146,7 +146,7 @@ export function ProfileSkeleton() {
  */
 export function GoalDetailSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18 px-4 sm:px-6 lg:px-8 animate-pulse">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-6 px-4 sm:px-6 lg:px-8 animate-pulse">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Back link */}
         <div className="h-4 w-28 bg-slate-200 dark:bg-slate-700 rounded mb-6" />

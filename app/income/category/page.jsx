@@ -278,7 +278,7 @@ export default function IncomeCategoryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-6">
       {/* delete modal */}
       <AnimatePresence>
         {deleteTarget && (

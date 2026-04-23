@@ -350,7 +350,7 @@ export default function ProfilePage() {
         <div className="absolute -bottom-40 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-500/6 to-indigo-600/6 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16 space-y-6">
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-16 space-y-6">
 
         {/* ── Hero header ── */}
         <motion.div

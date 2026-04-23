@@ -680,7 +680,7 @@ export default function ChatPage() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen pt-16 bg-slate-50 dark:bg-slate-950 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
 
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <Sidebar

@@ -465,7 +465,7 @@ const ExpenseList = () => {
   if (loading) return <ListPageSkeleton accentFrom="from-blue-600" accentVia="via-indigo-600" accentTo="to-purple-700" />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 py-18">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: -20 }}
@@ -527,18 +527,38 @@ const ExpenseList = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-blue-400/20 mb-5"
+          className="sticky top-0 z-30 overflow-hidden rounded-2xl border border-blue-400/20 mb-5"
         >
-          <div className="bg-gradient-to-r from-white dark:from-slate-900 via-blue-900/70 to-indigo-900/70 px-4 py-3 sm:px-5 sm:py-4">
+          <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 px-4 py-3 sm:px-5 sm:py-4">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(99,102,241,0.3),transparent_50%),radial-gradient(circle_at_90%_50%,rgba(56,189,248,0.2),transparent_45%)]" />
             <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 
-              {/* Center: big month + total + count — shown first on mobile, centered on desktop */}
+              {/* Center: month nav + total + count */}
               <div className="text-center sm:flex-1 sm:order-2">
                 {!isCustomRange ? (
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
-                  </h2>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="p-1.5 rounded-lg bg-white/10 border border-white/20 text-blue-100 hover:bg-white/25 hover:text-white transition-all"
+                      aria-label="Previous month"
+                    >
+                      <ChevronLeft size={18} strokeWidth={2.5} />
+                    </button>
+                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight min-w-[200px]">
+                      {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+                    </h2>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      disabled={
+                        currentYear === todayUTC.getUTCFullYear() &&
+                        currentMonth === todayUTC.getUTCMonth()
+                      }
+                      className="p-1.5 rounded-lg bg-white/10 border border-white/20 text-blue-100 hover:bg-white/25 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Next month"
+                    >
+                      <ChevronRight size={18} strokeWidth={2.5} />
+                    </button>
+                  </div>
                 ) : (
                   <h2 className="text-base sm:text-lg font-bold text-blue-100">
                     {dateRange.startDate && new Date(dateRange.startDate + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
@@ -547,8 +567,8 @@ const ExpenseList = () => {
                   </h2>
                 )}
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
-                  <span className="inline-flex items-center rounded-full bg-white/15 text-blue-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25 backdrop-blur-sm">
+                  <span className="text-sm sm:text-base font-bold text-white">{formatCurrency(expenses.reduce((s, e) => s + e.amount, 0))}</span>
+                  <span className="inline-flex items-center rounded-full bg-white/15 text-blue-50 text-[11px] font-semibold px-2.5 py-0.5 border border-white/25">
                     {expenses.length} expense{expenses.length !== 1 ? "s" : ""}
                   </span>
                 </div>
@@ -559,7 +579,7 @@ const ExpenseList = () => {
                 {/* Set Budget */}
                 <button
                   onClick={() => setBudgetSheetOpen(true)}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-blue-100 hover:bg-white/20 hover:text-slate-900 dark:text-white transition-all backdrop-blur-sm sm:order-1"
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-blue-100 hover:bg-white/20 hover:text-white transition-all sm:order-1"
                 >
                   <Wallet size={13} />
                   Set Budget
@@ -568,7 +588,7 @@ const ExpenseList = () => {
                 {/* Filters */}
                 <button
                   onClick={() => setShowFilters((prev) => !prev)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 backdrop-blur-sm sm:order-3 ${
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 sm:order-3 ${
                     showFilters
                       ? "bg-blue-500/30 border-blue-400/60 text-blue-200"
                       : "bg-white/10 border-white/20 text-blue-100 hover:bg-white/20 hover:text-white"
@@ -684,30 +704,6 @@ const ExpenseList = () => {
         )}
       </AnimatePresence>
 
-      {/* Floating month nav arrows */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.92 }}
-        onClick={() => changeMonth(-1)}
-        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
-        aria-label="Previous month"
-      >
-        <ChevronLeft size={22} strokeWidth={2.5} />
-      </motion.button>
-
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.92 }}
-        onClick={() => changeMonth(1)}
-        disabled={
-          currentYear === todayUTC.getUTCFullYear() &&
-          currentMonth === todayUTC.getUTCMonth()
-        }
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-        aria-label="Next month"
-      >
-        <ChevronRight size={22} strokeWidth={2.5} />
-      </motion.button>
 
       {/* Floating Add Button */}
       <motion.button

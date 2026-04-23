@@ -163,7 +163,7 @@ export default function BudgetAlertsBell() {
             animate={{ opacity: 1, y: 0,  scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-80 bg-gradient-to-br from-slate-100/98 dark:from-slate-800/98 to-white/98 dark:to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden z-50"
+            className="absolute left-full bottom-0 ml-2 w-80 bg-gradient-to-br from-slate-100/98 dark:from-slate-800/98 to-white/98 dark:to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden z-50"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-300/60 dark:border-slate-700/60">
