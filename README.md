@@ -25,13 +25,13 @@ Refinements List
 
 ## 📊 Analytics & Data Visualization
 
-13. **Dedicated analytics dashboard per module** — expense analytics, income analytics, budget analytics (currently only listed in navbar, pages may be incomplete)
-14. **Year-over-year comparison charts** — compare Jan 2025 vs Jan 2026 spending
-15. **Cash flow forecast** — project future income/expenses based on recurring patterns and trends
+- [ ] 13. **Dedicated analytics dashboard per module** — expense analytics, income analytics, budget analytics (currently only listed in navbar, pages may be incomplete)
+- [ ] 14. **Year-over-year comparison charts** — compare Jan 2025 vs Jan 2026 spending
+- [ ] 15. **Cash flow forecast** — project future income/expenses based on recurring patterns and trends
 16. **Savings velocity tracker** — for each goal, show a chart of contribution pace vs the required pace to hit deadline
 17. **Interactive drill-down charts** — click on a category in the pie chart to see individual transactions
 18. **Export reports as PDF** — monthly financial statement, budget report, tax-ready expense summaries
-19. **Custom date range on all pages** — currently dashboard has this, extend to all list/analytics views
+- [ ] 19. **Custom date range on all pages** — currently dashboard has this, extend to all list/analytics views
 
 
 ## 🔐 Auth & Security
