@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <!-- iOS masks the icon to a squircle, so fill the full canvas with the gradient -->
+  <rect width="180" height="180" fill="url(#g)"/>
+  <!-- F monogram, scaled from the 40x40 design (×4.5) and centered -->
+  <path d="M65.25 45 h58.5 a9 9 0 0 1 0 18 h-49.5 v27 h36 a9 9 0 0 1 0 18 h-36 v27 a9 9 0 0 1 -18 0 V54 a9 9 0 0 1 9 -9 z" fill="white"/>
+</svg>

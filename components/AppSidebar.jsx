@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { readToken, removeToken } from '@/lib/authenticate';
 import BudgetAlertsBell from '@/components/BudgetAlertsBell';
+import Logo from '@/components/ui/Logo';
 import {
   BarChart3, ChevronDown, ChevronLeft, ChevronRight, LogOut,
   LayoutDashboard, Sparkles, TrendingUp, TrendingDown, Tag, List,
@@ -106,9 +107,10 @@ export default function AppSidebar() {
       {/* ── Logo ──────────────────────────────────────────────────────────── */}
       <div className={`flex border-b border-slate-700/50 flex-shrink-0 ${collapsed ? 'flex-col items-center py-3 gap-2' : 'items-center h-16 px-4 gap-3'}`}>
         <Link href="/dashboard" className="flex items-center gap-2.5 group min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:shadow-lg group-hover:shadow-cyan-500/40 transition-all">
-            <BarChart3 className="w-5 h-5 text-white" />
-          </div>
+          <Logo
+            size={32}
+            className="rounded-lg flex-shrink-0 group-hover:shadow-lg group-hover:shadow-cyan-500/40 transition-all"
+          />
           {!collapsed && (
             <span className="text-lg font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent truncate">
               Fincraft AI
@@ -268,9 +270,7 @@ export default function AppSidebar() {
       {/* ── Mobile top bar ──────────────────────────────────────────────── */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-slate-950/95 backdrop-blur-xl border-b border-slate-700/50 flex items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-white" />
-          </div>
+          <Logo size={28} className="rounded-lg" />
           <span className="text-base font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
             Fincraft AI
           </span>

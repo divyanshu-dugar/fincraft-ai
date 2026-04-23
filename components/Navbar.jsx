@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated, readToken, removeToken } from '@/lib/authenticate';
 import {
-  Menu, X, ChevronDown, ChevronRight, LogOut, BarChart3, User, Sparkles,
+  Menu, X, ChevronDown, ChevronRight, LogOut, User, Sparkles,
   LayoutDashboard, Home, TrendingUp, TrendingDown, List, Tag,
 } from 'lucide-react';
 import BudgetAlertsBell from '@/components/BudgetAlertsBell';
+import Logo from '@/components/ui/Logo';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -147,9 +148,10 @@ export default function Navbar() {
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-2"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all">
-                <BarChart3 className="w-5 h-5 text-slate-900 dark:text-white" />
-              </div>
+              <Logo
+                size={32}
+                className="rounded-lg group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all"
+              />
               <span className="text-xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                 Fincraft AI
               </span>
