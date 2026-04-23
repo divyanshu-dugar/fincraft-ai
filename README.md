@@ -73,8 +73,8 @@ Refinements List
 - [ ] 45. **Skeleton loading states** — replace spinners with skeleton screens (you already have the `Skeleton` shadcn component)
 46. **Dark/Light theme toggle** — currently only dark mode; some users prefer light
 47. **Add breadcrumb navigation** — helps users understand where they are, especially on edit pages
-48. **Responsive tables** — expense/income tables should be card layouts on mobile, not horizontally scrolling tables
-49. **Add a sidebar layout** — for authenticated pages, a persistent sidebar with nav items is more efficient than dropdown menus for a SaaS app
+- [ ] 48. **Responsive tables** — expense/income tables should be card layouts on mobile, not horizontally scrolling tables
+- [ ] 49. **Add a sidebar layout** — for authenticated pages, a persistent sidebar with nav items is more efficient than dropdown menus for a SaaS app
 50. **Add a footer** — with links to docs, support, terms of service, privacy policy
 
 
