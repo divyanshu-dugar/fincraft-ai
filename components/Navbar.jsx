@@ -96,10 +96,10 @@ export default function Navbar() {
     {
       name: 'Ledgerify',
       items: [
-        { name: 'Manage Expenses',      href: '/expense/list',    icon: TrendingDown },
         { name: 'Manage Income',        href: '/income/list',     icon: TrendingUp },
-        { name: 'Expense Categories',   href: '/expense/category', icon: Tag },
+        { name: 'Manage Expenses',      href: '/expense/list',    icon: TrendingDown },
         { name: 'Income Categories',    href: '/income/category',  icon: Tag },
+        { name: 'Expense Categories',   href: '/expense/category', icon: Tag },
       ],
     },
     {
