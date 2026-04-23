@@ -167,8 +167,19 @@ export default function Dashboard() {
       const dateRange = getDateRange();
       const queryParams = `?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
 
-      // Fetch all data with time range filter
-      const [expensesRes, incomeRes, budgetRes, statsRes] = await Promise.all([
+      // Separate 12-month window for Monthly Breakdown, so it doesn't
+      // collapse to a single month when timeRange === "monthly"/"weekly".
+      const nowForBreakdown = new Date();
+      const bY = nowForBreakdown.getUTCFullYear();
+      const bM = nowForBreakdown.getUTCMonth();
+      const fmtUTC = (dt) =>
+        `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+      const breakdownStart = new Date(Date.UTC(bY, bM - 11, 1));
+      const breakdownEnd = new Date(Date.UTC(bY, bM + 1, 0));
+      const breakdownParams = `?startDate=${fmtUTC(breakdownStart)}&endDate=${fmtUTC(breakdownEnd)}`;
+
+      // Fetch all data with time range filter (+ 12-month window for breakdown)
+      const [expensesRes, incomeRes, budgetRes, statsRes, breakdownExpensesRes, breakdownIncomeRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses${queryParams}`, {
           headers: { Authorization: `jwt ${token}` },
         }),
@@ -187,12 +198,20 @@ export default function Dashboard() {
             headers: { Authorization: `jwt ${token}` },
           }
         ),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses${breakdownParams}`, {
+          headers: { Authorization: `jwt ${token}` },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/income${breakdownParams}`, {
+          headers: { Authorization: `jwt ${token}` },
+        }),
       ]);
 
       const expensesData = await expensesRes.json();
       const incomeData = await incomeRes.json();
       const budgetData = await budgetRes.json();
       const statsData = await statsRes.json();
+      const breakdownExpensesData = await breakdownExpensesRes.json();
+      const breakdownIncomeData = await breakdownIncomeRes.json();
 
       // Calculate metrics
       const totalExpenses = expensesData.reduce(
@@ -248,18 +267,26 @@ export default function Dashboard() {
       // Budget health
       const budgetHealth = calculateBudgetHealth(budgetData);
 
-      // Monthly breakdown: group income & expenses by month (use UTC to match stored dates)
+      // Monthly breakdown: group income & expenses by month over the last 12
+      // months so the section shows real month-on-month trends regardless of
+      // the currently selected time range. Pre-seeds every month in the
+      // window so gaps render as zero rows instead of disappearing.
       const monthlyMap = {};
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(Date.UTC(bY, bM - i, 1));
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+        monthlyMap[key] = { income: 0, expense: 0 };
+      }
       const toMonthKey = (dateStr) => {
         const d = new Date(dateStr);
         return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
       };
-      incomeData.forEach((inc) => {
+      (Array.isArray(breakdownIncomeData) ? breakdownIncomeData : []).forEach((inc) => {
         const key = toMonthKey(inc.date);
         if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
         monthlyMap[key].income += inc.amount;
       });
-      expensesData.forEach((exp) => {
+      (Array.isArray(breakdownExpensesData) ? breakdownExpensesData : []).forEach((exp) => {
         const key = toMonthKey(exp.date);
         if (!monthlyMap[key]) monthlyMap[key] = { income: 0, expense: 0 };
         monthlyMap[key].expense += exp.amount;

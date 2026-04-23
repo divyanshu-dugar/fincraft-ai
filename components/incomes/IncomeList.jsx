@@ -514,7 +514,7 @@ const IncomeList = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => changeMonth(-1)}
-        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200 dark:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
+        className="fixed left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200"
         aria-label="Previous month"
       >
         <ChevronLeft size={22} strokeWidth={2.5} />
@@ -528,7 +528,7 @@ const IncomeList = () => {
           currentYear === todayUTC.getUTCFullYear() &&
           currentMonth === todayUTC.getUTCMonth()
         }
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200 dark:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-600/60 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full shadow-xl flex items-center justify-center transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Next month"
       >
         <ChevronRight size={22} strokeWidth={2.5} />

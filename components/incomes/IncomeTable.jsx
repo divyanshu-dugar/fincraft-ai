@@ -172,6 +172,10 @@ export default function IncomeTable({
                           const category = income.category || {};
                           const categoryName = category.name || "Uncategorized";
                           const categoryColor = category.color || "#10B981";
+                          const rowStripeClass =
+                            incomeIndex % 2 === 0
+                              ? "bg-slate-100/80 dark:bg-slate-800/80"
+                              : "bg-slate-100/40 dark:bg-slate-800/40";
 
                           return (
                             <motion.tr
@@ -181,7 +185,7 @@ export default function IncomeTable({
                               transition={{
                                 delay: dateIndex * 0.1 + incomeIndex * 0.05,
                               }}
-                              className={`group border-b border-slate-300/30 dark:border-slate-700/30 last:border-b-0 odd:bg-slate-100/80 dark:bg-slate-800/80 even:bg-slate-100/40 dark:bg-slate-800/40 hover:bg-slate-200/40 dark:bg-slate-700/40 transition-colors ${selectedIds.has(income._id) ? "!bg-emerald-500/10 border-emerald-500/20" : ""}`}
+                              className={`group border-b border-slate-300/30 dark:border-slate-700/30 last:border-b-0 [&>td]:bg-inherit ${rowStripeClass} hover:bg-slate-200/40 dark:hover:bg-slate-700/40 transition-colors ${selectedIds.has(income._id) ? "!bg-emerald-500/10 border-emerald-500/20" : ""}`}
                             >
                               <td className="px-3 py-4">
                                 <button

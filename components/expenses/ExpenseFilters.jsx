@@ -170,7 +170,7 @@ export default function ExpenseFilters({
                   className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left rounded-lg mx-0 transition-colors ${
                     selectedCategory === "all"
                       ? "text-purple-300 bg-purple-500/15 font-semibold"
-                      : "text-slate-800 dark:text-slate-200 hover:bg-slate-200/60 dark:bg-slate-700/60"
+                      : "text-slate-800 dark:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
                   }`}
                 >
                   {selectedCategory === "all" && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}
@@ -204,7 +204,7 @@ export default function ExpenseFilters({
                         className={`w-full flex items-center gap-2 pl-10 pr-4 py-2 text-sm text-left transition-colors ${
                           selectedCategory === sub._id
                             ? "text-purple-300 bg-purple-500/15 font-semibold"
-                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:bg-slate-700/60 hover:text-slate-800 dark:text-slate-200"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 hover:text-slate-800 dark:hover:text-slate-200"
                         }`}
                       >
                         {selectedCategory === sub._id && <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />}

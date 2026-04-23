@@ -9,8 +9,9 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
   const [monthsToShow, setMonthsToShow] = useState(6);
   const [customMonths, setCustomMonths] = useState(6);
 
-  // Show only the last N months
-  const rows = allRows.slice(-monthsToShow);
+  // allRows is sorted newest → oldest, so the most recent N months are at the
+  // start of the array.
+  const rows = allRows.slice(0, monthsToShow);
 
   const formatMonth = (key) => {
     const [year, month] = key.split("-");

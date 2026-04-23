@@ -58,7 +58,7 @@ export default function ConfirmDeleteModal({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:bg-slate-700 disabled:opacity-50 transition-all"
+                className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-all"
               >
                 Cancel
               </button>
