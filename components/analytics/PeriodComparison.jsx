@@ -9,7 +9,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Legend,
 } from "recharts";
 import {
   ArrowDownRight,
@@ -51,6 +50,7 @@ function fmtMonth(yyyyMM) {
   const [y, m] = yyyyMM.split("-");
   return new Date(Number(y), Number(m) - 1, 1).toLocaleString("en-US", {
     month: "short",
+    year: "2-digit",
   });
 }
 
@@ -97,42 +97,18 @@ function ChangeBadge({ value, inverted = false }) {
   );
 }
 
-// ─── Custom tooltip ───────────────────────────────────────────────────────────
-function ComparisonTooltip({ active, payload, label, periodALabel, periodBLabel, accentA, accentB }) {
+// ─── Simple bar tooltip ───────────────────────────────────────────────────────
+function SimpleBarTooltip({ active, payload, label, accentColor }) {
   if (!active || !payload?.length) return null;
-  const a = payload.find((p) => p.dataKey === "periodA");
-  const b = payload.find((p) => p.dataKey === "periodB");
-  const valA = a?.value || 0;
-  const valB = b?.value || 0;
-  const diff = valA - valB;
-  const change = pctChange(valA, valB);
+  const val = payload[0]?.value || 0;
   return (
-    <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl p-4 min-w-[220px] shadow-xl">
-      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
+    <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl p-4 min-w-[160px] shadow-xl">
+      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">
         {label}
       </p>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentA }} />
-            <span className="text-sm text-slate-600 dark:text-slate-400">{periodALabel}</span>
-          </div>
-          <span className="text-sm font-bold text-slate-900 dark:text-white">{moneyDetailed(valA)}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentB }} />
-            <span className="text-sm text-slate-600 dark:text-slate-400">{periodBLabel}</span>
-          </div>
-          <span className="text-sm font-bold text-slate-900 dark:text-white">{moneyDetailed(valB)}</span>
-        </div>
-      </div>
-      <div className="mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-500 uppercase">Change</span>
-        <span className={`text-sm font-bold ${diff >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-          {diff >= 0 ? "+" : ""}
-          {moneyDetailed(diff)} ({change >= 0 ? "+" : ""}{change.toFixed(1)}%)
-        </span>
+      <div className="flex items-center gap-2">
+        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }} />
+        <span className="text-sm font-bold text-slate-900 dark:text-white">{moneyDetailed(val)}</span>
       </div>
     </div>
   );
@@ -152,54 +128,51 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
   const [mode, setMode] = useState("mom"); // "mom" | "yoy"
 
   const isExpense = kind === "expense";
-  const accent = isExpense ? "blue" : "emerald";
   const accentA = isExpense ? "#3b82f6" : "#10b981";
   const accentB = isExpense ? "#8b5cf6" : "#34d399";
 
-  // ── build month-over-month data ───────────────────────────────────────────
-  const momData = useMemo(() => {
-    if (months.length < 2) return { chart: [], table: [] };
-    // aggregate total per month
-    const monthTotals = {};
+  // ── aggregate total per month ─────────────────────────────────────────────
+  const monthTotals = useMemo(() => {
+    const map = {};
     for (const r of tableRows) {
-      monthTotals[r.month] = (monthTotals[r.month] || 0) + r.amount;
+      map[r.month] = (map[r.month] || 0) + r.amount;
     }
+    return map;
+  }, [tableRows]);
 
-    const chart = [];
-    const table = [];
+  // ── chart data: simple single bars per month ──────────────────────────────
+  const chartData = useMemo(() => {
+    return months.map((m) => ({
+      label: fmtMonth(m),
+      amount: monthTotals[m] || 0,
+      month: m,
+    }));
+  }, [months, monthTotals]);
+
+  // ── build month-over-month table data ─────────────────────────────────────
+  const momTableData = useMemo(() => {
+    if (months.length < 2) return [];
+    const rows = [];
     for (let i = 1; i < months.length; i++) {
       const curr = months[i];
       const prev = months[i - 1];
       const currAmt = monthTotals[curr] || 0;
       const prevAmt = monthTotals[prev] || 0;
-      const change = pctChange(currAmt, prevAmt);
-      const diff = currAmt - prevAmt;
-      chart.push({
-        label: fmtMonth(curr),
-        periodA: currAmt,
-        periodB: prevAmt,
-        month: curr,
-      });
-      table.push({
+      rows.push({
         month: curr,
         prevMonth: prev,
         current: currAmt,
         previous: prevAmt,
-        diff,
-        changePct: change,
+        diff: currAmt - prevAmt,
+        changePct: pctChange(currAmt, prevAmt),
       });
     }
-    return { chart, table };
-  }, [tableRows, months]);
+    // Reverse: most recent first
+    return rows.reverse();
+  }, [months, monthTotals]);
 
-  // ── build year-over-year data ─────────────────────────────────────────────
+  // ── build year-over-year table data ───────────────────────────────────────
   const yoyData = useMemo(() => {
-    // aggregate per month
-    const monthTotals = {};
-    for (const r of tableRows) {
-      monthTotals[r.month] = (monthTotals[r.month] || 0) + r.amount;
-    }
-
     // group months by calendar month (01-12), collect years
     const byCalMonth = {}; // { "01": { "2025": 1200, "2026": 1500 } }
     const yearSet = new Set();
@@ -211,10 +184,9 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
     }
 
     const years = Array.from(yearSet).sort();
-    if (years.length < 2) return { chart: [], table: [], years: [] };
+    if (years.length < 2) return { table: [], years: [] };
 
     const calMonths = Object.keys(byCalMonth).sort();
-    const chart = [];
     const table = [];
 
     // compare the two most recent years
@@ -224,54 +196,45 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
     for (const cm of calMonths) {
       const currAmt = byCalMonth[cm]?.[currYear] || 0;
       const prevAmt = byCalMonth[cm]?.[prevYear] || 0;
-      // Only include if at least one year has data
       if (currAmt === 0 && prevAmt === 0) continue;
-      const change = pctChange(currAmt, prevAmt);
-      const diff = currAmt - prevAmt;
-      const monthLabel = fmtMonth(`${currYear}-${cm}`);
-      chart.push({
-        label: monthLabel,
-        periodA: currAmt,
-        periodB: prevAmt,
-        month: cm,
-      });
       table.push({
-        monthLabel,
+        monthLabel: fmtMonth(`${currYear}-${cm}`),
         calMonth: cm,
         current: currAmt,
         previous: prevAmt,
-        diff,
-        changePct: change,
+        diff: currAmt - prevAmt,
+        changePct: pctChange(currAmt, prevAmt),
         currYear,
         prevYear,
       });
     }
-    return { chart, table, years, currYear, prevYear };
-  }, [tableRows, months]);
+    // Reverse: most recent first
+    table.reverse();
+    return { table, years, currYear, prevYear };
+  }, [months, monthTotals]);
 
-  const activeData = mode === "mom" ? momData : yoyData;
-  const periodALabel = mode === "mom" ? "Current month" : (yoyData.currYear || "Current year");
-  const periodBLabel = mode === "mom" ? "Previous month" : (yoyData.prevYear || "Previous year");
+  const activeTableData = mode === "mom" ? momTableData : yoyData.table;
+  const periodALabel = mode === "mom" ? "Current" : (yoyData.currYear || "Current year");
+  const periodBLabel = mode === "mom" ? "Previous" : (yoyData.prevYear || "Previous year");
   const hasYoyData = yoyData.years?.length >= 2;
 
   // ── summary stats ─────────────────────────────────────────────────────────
   const summary = useMemo(() => {
-    const rows = activeData.table;
+    const rows = activeTableData;
     if (!rows.length) return null;
     const totalCurr = rows.reduce((s, r) => s + r.current, 0);
     const totalPrev = rows.reduce((s, r) => s + r.previous, 0);
     const overallChange = pctChange(totalCurr, totalPrev);
-    const bestRow = [...rows].sort((a, b) => b.changePct - a.changePct)[0];
-    const worstRow = [...rows].sort((a, b) => a.changePct - b.changePct)[0];
     const growthCount = rows.filter((r) => r.changePct > 0.5).length;
     const declineCount = rows.filter((r) => r.changePct < -0.5).length;
-    return { totalCurr, totalPrev, overallChange, bestRow, worstRow, growthCount, declineCount, count: rows.length };
-  }, [activeData]);
+    return { totalCurr, totalPrev, overallChange, growthCount, declineCount, count: rows.length };
+  }, [activeTableData]);
 
   if (months.length < 2) return null;
 
   const borderColor = isExpense ? "border-cyan-400/20" : "border-emerald-400/20";
   const iconBg = isExpense ? "bg-blue-500/15 text-blue-400" : "bg-emerald-500/15 text-emerald-400";
+  const sectionTitle = isExpense ? "Spending Comparison" : "Income Comparison";
 
   return (
     <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border ${borderColor} overflow-hidden`}>
@@ -286,7 +249,7 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
           </div>
           <div className="text-left min-w-0">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
-              Period Comparison
+              {sectionTitle}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5 leading-tight">
               Compare {isExpense ? "spending" : "income"} month-over-month and year-over-year
@@ -300,7 +263,7 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
 
       {sectionOpen && (
         <div className="border-t border-slate-300/50 dark:border-slate-700/50 px-6 py-5 space-y-6">
-          {/* ── mode toggle ─────────────────────────────────────────────────── */}
+          {/* ── mode toggle + summary ────────────────────────────────────────── */}
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-1 gap-0.5">
               {[
@@ -339,33 +302,25 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
             )}
           </div>
 
-          {/* ── summary stat cards ──────────────────────────────────────────── */}
+          {/* ── summary stat cards (growth/decline only) ─────────────────────── */}
           {summary && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-slate-300/40 dark:border-slate-700/40 bg-slate-50/50 dark:bg-slate-900/50 p-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{periodALabel} Total</p>
-                <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">{money(summary.totalCurr)}</p>
-              </div>
-              <div className="rounded-xl border border-slate-300/40 dark:border-slate-700/40 bg-slate-50/50 dark:bg-slate-900/50 p-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{periodBLabel} Total</p>
-                <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">{money(summary.totalPrev)}</p>
-              </div>
-              <div className="rounded-xl border border-slate-300/40 dark:border-slate-700/40 bg-slate-50/50 dark:bg-slate-900/50 p-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Periods with Growth</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Months with Growth</p>
                 <p className="text-lg font-bold text-emerald-400 tabular-nums">{summary.growthCount} <span className="text-xs text-slate-500 font-medium">of {summary.count}</span></p>
               </div>
               <div className="rounded-xl border border-slate-300/40 dark:border-slate-700/40 bg-slate-50/50 dark:bg-slate-900/50 p-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Periods with Decline</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Months with Decline</p>
                 <p className="text-lg font-bold text-rose-400 tabular-nums">{summary.declineCount} <span className="text-xs text-slate-500 font-medium">of {summary.count}</span></p>
               </div>
             </div>
           )}
 
-          {/* ── bar chart ───────────────────────────────────────────────────── */}
-          {activeData.chart.length > 0 ? (
-            <div className="h-[320px] w-full">
+          {/* ── simple bar chart: one bar per month ─────────────────────────── */}
+          {chartData.length > 0 ? (
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={activeData.chart} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                   <XAxis
                     dataKey="label"
@@ -380,34 +335,12 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
                     tickLine={false}
                     width={64}
                   />
-                  <Tooltip
-                    content={
-                      <ComparisonTooltip
-                        periodALabel={periodALabel}
-                        periodBLabel={periodBLabel}
-                        accentA={accentA}
-                        accentB={accentB}
-                      />
-                    }
-                  />
-                  <Legend
-                    formatter={(value) => (value === "periodA" ? periodALabel : periodBLabel)}
-                    wrapperStyle={{ fontSize: 12, fontWeight: 600 }}
-                  />
+                  <Tooltip content={<SimpleBarTooltip accentColor={accentA} />} />
                   <Bar
-                    dataKey="periodA"
-                    name="periodA"
+                    dataKey="amount"
                     fill={accentA}
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={40}
-                  />
-                  <Bar
-                    dataKey="periodB"
-                    name="periodB"
-                    fill={accentB}
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={40}
-                    opacity={0.6}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={56}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -418,14 +351,14 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
             </div>
           )}
 
-          {/* ── detail table ────────────────────────────────────────────────── */}
-          {activeData.table.length > 0 && (
+          {/* ── detail table (sorted most recent first) ─────────────────────── */}
+          {activeTableData.length > 0 && (
             <div className="overflow-x-auto -mx-2">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-300/50 dark:border-slate-700/50">
                     <th className="text-left px-3 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {mode === "mom" ? "Month" : "Month"}
+                      Month
                     </th>
                     <th className="text-right px-3 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">
                       {periodALabel}
@@ -445,10 +378,10 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/30 dark:divide-slate-700/30">
-                  {activeData.table.map((row, i) => {
+                  {activeTableData.map((row, i) => {
                     const label = mode === "mom" ? fmtMonthFull(row.month) : row.monthLabel;
                     const maxAmt = Math.max(
-                      ...activeData.table.map((r) => Math.max(r.current, r.previous))
+                      ...activeTableData.map((r) => Math.max(r.current, r.previous))
                     );
                     const barWidthA = maxAmt > 0 ? (row.current / maxAmt) * 100 : 0;
                     const barWidthB = maxAmt > 0 ? (row.previous / maxAmt) * 100 : 0;
@@ -499,30 +432,7 @@ export default function PeriodComparison({ tableRows, months, kind = "expense" }
                     );
                   })}
                 </tbody>
-                {/* ── totals footer ── */}
-                {summary && (
-                  <tfoot>
-                    <tr className="border-t-2 border-slate-300/60 dark:border-slate-600/60 bg-slate-100/40 dark:bg-slate-800/40">
-                      <td className="px-3 py-3 font-bold text-slate-800 dark:text-slate-200 uppercase text-xs tracking-wider">
-                        Total
-                      </td>
-                      <td className="px-3 py-3 text-right font-bold text-slate-900 dark:text-white tabular-nums">
-                        {moneyDetailed(summary.totalCurr)}
-                      </td>
-                      <td className="px-3 py-3 text-right font-bold text-slate-600 dark:text-slate-400 tabular-nums">
-                        {moneyDetailed(summary.totalPrev)}
-                      </td>
-                      <td className={`px-3 py-3 text-right font-bold tabular-nums ${(summary.totalCurr - summary.totalPrev) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                        {(summary.totalCurr - summary.totalPrev) >= 0 ? "+" : ""}
-                        {moneyDetailed(summary.totalCurr - summary.totalPrev)}
-                      </td>
-                      <td className="px-3 py-3 text-right">
-                        <ChangeBadge value={summary.overallChange} inverted={!isExpense} />
-                      </td>
-                      <td className="px-3 py-3" />
-                    </tr>
-                  </tfoot>
-                )}
+
               </table>
             </div>
           )}
