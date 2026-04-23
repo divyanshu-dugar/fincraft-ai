@@ -6,8 +6,16 @@ import { CalendarRange, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp 
 export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
   const allRows = dashboardData?.monthlyBreakdown || [];
   const [collapsed, setCollapsed] = useState(false);
-  const [monthsToShow, setMonthsToShow] = useState(6);
+  // mode: "2" | "4" | "6" | "12" | "all" | "custom"
+  const [mode, setMode] = useState("6");
   const [customMonths, setCustomMonths] = useState(6);
+
+  const monthsToShow =
+    mode === "all"
+      ? allRows.length
+      : mode === "custom"
+      ? Math.max(1, Math.min(allRows.length || 1, customMonths))
+      : Number(mode);
 
   // allRows is sorted newest → oldest, so the most recent N months are at the
   // start of the array.
@@ -58,38 +66,30 @@ export function MonthlyBreakdown({ dashboardData, formatCurrency }) {
           </button>
           <select
             className="px-2 py-1 text-xs rounded-lg bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border border-slate-600 focus:outline-none"
-            value={monthsToShow}
-            onChange={e => {
-              const val = e.target.value;
-              if (val === 'custom') {
-                setMonthsToShow(customMonths);
-              } else {
-                setMonthsToShow(Number(val));
-              }
-            }}
+            value={mode}
+            onChange={e => setMode(e.target.value)}
           >
-            <option value={2}>Last 2 months</option>
-            <option value={4}>Last 4 months</option>
-            <option value={6}>Last 6 months</option>
-            <option value={12}>Last 12 months</option>
-            <option value={allRows.length}>All</option>
+            <option value="2">Last 2 months</option>
+            <option value="4">Last 4 months</option>
+            <option value="6">Last 6 months</option>
+            <option value="12">Last 12 months</option>
+            <option value="all">All</option>
             <option value="custom">Custom…</option>
           </select>
-          {monthsToShow === 'custom' || (![2,4,6,12,allRows.length].includes(monthsToShow)) ? (
+          {mode === "custom" && (
             <input
               type="number"
               min={1}
-              max={allRows.length}
+              max={allRows.length || 1}
               value={customMonths}
               onChange={e => {
-                const val = Math.max(1, Math.min(allRows.length, Number(e.target.value)));
+                const val = Math.max(1, Math.min(allRows.length || 1, Number(e.target.value) || 1));
                 setCustomMonths(val);
-                setMonthsToShow(val);
               }}
               className="w-16 px-2 py-1 text-xs rounded-lg bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 border border-slate-600 focus:outline-none"
               placeholder="N months"
             />
-          ) : null}
+          )}
         </div>
       </div>
 

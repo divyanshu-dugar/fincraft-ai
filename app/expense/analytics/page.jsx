@@ -33,11 +33,14 @@ import {
   Minus,
   RefreshCw,
   Search,
+  Sparkles,
   Tags,
   TrendingUp,
   Zap,
 } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
+import CardDateRangeControl from "@/components/analytics/CardDateRangeControl";
+import AIInsightsPanel from "@/components/analytics/AIInsightsPanel";
 
 // ─── palette ────────────────────────────────────────────────────────────────
 const COLORS = [
@@ -490,6 +493,7 @@ function yTickFmt(v) { return v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
 // ─── page ─────────────────────────────────────────────────────────────────────
 export default function ExpenseAnalyticsPage() {
   const [range,               setRange]               = useState(defaultRange);
+  const [chartRangeOverride,  setChartRangeOverride]  = useState(null);
   const [activePreset,        setActivePreset]        = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
@@ -503,12 +507,15 @@ export default function ExpenseAnalyticsPage() {
   const [collapsedGroups,     setCollapsedGroups]     = useState({});
   const [showFilters,         setShowFilters]         = useState(false);
   const [loading,             setLoading]             = useState(false);
+  const [chartLoading,        setChartLoading]        = useState(false);
   const [error,               setError]               = useState("");
   const [data, setData] = useState({
     categories: [], months: [], table: [],
     chart: { groupedBars: [], trendLines: [] },
     anomalies: [], summary: { totalRows: 0, anomalyCount: 0 },
   });
+  const [chartDataOverride, setChartDataOverride] = useState(null);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
 
   // first-load vs refresh distinction
   const isFirstLoad = loading && data.months.length === 0;
@@ -557,93 +564,53 @@ export default function ExpenseAnalyticsPage() {
     };
   }, [filteredTableRows, data.summary]);
 
-  // ── parent-level aggregation ──────────────────────────────────────────────
-  const pieDataParent = useMemo(() => {
-    const totals = new Map();
-    for (const row of filteredTableRows) {
-      const parent = row.parentName || row.category;
-      const existing = totals.get(parent);
-      if (!existing) {
-        totals.set(parent, {
-          name: parent,
-          value: row.amount,
-          icon: row.parentIcon || row.categoryIcon || '',
-        });
-      } else {
-        existing.value += row.amount;
-      }
+  // Compact payload for the AI — only aggregates, no raw notes/merchant text.
+  const aiSummary = useMemo(() => {
+    const monthMap = {};
+    const catMap = {};
+    for (const r of filteredTableRows) {
+      monthMap[r.month] = (monthMap[r.month] || 0) + r.amount;
+      const label = r.parentName ? `${r.parentName} › ${r.category}` : r.category;
+      catMap[label] = (catMap[label] || 0) + r.amount;
     }
-    const sorted = Array.from(totals.values()).sort((a, b) => b.value - a.value);
-    return sorted.map((item, i) => ({ ...item, color: COLORS[i % COLORS.length] }));
-  }, [filteredTableRows]);
+    const monthlyTotals = Object.entries(monthMap)
+      .map(([month, amount]) => ({ month, amount: Number(amount.toFixed(2)) }))
+      .sort((a, b) => a.month.localeCompare(b.month));
 
-  // ── sub-level aggregation ────────────────────────────────────────────────
-  const pieDataSub = useMemo(() => {
-    const totals = new Map();
-    for (const row of filteredTableRows) {
-      const key = row.categoryId;
-      const existing = totals.get(key);
-      if (!existing) {
-        totals.set(key, {
-          name: row.category,
-          value: row.amount,
-          color: row.categoryColor || COLORS[totals.size % COLORS.length],
-          parent: row.parentName || row.category,
-          parentIcon: row.parentIcon || row.categoryIcon || '',
-          icon: row.categoryIcon || '',
-        });
-      } else {
-        existing.value += row.amount;
-      }
-    }
-    return Array.from(totals.values()).sort((a, b) => b.value - a.value);
-  }, [filteredTableRows]);
+    const total = kpis.totalSpend || 0;
+    const categoryTotals = Object.entries(catMap)
+      .map(([label, amount]) => ({
+        label,
+        amount: Number(amount.toFixed(2)),
+        share: total > 0 ? Number(((amount / total) * 100).toFixed(1)) : 0,
+      }))
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 12);
 
-  // ── active data based on depth ───────────────────────────────────────────
-  const activePieData = categoryDepth === 'parent' ? pieDataParent : pieDataSub;
-  const pieTotal = activePieData.reduce((s, d) => s + d.value, 0);
+    const anomalies = (data.anomalies || []).slice(0, 8).map((a) => ({
+      month: a.month,
+      category: a.parentName ? `${a.parentName} › ${a.category}` : a.category,
+      amount: Number((a.amount || 0).toFixed(2)),
+      severity: a.anomaly?.severity || "medium",
+    }));
 
-  // ── legend groups (subcategories organized under parents) ────────────────
-  const legendGroups = useMemo(() => {
-    const groups = new Map();
-    for (const item of pieDataSub) {
-      const parent = item.parent;
-      if (!groups.has(parent)) {
-        const parentItem = pieDataParent.find((p) => p.name === parent);
-        groups.set(parent, {
-          name: parent,
-          icon: item.parentIcon,
-          color: parentItem?.color || COLORS[groups.size % COLORS.length],
-          total: parentItem?.value || 0,
-          children: [],
-        });
-      }
-      groups.get(parent).children.push(item);
-    }
-    return Array.from(groups.values()).sort((a, b) => b.total - a.total);
-  }, [pieDataSub, pieDataParent]);
-
-  // ── bar data aggregated by parent ────────────────────────────────────────
-  const barDataParent = useMemo(() => {
-    const subParentMap = new Map();
-    for (const row of filteredTableRows) {
-      subParentMap.set(row.category, row.parentName || row.category);
-    }
-    return (data.chart.groupedBars || []).map((monthRow) => {
-      const newRow = { month: monthRow.month };
-      for (const [key, value] of Object.entries(monthRow)) {
-        if (key === 'month') continue;
-        const parent = subParentMap.get(key) || key;
-        newRow[parent] = (newRow[parent] || 0) + (value || 0);
-      }
-      return newRow;
-    });
-  }, [data.chart.groupedBars, filteredTableRows]);
+    return {
+      totalAmount: Number(total.toFixed(2)),
+      peakMonth: kpis.peakMonth,
+      peakAmount: Number((kpis.peakAmount || 0).toFixed(2)),
+      topCategory: kpis.topCategory,
+      topAmount: Number((kpis.topAmount || 0).toFixed(2)),
+      anomalyCount: kpis.anomalyCount || 0,
+      entryCount: filteredTableRows.length,
+      categoriesTracked: activeCategories.length,
+      monthlyTotals,
+      categoryTotals,
+      anomalies,
+    };
+  }, [filteredTableRows, kpis, activeCategories, data.anomalies]);
 
   const toggleLegendGroup = (name) =>
     setLegendExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
-
-  const anomalyMonths = useMemo(() => new Set(data.anomalies.map((r) => r.month)), [data.anomalies]);
 
   // group filtered table rows by category for the MoM comparison grid
   const categoryMoMGroups = useMemo(() => {
@@ -673,6 +640,101 @@ export default function ExpenseAnalyticsPage() {
   }, [filteredTableRows]);
 
   const hasData = filteredTableRows.length > 0;
+  const activeChartRange = chartRangeOverride || range;
+  const chartSource = chartDataOverride || data;
+
+  const chartCategories = useMemo(() => {
+    if (!selectedCategoryIds.length) return chartSource.categories;
+    return chartSource.categories.filter((c) => categoryIdSet.has(c.categoryId));
+  }, [chartSource.categories, selectedCategoryIds, categoryIdSet]);
+
+  const chartFilteredTableRows = useMemo(() => {
+    if (!selectedCategoryIds.length) return chartSource.table;
+    return chartSource.table.filter((r) => categoryIdSet.has(r.categoryId));
+  }, [chartSource.table, selectedCategoryIds, categoryIdSet]);
+
+  const chartPieDataParent = useMemo(() => {
+    const totals = new Map();
+    for (const row of chartFilteredTableRows) {
+      const parent = row.parentName || row.category;
+      const existing = totals.get(parent);
+      if (!existing) {
+        totals.set(parent, {
+          name: parent,
+          value: row.amount,
+          icon: row.parentIcon || row.categoryIcon || "",
+        });
+      } else {
+        existing.value += row.amount;
+      }
+    }
+    const sorted = Array.from(totals.values()).sort((a, b) => b.value - a.value);
+    return sorted.map((item, i) => ({ ...item, color: COLORS[i % COLORS.length] }));
+  }, [chartFilteredTableRows]);
+
+  const chartPieDataSub = useMemo(() => {
+    const totals = new Map();
+    for (const row of chartFilteredTableRows) {
+      const key = row.categoryId;
+      const existing = totals.get(key);
+      if (!existing) {
+        totals.set(key, {
+          name: row.category,
+          value: row.amount,
+          color: row.categoryColor || COLORS[totals.size % COLORS.length],
+          parent: row.parentName || row.category,
+          parentIcon: row.parentIcon || row.categoryIcon || "",
+          icon: row.categoryIcon || "",
+        });
+      } else {
+        existing.value += row.amount;
+      }
+    }
+    return Array.from(totals.values()).sort((a, b) => b.value - a.value);
+  }, [chartFilteredTableRows]);
+
+  const chartActivePieData = categoryDepth === "parent" ? chartPieDataParent : chartPieDataSub;
+  const chartPieTotal = chartActivePieData.reduce((sum, item) => sum + item.value, 0);
+
+  const chartLegendGroups = useMemo(() => {
+    const groups = new Map();
+    for (const item of chartPieDataSub) {
+      const parent = item.parent;
+      if (!groups.has(parent)) {
+        const parentItem = chartPieDataParent.find((entry) => entry.name === parent);
+        groups.set(parent, {
+          name: parent,
+          icon: item.parentIcon,
+          color: parentItem?.color || COLORS[groups.size % COLORS.length],
+          total: parentItem?.value || 0,
+          children: [],
+        });
+      }
+      groups.get(parent).children.push(item);
+    }
+    return Array.from(groups.values()).sort((a, b) => b.total - a.total);
+  }, [chartPieDataSub, chartPieDataParent]);
+
+  const chartBarDataParent = useMemo(() => {
+    const subParentMap = new Map();
+    for (const row of chartFilteredTableRows) {
+      subParentMap.set(row.category, row.parentName || row.category);
+    }
+    return (chartSource.chart.groupedBars || []).map((monthRow) => {
+      const newRow = { month: monthRow.month };
+      for (const [key, value] of Object.entries(monthRow)) {
+        if (key === "month") continue;
+        const parent = subParentMap.get(key) || key;
+        newRow[parent] = (newRow[parent] || 0) + (value || 0);
+      }
+      return newRow;
+    });
+  }, [chartSource.chart.groupedBars, chartFilteredTableRows]);
+
+  const chartAnomalyMonths = useMemo(
+    () => new Set((chartSource.anomalies || []).map((row) => row.month)),
+    [chartSource.anomalies]
+  );
 
   // ── fetchers ─────────────────────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
@@ -738,8 +800,38 @@ export default function ExpenseAnalyticsPage() {
     }
   }, [range.startMonth, range.endMonth, selectedCategoryIds]);
 
+  const fetchChartAnalytics = useCallback(async () => {
+    if (!chartRangeOverride) {
+      setChartDataOverride(null);
+      return;
+    }
+    const token = getToken();
+    if (!token) return;
+    setChartLoading(true);
+    try {
+      const params = new URLSearchParams({
+        startMonth: chartRangeOverride.startMonth,
+        endMonth: chartRangeOverride.endMonth,
+      });
+      if (selectedCategoryIds.length) params.set("categoryIds", selectedCategoryIds.join(","));
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/analytics/category-month-comparison?${params}`,
+        { headers: { Authorization: `jwt ${token}` } }
+      );
+      if (!res.ok) {
+        throw new Error("Failed to load chart analytics");
+      }
+      setChartDataOverride(await res.json());
+    } catch {
+      setChartDataOverride(null);
+    } finally {
+      setChartLoading(false);
+    }
+  }, [chartRangeOverride, selectedCategoryIds]);
+
   useEffect(() => { fetchCategories(); }, [fetchCategories]);
   useEffect(() => { fetchAnalytics();  }, [fetchAnalytics]);
+  useEffect(() => { fetchChartAnalytics(); }, [fetchChartAnalytics]);
 
   // ── handlers ──────────────────────────────────────────────────────────────────
   const applyPreset = (preset) => {
@@ -862,6 +954,15 @@ export default function ExpenseAnalyticsPage() {
               <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
             </button>
             <button
+              onClick={() => setAiPanelOpen(true)}
+              disabled={isFirstLoad}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-blue-400/50 bg-blue-500/15 text-sm font-semibold text-blue-300 hover:bg-blue-500/25 hover:border-blue-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Generate AI insights from the current view"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden sm:inline">Explore with AI</span>
+            </button>
+            <button
               onClick={exportCSV}
               disabled={!hasData || isFirstLoad}
               className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-600 bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
@@ -872,6 +973,15 @@ export default function ExpenseAnalyticsPage() {
           </div>
         </div>
       </div>
+
+      <AIInsightsPanel
+        open={aiPanelOpen}
+        onClose={() => setAiPanelOpen(false)}
+        kind="expense"
+        range={range}
+        summary={aiSummary}
+        accent="blue"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
 
@@ -1159,7 +1269,7 @@ export default function ExpenseAnalyticsPage() {
               {PRESETS.map((p) => (
                 <button
                   key={p.label}
-                  onClick={() => applyPreset(p.months)}
+                  onClick={() => applyPreset(p)}
                   className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all"
                 >
                   Try last {p.label}
@@ -1173,14 +1283,17 @@ export default function ExpenseAnalyticsPage() {
             <AnomalyAlert anomalies={data.anomalies} />
 
             {/* ── charts card ────────────────────────────────────────────── */}
-            <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
+            <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 p-6 transition-opacity duration-200 ${(isRefreshing || chartLoading) ? "opacity-60" : ""}`}>
               {/* header */}
               <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900 dark:text-white">Spending by category</h2>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
                     {categoryDepth === 'parent' ? 'Aggregated by main category' : 'Detailed subcategory breakdown'}
-                    {chartView === 'bar' && anomalyMonths.size > 0 && (
+                    <span className="ml-2">
+                      {fmtMonth(activeChartRange.startMonth)} → {fmtMonth(activeChartRange.endMonth)}
+                    </span>
+                    {chartView === 'bar' && chartAnomalyMonths.size > 0 && (
                       <span className="ml-2 text-rose-500 font-semibold">
                         — dashed lines mark anomaly months
                       </span>
@@ -1189,6 +1302,15 @@ export default function ExpenseAnalyticsPage() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                  <CardDateRangeControl
+                    tone="blue"
+                    pageRange={range}
+                    overrideRange={chartRangeOverride}
+                    onChange={setChartRangeOverride}
+                    presets={PRESETS}
+                    formatMonthLabel={fmtMonth}
+                    loading={chartLoading}
+                  />
                   {/* depth toggle */}
                   <div className="flex items-center bg-slate-200/50 dark:bg-slate-700/50 rounded-xl p-1 gap-0.5">
                     {[
@@ -1231,7 +1353,7 @@ export default function ExpenseAnalyticsPage() {
               </div>
 
               {/* too-many hint */}
-              {chartView === "bar" && categoryDepth === 'sub' && activeCategories.length > 8 && (
+              {chartView === "bar" && categoryDepth === 'sub' && chartCategories.length > 8 && (
                 <p className="mb-3 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl">
                   Tip: bar charts are clearest with fewer than 8 categories. Use the category filter above to narrow down.
                 </p>
@@ -1246,7 +1368,7 @@ export default function ExpenseAnalyticsPage() {
                       {chartView === "pie" ? (
                         <PieChart>
                           <Pie
-                            data={activePieData}
+                            data={chartActivePieData}
                             cx="50%"
                             cy="50%"
                             innerRadius={70}
@@ -1259,7 +1381,7 @@ export default function ExpenseAnalyticsPage() {
                             animationBegin={0}
                             animationDuration={600}
                           >
-                            {activePieData.map((entry, index) => (
+                            {chartActivePieData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>
@@ -1267,7 +1389,7 @@ export default function ExpenseAnalyticsPage() {
                             content={({ active, payload }) => {
                               if (!active || !payload?.length) return null;
                               const item = payload[0];
-                              const pctVal = pieTotal > 0 ? ((item.value / pieTotal) * 100).toFixed(1) : '0';
+                              const pctVal = chartPieTotal > 0 ? ((item.value / chartPieTotal) * 100).toFixed(1) : '0';
                               return (
                                 <div className="bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-300 dark:border-slate-700 rounded-2xl p-4 min-w-[180px] shadow-xl">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1289,7 +1411,7 @@ export default function ExpenseAnalyticsPage() {
                         </PieChart>
                       ) : (
                         <BarChart
-                          data={categoryDepth === 'parent' ? barDataParent : data.chart.groupedBars}
+                          data={categoryDepth === 'parent' ? chartBarDataParent : chartSource.chart.groupedBars}
                           margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -1297,7 +1419,7 @@ export default function ExpenseAnalyticsPage() {
                           <YAxis {...yAxisProps} />
                           <Tooltip content={<ChartTooltip />} />
                           {categoryDepth === 'parent'
-                            ? pieDataParent.map((p, i) => (
+                            ? chartPieDataParent.map((p, i) => (
                                 <Bar
                                   key={p.name}
                                   dataKey={p.name}
@@ -1306,7 +1428,7 @@ export default function ExpenseAnalyticsPage() {
                                   maxBarSize={48}
                                 />
                               ))
-                            : activeCategories.map((cat) => (
+                            : chartCategories.map((cat) => (
                                 <Bar
                                   key={cat.categoryId}
                                   dataKey={cat.categoryName}
@@ -1316,7 +1438,7 @@ export default function ExpenseAnalyticsPage() {
                                 />
                               ))
                           }
-                          {Array.from(anomalyMonths).map((month) => (
+                          {Array.from(chartAnomalyMonths).map((month) => (
                             <ReferenceLine
                               key={month}
                               x={month}
@@ -1332,7 +1454,7 @@ export default function ExpenseAnalyticsPage() {
                   {/* center stat inside donut */}
                   {chartView === 'pie' && (
                     <div className="text-center -mt-4 mb-2 lg:mb-0">
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{money(pieTotal)}</p>
+                      <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{money(chartPieTotal)}</p>
                       <p className="text-xs text-slate-500 font-medium">Total spend</p>
                     </div>
                   )}
@@ -1341,9 +1463,9 @@ export default function ExpenseAnalyticsPage() {
                 {/* legend panel */}
                 <div className="w-full lg:w-72 xl:w-80 lg:max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
                   <CategoryLegend
-                    groups={legendGroups}
+                    groups={chartLegendGroups}
                     depth={categoryDepth}
-                    total={pieTotal}
+                    total={chartPieTotal}
                     expanded={legendExpanded}
                     onToggle={toggleLegendGroup}
                     formatMoney={money}

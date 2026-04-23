@@ -176,7 +176,7 @@ function SubcategoryRow({ sub, onEdit, onDelete }) {
     >
       <span className="text-base">{sub.icon || '💰'}</span>
       <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-300">{sub.name}</span>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1">
         <button onClick={() => onEdit(sub)} className="p-1.5 rounded-lg hover:bg-blue-500/15 text-slate-500 hover:text-blue-400 transition-all">
           <Edit3 className="w-3.5 h-3.5" />
         </button>

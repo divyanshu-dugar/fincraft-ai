@@ -237,10 +237,13 @@ export default function ExpenseTable({
                           const category = expense.category || {};
                           const categoryName = category.name || "Uncategorized";
                           const categoryColor = category.color || "#9ca3af";
+                          // Parent wrapper is bg-slate-800/80, so even rows
+                          // were blending in. Use a clearly lighter shade on
+                          // one stripe to make the zebra visible.
                           const rowStripeClass =
                             expenseIndex % 2 === 0
-                              ? "bg-slate-100/80 dark:bg-slate-800/80"
-                              : "bg-slate-100/40 dark:bg-slate-800/40";
+                              ? "bg-slate-200/40 dark:bg-slate-700/40"
+                              : "";
 
                           return (
                             <motion.tr

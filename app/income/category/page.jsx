@@ -170,7 +170,7 @@ function CategoryCard({ cat, onEdit, onDelete }) {
         style={{ backgroundColor: cat.color || '#10b981' }}
         title={cat.color}
       />
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1">
         <button onClick={() => onEdit(cat)}
           className="p-1.5 rounded-lg hover:bg-blue-500/15 text-slate-500 hover:text-blue-400 transition-all" title="Edit">
           <Edit3 className="w-3.5 h-3.5" />

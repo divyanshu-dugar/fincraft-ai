@@ -10,7 +10,6 @@ import {
   LayoutDashboard, Home, TrendingUp, TrendingDown, List, Tag,
 } from 'lucide-react';
 import BudgetAlertsBell from '@/components/BudgetAlertsBell';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -286,9 +285,6 @@ export default function Navbar() {
 
             {/* Budget Alerts Bell */}
             {authenticated && <BudgetAlertsBell />}
-
-            {/* Theme Toggle */}
-            <ThemeToggle />
 
             {/* Auth Buttons */}
             {authenticated ? (
