@@ -41,6 +41,7 @@ import {
 import { getToken } from "@/lib/authenticate";
 import CardDateRangeControl from "@/components/analytics/CardDateRangeControl";
 import AIInsightsPanel from "@/components/analytics/AIInsightsPanel";
+import PeriodComparison from "@/components/analytics/PeriodComparison";
 
 // ─── palette ────────────────────────────────────────────────────────────────
 const COLORS = [
@@ -1473,6 +1474,13 @@ export default function ExpenseAnalyticsPage() {
                 </div>
               </div>
             </div>
+
+            {/* ── period comparison (MoM + YoY) ─────────────────────────── */}
+            <PeriodComparison
+              tableRows={filteredTableRows}
+              months={data.months}
+              kind="expense"
+            />
 
             {/* ── month-on-month category comparison ─────────────────────── */}
             <div className={`bg-slate-100/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-cyan-400/20 overflow-hidden transition-opacity duration-200 ${isRefreshing ? "opacity-60" : ""}`}>
