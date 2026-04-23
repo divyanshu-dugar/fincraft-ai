@@ -11,7 +11,7 @@
 
 ## 🤖 AI & Intelligence
 
-5. **"Explore with AI" button on expense/income analytics pages** — one-click sends current view's data to AI, returns plain-language insights + actionable recommendations (e.g., "your food spending is 40% higher than last month — consider meal prepping")
+- [ ] 5. **"Explore with AI" button on expense/income analytics pages** — one-click sends current view's data to AI, returns plain-language insights + actionable recommendations (e.g., "your food spending is 40% higher than last month — consider meal prepping")
 6. **AI-generated weekly/monthly financial summary emails** — opt-in digest with spending trends, budget alerts, goal progress, and AI recommendations
 7. **Proactive AI alerts** — push/email notifications like "You've already spent 85% of your Food budget and it's only the 15th"
 8. **Smart categorization** — when adding an expense, AI auto-suggests the category based on the note/description (using embeddings you already generate)
@@ -52,11 +52,11 @@
 31. **Add a state management solution** — React Context or Zustand for auth state, user profile, theme preferences (currently re-reading localStorage on every component mount)
 32. **Move business logic to API** — dashboard currently calculates trends, health score, insights client-side; this should be a server endpoint
 33. **Add request/response logging middleware** — structured JSON logging with request IDs for debugging and monitoring
-34. **Add API versioning** — prefix routes with `/v1/` to allow future breaking changes
-35. **Consistent route naming** — some routes use `/expenses`, others use `/api/auth` — standardize to `/api/v1/*` for everything
+- [ ] 34. **Add API versioning** — prefix routes with `/v1/` to allow future breaking changes
+- [ ] 35. **Consistent route naming** — some routes use `/expenses`, others use `/api/auth` — standardize to `/api/v1/*` for everything
 36. **Add TypeScript to the API** — currently pure JS with no type safety; adding TS catches bugs at build time
 37. **Add database migrations/seeding** — scripts to set up initial categories, demo data for new users
-38. **Add health check endpoint to API** — `/api/health` returning DB connection status, uptime, version
+- [ ] 38. **Add health check endpoint to API** — `/api/health` returning DB connection status, uptime, version
 
 
 
@@ -73,7 +73,7 @@
 47. **Add breadcrumb navigation** — helps users understand where they are, especially on edit pages
 - [ ] 48. **Responsive tables** — expense/income tables should be card layouts on mobile, not horizontally scrolling tables
 - [ ] 49. **Add a sidebar layout** — for authenticated pages, a persistent sidebar with nav items is more efficient than dropdown menus for a SaaS app
-50. **Add a footer** — with links to docs, support, terms of service, privacy policy
+- [ ] 50. **Add a footer** — with links to docs, support, terms of service, privacy policy
 
 
 
