@@ -339,7 +339,7 @@ export default function ExpenseCategoryPage() {
     try {
       const token = getToken();
       if (!token) return;
-      const res = await fetch(`${API}/expense-categories`, { headers: { Authorization: `jwt ${token}` } });
+      const res = await fetch(`${API}/api/v1/expense-categories`, { headers: { Authorization: `jwt ${token}` } });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setTree(data.tree || []);

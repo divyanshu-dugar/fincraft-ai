@@ -53,7 +53,7 @@ export default function RecurringIncomePage() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-incomes`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -69,7 +69,7 @@ export default function RecurringIncomePage() {
     setTogglingId(rule._id);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes/${rule._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-incomes/${rule._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify({ isActive: !rule.isActive }),
@@ -86,7 +86,7 @@ export default function RecurringIncomePage() {
     setDeletingId(id);
     try {
       const token = getToken();
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-incomes/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `jwt ${token}` },
       });

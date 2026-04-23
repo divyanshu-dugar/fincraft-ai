@@ -112,7 +112,7 @@ export default function EditBudget() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${API}/expense-categories`, {
+      const res = await fetch(`${API}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -125,7 +125,7 @@ export default function EditBudget() {
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${API}/expense-categories/seed`, { method: 'POST', headers: { Authorization: `jwt ${token}` } });
+      await fetch(`${API}/api/v1/expense-categories/seed`, { method: 'POST', headers: { Authorization: `jwt ${token}` } });
       fetchCategoryTree();
     } catch { /* silent */ }
   }, [fetchCategoryTree]);
@@ -138,7 +138,7 @@ export default function EditBudget() {
     if (!token) throw new Error('Not authenticated');
     const body = parentId ? { name: catName, parentCategory: parentId } : { name: catName, isParent: true };
     if (color) body.color = color;
-    const res = await fetch(`${API}/expense-categories`, {
+    const res = await fetch(`${API}/api/v1/expense-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify(body),
@@ -153,7 +153,7 @@ export default function EditBudget() {
     (async () => {
       try {
         const token = getToken();
-        const res = await fetch(`${API}/budgets/${id}`, {
+        const res = await fetch(`${API}/api/v1/budgets/${id}`, {
           headers: { Authorization: `jwt ${token}` },
         });
         if (!res.ok) throw new Error('Not found');
@@ -250,7 +250,7 @@ export default function EditBudget() {
     setShowScopeModal(false);
     try {
       const token = getToken();
-      const res = await fetch(`${API}/budgets/${id}?updateScope=${scope}`, {
+      const res = await fetch(`${API}/api/v1/budgets/${id}?updateScope=${scope}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify(payload),

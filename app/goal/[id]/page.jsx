@@ -146,7 +146,7 @@ export default function GoalDetailPage() {
   const fetchGoal = useCallback(async () => {
     const token = getToken();
     try {
-      const res = await fetch(`${API}/saving-goals/${id}`, {
+      const res = await fetch(`${API}/api/v1/saving-goals/${id}`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) throw new Error("Failed to load goal");
@@ -170,7 +170,7 @@ export default function GoalDetailPage() {
     setSubmitting(true);
     const token = getToken();
     try {
-      const res = await fetch(`${API}/saving-goals/${id}/contribute`, {
+      const res = await fetch(`${API}/api/v1/saving-goals/${id}/contribute`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +195,7 @@ export default function GoalDetailPage() {
   const handleDeleteContribution = async (contributionId) => {
     const token = getToken();
     try {
-      const res = await fetch(`${API}/saving-goals/${id}/contribute/${contributionId}`, {
+      const res = await fetch(`${API}/api/v1/saving-goals/${id}/contribute/${contributionId}`, {
         method: "DELETE",
         headers: { Authorization: `jwt ${token}` },
       });

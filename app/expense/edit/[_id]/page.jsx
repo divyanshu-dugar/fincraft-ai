@@ -61,7 +61,7 @@ const EditExpense = () => {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -74,7 +74,7 @@ const EditExpense = () => {
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories/seed`, {
         method: 'POST',
         headers: { Authorization: `jwt ${token}` },
       });
@@ -86,7 +86,7 @@ const EditExpense = () => {
   const fetchExpense = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/${params._id}`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) {
@@ -142,7 +142,7 @@ const EditExpense = () => {
     if (!token) throw new Error('Not authenticated');
     const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
     if (color) body.color = color;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify(body),
@@ -174,7 +174,7 @@ const EditExpense = () => {
     try {
       const token = getToken();
       const categoryId = category.subcategoryId || category.parentId;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/${params._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify({
@@ -204,7 +204,7 @@ const EditExpense = () => {
     setDeleting(true);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/${params._id}`, {
         method: 'DELETE',
         headers: { Authorization: `jwt ${token}` },
       });

@@ -358,7 +358,7 @@ export default function BudgetAnalyticsPage() {
     setError("");
     try {
       const params = new URLSearchParams({ startDate: range.startDate, endDate: range.endDate });
-      const res = await fetch(`${API}/budgets/stats?${params}`, {
+      const res = await fetch(`${API}/api/v1/budgets/stats?${params}`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) {
@@ -378,7 +378,7 @@ export default function BudgetAnalyticsPage() {
     if (!token) return;
     setAlertsLoading(true);
     try {
-      const res = await fetch(`${API}/budgets/alerts`, {
+      const res = await fetch(`${API}/api/v1/budgets/alerts`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (res.ok) setAlerts(await res.json());
@@ -389,7 +389,7 @@ export default function BudgetAnalyticsPage() {
   const markAlertRead = async (alertId) => {
     const token = getToken();
     try {
-      await fetch(`${API}/budgets/alerts/${alertId}/read`, {
+      await fetch(`${API}/api/v1/budgets/alerts/${alertId}/read`, {
         method: "PUT",
         headers: { Authorization: `jwt ${token}` },
       });

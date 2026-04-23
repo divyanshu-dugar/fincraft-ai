@@ -55,7 +55,7 @@ export default function AIInsightsPanel({
     setState({ status: "loading", data: null, error: "" });
     try {
       const res = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/ai-analytics-insights`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ai-analytics-insights`,
         {
           method: "POST",
           body: JSON.stringify({ kind, range, summary }),

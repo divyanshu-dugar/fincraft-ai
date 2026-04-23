@@ -53,7 +53,7 @@ export default function RecurringExpensesPage() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-expenses`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -69,7 +69,7 @@ export default function RecurringExpensesPage() {
     setTogglingId(rule._id);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses/${rule._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-expenses/${rule._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify({ isActive: !rule.isActive }),
@@ -86,7 +86,7 @@ export default function RecurringExpensesPage() {
     setDeletingId(id);
     try {
       const token = getToken();
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-expenses/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `jwt ${token}` },
       });

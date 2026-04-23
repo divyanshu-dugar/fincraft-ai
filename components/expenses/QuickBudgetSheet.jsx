@@ -291,7 +291,7 @@ export default function QuickBudgetSheet({
         repeatUntil:    isRecurring && repeatUntil ? `${repeatUntil}T23:59:59.999Z` : null,
       };
 
-      const res = await fetch(`${API}/budgets`, {
+      const res = await fetch(`${API}/api/v1/budgets`, {
         method:  'POST',
         headers: {
           'Content-Type':  'application/json',

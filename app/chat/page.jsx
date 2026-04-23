@@ -26,7 +26,7 @@ import {
 import { getToken } from "@/lib/authenticate";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
-const AI_API = `${API}/api`;
+const AI_API = `${API}/api/v1`;
 
 // ─── categorized question prompts ────────────────────────────────────────────
 const QUESTION_CATEGORIES = [

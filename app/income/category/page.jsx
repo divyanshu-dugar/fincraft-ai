@@ -202,7 +202,7 @@ export default function IncomeCategoryPage() {
     try {
       const token = getToken();
       if (!token) return;
-      const res = await fetch(`${API}/income-categories`, { headers: { Authorization: `jwt ${token}` } });
+      const res = await fetch(`${API}/api/v1/income-categories`, { headers: { Authorization: `jwt ${token}` } });
       if (!res.ok) throw new Error();
       setCategories(await res.json());
     } catch {
@@ -218,7 +218,7 @@ export default function IncomeCategoryPage() {
     setActionLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${API}/income-categories`, {
+      const res = await fetch(`${API}/api/v1/income-categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify(data),
@@ -238,7 +238,7 @@ export default function IncomeCategoryPage() {
     setActionLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${API}/income-categories/${editingCat._id}`, {
+      const res = await fetch(`${API}/api/v1/income-categories/${editingCat._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify(data),
@@ -258,7 +258,7 @@ export default function IncomeCategoryPage() {
     setActionLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${API}/income-categories/${deleteTarget._id}`, {
+      const res = await fetch(`${API}/api/v1/income-categories/${deleteTarget._id}`, {
         method: 'DELETE',
         headers: { Authorization: `jwt ${token}` },
       });

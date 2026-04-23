@@ -113,7 +113,7 @@ const ExpenseList = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses/process`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-expenses/process`, {
       method: 'POST',
       headers: { Authorization: `jwt ${token}` },
     })
@@ -142,7 +142,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expense-categories`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -230,7 +230,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/stats`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/stats`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -272,7 +272,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/${deleteTarget}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/${deleteTarget}`,
         {
           method: "DELETE",
           headers: {
@@ -331,7 +331,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-delete`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/bulk-delete`,
         {
           method: "POST",
           headers: {
@@ -360,7 +360,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-recategorize`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/bulk-recategorize`,
         {
           method: "POST",
           headers: {
@@ -388,7 +388,7 @@ const ExpenseList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/bulk-edit-date`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/bulk-edit-date`,
         {
           method: "POST",
           headers: {
@@ -654,7 +654,7 @@ const ExpenseList = () => {
           const token = getToken();
           const body = parentId ? { name: catName, parentCategory: parentId } : { name: catName, isParent: true };
           if (color) body.color = color;
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `${AUTH_SCHEME} ${token}` },
             body: JSON.stringify(body),

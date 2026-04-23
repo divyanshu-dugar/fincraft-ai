@@ -120,7 +120,7 @@ export function CashFlowForecast() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${API}/cash-flow-forecast?months=${forecastMonths}`, {
+      const res = await fetch(`${API}/api/v1/cash-flow-forecast?months=${forecastMonths}`, {
         headers: authHeaders(),
       });
       if (!res.ok) throw new Error("Failed to fetch forecast");

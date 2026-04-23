@@ -64,7 +64,7 @@ export default function BudgetAlertsBell({ isSidebar = false, collapsed = false 
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/budgets/alerts`, { headers: authHeaders() });
+      const res = await fetch(`${API}/api/v1/budgets/alerts`, { headers: authHeaders() });
       if (!res.ok) return;
       const data = await res.json();
       setAlerts(Array.isArray(data) ? data : []);
@@ -75,7 +75,7 @@ export default function BudgetAlertsBell({ isSidebar = false, collapsed = false 
     setLoading(true);
     try {
       // Trigger backend check — creates new alerts if thresholds crossed
-      await fetch(`${API}/budgets/check-alerts`, { headers: authHeaders() });
+      await fetch(`${API}/api/v1/budgets/check-alerts`, { headers: authHeaders() });
     } catch { /* silent */ } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export default function BudgetAlertsBell({ isSidebar = false, collapsed = false 
 
   const markRead = async (id) => {
     try {
-      await fetch(`${API}/budgets/alerts/${id}/read`, {
+      await fetch(`${API}/api/v1/budgets/alerts/${id}/read`, {
         method: 'PUT',
         headers: authHeaders(),
       });
@@ -111,7 +111,7 @@ export default function BudgetAlertsBell({ isSidebar = false, collapsed = false 
 
   const clearAlerts = async (all = false) => {
     try {
-      const url = `${API}/budgets/alerts${all ? '?all=1' : ''}`;
+      const url = `${API}/api/v1/budgets/alerts${all ? '?all=1' : ''}`;
       await fetch(url, { method: 'DELETE', headers: authHeaders() });
       if (all) {
         setAlerts([]);

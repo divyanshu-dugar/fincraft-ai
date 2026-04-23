@@ -59,7 +59,7 @@ export default function AddExpense() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -73,7 +73,7 @@ export default function AddExpense() {
     if (!token || seedLoading) return;
     setSeedLoading(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories/seed`, {
         method: 'POST',
         headers: { Authorization: `jwt ${token}` },
       });
@@ -95,7 +95,7 @@ export default function AddExpense() {
     if (!token) throw new Error('Not authenticated');
     const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
     if (color) body.color = color;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify(body),
@@ -130,7 +130,7 @@ export default function AddExpense() {
 
       if (isRecurring) {
         // Create a recurring expense rule
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-expenses`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-expenses`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
           body: JSON.stringify({
@@ -149,7 +149,7 @@ export default function AddExpense() {
         }
       } else {
         // Create a one-off expense
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
           body: JSON.stringify({ date: toApiLocalDateTime(date), category: categoryId, amount: Number(amount), note, currency }),

@@ -74,7 +74,7 @@ const IncomeList = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes/process`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-incomes/process`, {
       method: 'POST',
       headers: { Authorization: `jwt ${token}` },
     })
@@ -94,7 +94,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income-categories`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`,
         {
           headers: {
             Authorization: `jwt ${token}`,
@@ -126,15 +126,15 @@ const IncomeList = () => {
 
       // Determine which endpoint to use
       if (selectedCategory === "all") {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/income`;
+        url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income`;
         if (dateQueryString) {
           url = `${url}?${dateQueryString}`;
         }
       } else {
         if (dateQueryString) {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}/date-range?${dateQueryString}`;
+          url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/category/${selectedCategory}/date-range?${dateQueryString}`;
         } else {
-          url = `${process.env.NEXT_PUBLIC_API_URL}/income/category/${selectedCategory}`;
+          url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/category/${selectedCategory}`;
         }
       }
 
@@ -165,7 +165,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/stats`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/stats`,
         {
           headers: { Authorization: `jwt ${token}` },
         }
@@ -191,7 +191,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/${deleteTarget}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/${deleteTarget}`,
         {
           method: "DELETE",
           headers: { Authorization: `jwt ${token}` },
@@ -244,7 +244,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-delete`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/bulk-delete`,
         {
           method: "POST",
           headers: {
@@ -270,7 +270,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-recategorize`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/bulk-recategorize`,
         {
           method: "POST",
           headers: {
@@ -295,7 +295,7 @@ const IncomeList = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/bulk-edit-date`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/bulk-edit-date`,
         {
           method: "POST",
           headers: {

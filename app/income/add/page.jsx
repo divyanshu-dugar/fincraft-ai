@@ -57,7 +57,7 @@ export default function AddIncome() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -72,7 +72,7 @@ export default function AddIncome() {
     if (!token || seedLoading) return;
     setSeedLoading(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories/seed`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories/seed`, {
         method: 'POST',
         headers: { Authorization: `jwt ${token}` },
       });
@@ -92,7 +92,7 @@ export default function AddIncome() {
   const handleAddCategory = async (name) => {
     const token = getToken();
     if (!token) throw new Error('Not authenticated');
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify({ name }),
@@ -125,7 +125,7 @@ export default function AddIncome() {
       const token = getToken();
 
       if (isRecurring) {
-        const recurRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recurring-incomes`, {
+        const recurRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recurring-incomes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
           body: JSON.stringify({
@@ -143,7 +143,7 @@ export default function AddIncome() {
           throw new Error(d.error || 'Failed to create recurring income');
         }
       } else {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
           body: JSON.stringify({ date: toApiLocalDateTime(date), category: category._id, amount: Number(amount), note, currency }),

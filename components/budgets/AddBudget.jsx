@@ -105,7 +105,7 @@ export default function AddBudget() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${API}/expense-categories`, {
+      const res = await fetch(`${API}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -118,7 +118,7 @@ export default function AddBudget() {
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${API}/expense-categories/seed`, {
+      await fetch(`${API}/api/v1/expense-categories/seed`, {
         method: 'POST',
         headers: { Authorization: `jwt ${token}` },
       });
@@ -134,7 +134,7 @@ export default function AddBudget() {
     if (!token) throw new Error('Not authenticated');
     const body = parentId ? { name: catName, parentCategory: parentId } : { name: catName, isParent: true };
     if (color) body.color = color;
-    const res = await fetch(`${API}/expense-categories`, {
+    const res = await fetch(`${API}/api/v1/expense-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify(body),
@@ -180,7 +180,7 @@ export default function AddBudget() {
         isRecurring,
         repeatUntil: isRecurring && repeatUntil ? new Date(repeatUntil + 'T23:59:59.999Z').toISOString() : null,
       };
-      const res = await fetch(`${API}/budgets`, {
+      const res = await fetch(`${API}/api/v1/budgets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify(payload),

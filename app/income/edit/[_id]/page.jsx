@@ -61,7 +61,7 @@ export default function EditIncome() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -73,7 +73,7 @@ export default function EditIncome() {
   const fetchIncome = useCallback(async (cats) => {
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/${params._id}`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) { setErrors({ form: 'Failed to load income.' }); return; }
@@ -100,7 +100,7 @@ export default function EditIncome() {
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories/seed`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories/seed`, {
         method: 'POST',
         headers: { Authorization: `jwt ${token}` },
       });
@@ -122,7 +122,7 @@ export default function EditIncome() {
   const handleAddCategory = async (name) => {
     const token = getToken();
     if (!token) throw new Error('Not authenticated');
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
       body: JSON.stringify({ name }),
@@ -154,7 +154,7 @@ export default function EditIncome() {
     setSaving(true);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/${params._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` },
         body: JSON.stringify({ date: toApiLocalDateTime(date), category: category._id, amount: Number(amount), note, currency }),
@@ -178,7 +178,7 @@ export default function EditIncome() {
     setDeleting(true);
     try {
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income/${params._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/${params._id}`, {
         method: 'DELETE',
         headers: { Authorization: `jwt ${token}` },
       });

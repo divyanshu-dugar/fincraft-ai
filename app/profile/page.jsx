@@ -204,7 +204,7 @@ export default function ProfilePage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API}/api/profile`, { headers: authHeader() });
+        const res = await fetch(`${API}/api/v1/profile`, { headers: authHeader() });
         if (!res.ok) throw new Error();
         const data = await res.json();
         setProfile(data);
@@ -233,7 +233,7 @@ export default function ProfilePage() {
         return;
       }
 
-      const res = await fetch(`${API}/api/profile`, {
+      const res = await fetch(`${API}/api/v1/profile`, {
         method: 'PATCH',
         headers: authHeader(),
         body: JSON.stringify(body),
@@ -274,7 +274,7 @@ export default function ProfilePage() {
 
     setSavingPassword(true);
     try {
-      const res = await fetch(`${API}/api/profile/change-password`, {
+      const res = await fetch(`${API}/api/v1/profile/change-password`, {
         method: 'PATCH',
         headers: authHeader(),
         body: JSON.stringify({ currentPassword, newPassword }),
@@ -305,7 +305,7 @@ export default function ProfilePage() {
 
     setDeletingAccount(true);
     try {
-      const res = await fetch(`${API}/api/profile`, {
+      const res = await fetch(`${API}/api/v1/profile`, {
         method: 'DELETE',
         headers: authHeader(),
         body: JSON.stringify({ password: deletePassword }),

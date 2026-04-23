@@ -37,7 +37,7 @@ export default function SavingsGoals() {
     try {
       const token = getToken();
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/saving-goals`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/saving-goals`,
         {
           headers: { Authorization: `jwt ${token}` },
         }
@@ -73,7 +73,7 @@ export default function SavingsGoals() {
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${id}/save`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/saving-goals/${id}/save`,
         {
           method: "PUT",
           headers: {
@@ -103,8 +103,8 @@ export default function SavingsGoals() {
     const token = getToken();
     const payload = { ...formData, amount: parseFloat(formData.amount) };
     const url = editingGoal
-      ? `${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${editingGoal._id}`
-      : `${process.env.NEXT_PUBLIC_API_URL}/saving-goals`;
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/saving-goals/${editingGoal._id}`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/saving-goals`;
     const method = editingGoal ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -127,7 +127,7 @@ export default function SavingsGoals() {
 
   const deleteGoal = async (id) => {
     const token = getToken();
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/saving-goals/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/saving-goals/${id}`, {
       method: "DELETE",
       headers: { Authorization: `jwt ${token}` },
     });

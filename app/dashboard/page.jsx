@@ -180,28 +180,28 @@ export default function Dashboard() {
 
       // Fetch all data with time range filter (+ 12-month window for breakdown)
       const [expensesRes, incomeRes, budgetRes, statsRes, breakdownExpensesRes, breakdownIncomeRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses${queryParams}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses${queryParams}`, {
           headers: { Authorization: `jwt ${token}` },
         }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/income${queryParams}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income${queryParams}`, {
           headers: { Authorization: `jwt ${token}` },
         }),
         fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/budgets/stats${queryParams}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/budgets/stats${queryParams}`,
           {
             headers: { Authorization: `jwt ${token}` },
           }
         ),
         fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/expenses/stats${queryParams}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/stats${queryParams}`,
           {
             headers: { Authorization: `jwt ${token}` },
           }
         ),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses${breakdownParams}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses${breakdownParams}`, {
           headers: { Authorization: `jwt ${token}` },
         }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/income${breakdownParams}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income${breakdownParams}`, {
           headers: { Authorization: `jwt ${token}` },
         }),
       ]);

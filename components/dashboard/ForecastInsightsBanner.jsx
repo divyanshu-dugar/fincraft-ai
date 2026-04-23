@@ -23,7 +23,7 @@ export function ForecastInsightsBanner() {
 
   const fetchInsight = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/cash-flow-forecast?months=1`, {
+      const res = await fetch(`${API}/api/v1/cash-flow-forecast?months=1`, {
         headers: authHeaders(),
       });
       if (!res.ok) return;

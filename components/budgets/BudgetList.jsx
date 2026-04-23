@@ -111,7 +111,7 @@ export default function BudgetList() {
   useEffect(() => {
     const token = getToken();
     if (token) {
-      fetch(`${API}/budgets/rollover`, {
+      fetch(`${API}/api/v1/budgets/rollover`, {
         method: "POST",
         headers: { Authorization: `jwt ${token}` },
       }).catch(() => {});
@@ -122,7 +122,7 @@ export default function BudgetList() {
   const fetchAlerts = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch(`${API}/budgets/alerts`, { headers: { Authorization: `jwt ${token}` } });
+      const res = await fetch(`${API}/api/v1/budgets/alerts`, { headers: { Authorization: `jwt ${token}` } });
       if (res.ok) {
         const data = await res.json();
         setAlerts(data.filter((a) => !a.isRead));
@@ -143,7 +143,7 @@ export default function BudgetList() {
         currentYear > nowDate.getFullYear() ||
         (currentYear === nowDate.getFullYear() && currentMonth > nowDate.getMonth());
       if (isFuture) {
-        await fetch(`${API}/budgets/rollover-to`, {
+        await fetch(`${API}/api/v1/budgets/rollover-to`, {
           method: "POST",
           headers: { Authorization: `jwt ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify({ targetYear: currentYear, targetMonth: currentMonth }),
@@ -153,8 +153,8 @@ export default function BudgetList() {
       const end   = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).toISOString().split("T")[0];
       const qs    = new URLSearchParams({ startDate: start, endDate: end });
       const [budgetsRes, statsRes] = await Promise.all([
-        fetch(`${API}/budgets?${qs}`,       { headers: { Authorization: `jwt ${token}` } }),
-        fetch(`${API}/budgets/stats?${qs}`, { headers: { Authorization: `jwt ${token}` } }),
+        fetch(`${API}/api/v1/budgets?${qs}`,       { headers: { Authorization: `jwt ${token}` } }),
+        fetch(`${API}/api/v1/budgets/stats?${qs}`, { headers: { Authorization: `jwt ${token}` } }),
       ]);
       if (budgetsRes.ok) {
         const data = await budgetsRes.json();
@@ -175,7 +175,7 @@ export default function BudgetList() {
     setMonthStats(null);
     try {
       const token = getToken();
-      const res = await fetch(`${API}/budgets`, { headers: { Authorization: `jwt ${token}` } });
+      const res = await fetch(`${API}/api/v1/budgets`, { headers: { Authorization: `jwt ${token}` } });
       if (res.ok) {
         const data = await res.json();
         setBudgets(data.filter((b) => b.period === "yearly"));
@@ -214,8 +214,8 @@ export default function BudgetList() {
     try {
       const token = getToken();
       const url = cascade
-        ? `${API}/budgets/${budget._id}?cascade=true`
-        : `${API}/budgets/${budget._id}`;
+        ? `${API}/api/v1/budgets/${budget._id}?cascade=true`
+        : `${API}/api/v1/budgets/${budget._id}`;
       const res = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `jwt ${token}` },
@@ -232,7 +232,7 @@ export default function BudgetList() {
   async function markRead(alertId) {
     try {
       const token = getToken();
-      await fetch(`${API}/budgets/alerts/${alertId}/read`, {
+      await fetch(`${API}/api/v1/budgets/alerts/${alertId}/read`, {
         method: "PUT",
         headers: { Authorization: `jwt ${token}` },
       });

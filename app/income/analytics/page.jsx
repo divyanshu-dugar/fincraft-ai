@@ -609,7 +609,7 @@ export default function IncomeAnalyticsPage() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/income-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/income-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (res.ok) setAvailableCategories(await res.json());
@@ -625,7 +625,7 @@ export default function IncomeAnalyticsPage() {
       const params = new URLSearchParams({ startMonth: range.startMonth, endMonth: range.endMonth });
       if (selectedCategoryIds.length) params.set("categoryIds", selectedCategoryIds.join(","));
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/analytics/category-month-comparison?${params}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/analytics/category-month-comparison?${params}`,
         { headers: { Authorization: `jwt ${token}` } }
       );
       if (!res.ok) {
@@ -655,7 +655,7 @@ export default function IncomeAnalyticsPage() {
       });
       if (selectedCategoryIds.length) params.set("categoryIds", selectedCategoryIds.join(","));
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/income/analytics/category-month-comparison?${params}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/income/analytics/category-month-comparison?${params}`,
         { headers: { Authorization: `jwt ${token}` } }
       );
       if (!res.ok) {

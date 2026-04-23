@@ -36,7 +36,7 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/reset-password`, {
         method: 'POST',
         body: JSON.stringify({ token, password }),
         headers: { 'content-type': 'application/json' },

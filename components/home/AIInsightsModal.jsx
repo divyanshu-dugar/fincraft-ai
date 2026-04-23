@@ -41,7 +41,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-sessions`,
         {
           headers: {
             'Authorization': `jwt ${token}`,
@@ -71,7 +71,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions/${sessionId}/messages`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-sessions/${sessionId}/messages`,
         {
           headers: {
             'Authorization': `jwt ${token}`,
@@ -94,7 +94,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-session`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-session`,
         {
           method: 'POST',
           headers: {
@@ -126,7 +126,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-sessions/${sessionId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-sessions/${sessionId}`,
         {
           method: 'DELETE',
           headers: {
@@ -170,7 +170,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-message`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-message`,
         {
           method: 'POST',
           headers: {
@@ -228,7 +228,7 @@ export default function AIInsightsModal({ isOpen, onClose }) {
     try {
       const token = getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat-message`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-message`,
         {
           method: 'POST',
           headers: {

@@ -293,7 +293,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (!res.ok) return;
@@ -307,7 +307,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     const token = getToken();
     if (!token) return;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories/seed`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories/seed`, {
         method: "POST",
         headers: { Authorization: `jwt ${token}` },
       });
@@ -323,7 +323,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       const token = getToken();
       if (!token) return;
       try {
-        const checkRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+        const checkRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
           headers: { Authorization: `jwt ${token}` },
         });
         if (!checkRes.ok) return;
@@ -340,7 +340,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     if (!token) throw new Error("Not authenticated");
     const body = parentId ? { name, parentCategory: parentId } : { name, isParent: true };
     if (color) body.color = color;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `jwt ${token}` },
       body: JSON.stringify(body),
@@ -392,7 +392,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       const formData = new FormData();
       formData.append("image", imageFile);
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/extract-from-image`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/extract-from-image`, {
         method: "POST",
         headers: { Authorization: `jwt ${token}` },
         body: formData,
@@ -525,7 +525,7 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
       }
 
       const token = getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/import`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/import`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `jwt ${token}` },
         body: JSON.stringify({ expenses }),

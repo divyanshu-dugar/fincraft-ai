@@ -742,7 +742,7 @@ export default function ExpenseAnalyticsPage() {
     const token = getToken();
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expense-categories`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/expense-categories`, {
         headers: { Authorization: `jwt ${token}` },
       });
       if (res.ok) {
@@ -786,7 +786,7 @@ export default function ExpenseAnalyticsPage() {
       const params = new URLSearchParams({ startMonth: range.startMonth, endMonth: range.endMonth });
       if (selectedCategoryIds.length) params.set("categoryIds", selectedCategoryIds.join(","));
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/analytics/category-month-comparison?${params}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/analytics/category-month-comparison?${params}`,
         { headers: { Authorization: `jwt ${token}` } }
       );
       if (!res.ok) {
@@ -816,7 +816,7 @@ export default function ExpenseAnalyticsPage() {
       });
       if (selectedCategoryIds.length) params.set("categoryIds", selectedCategoryIds.join(","));
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/analytics/category-month-comparison?${params}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/expenses/analytics/category-month-comparison?${params}`,
         { headers: { Authorization: `jwt ${token}` } }
       );
       if (!res.ok) {
