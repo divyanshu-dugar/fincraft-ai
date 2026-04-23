@@ -211,8 +211,8 @@ export default function AppSidebar() {
       {/* ── Bottom section: alerts, user, logout ─────────────────────────── */}
       <div className={`border-t border-slate-700/50 p-3 space-y-1 flex-shrink-0 ${collapsed ? 'items-center' : ''}`}>
         {/* Budget alerts */}
-        <div className={`flex ${collapsed ? 'justify-center' : 'px-1'}`}>
-          <BudgetAlertsBell />
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'px-1'}`}>
+          <BudgetAlertsBell isSidebar={true} collapsed={collapsed} />
         </div>
 
         {/* Profile link */}

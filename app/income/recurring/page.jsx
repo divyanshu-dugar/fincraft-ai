@@ -101,7 +101,7 @@ export default function RecurringIncomePage() {
   const inactive = rules.filter((r) => !r.isActive);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950 pt-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-900 to-slate-50 dark:to-slate-950">
       <ConfirmDeleteModal
         open={!!confirmDeleteId}
         onClose={() => setConfirmDeleteId(null)}
@@ -120,6 +120,16 @@ export default function RecurringIncomePage() {
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <Repeat className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">Recurring Incomes</h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-none mt-0.5">Auto-generated on schedule</p>
+            </div>
+          </div>
           <div className="ml-auto">
             <button
               onClick={() => router.push('/income/add')}

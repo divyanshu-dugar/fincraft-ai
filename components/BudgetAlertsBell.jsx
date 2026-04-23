@@ -47,7 +47,7 @@ function alertMeta(type) {
   }
 }
 
-export default function BudgetAlertsBell() {
+export default function BudgetAlertsBell({ isSidebar = false, collapsed = false }) {
   const [alerts,  setAlerts]  = useState([]);
   const [open,    setOpen]    = useState(false);
   const [loading, setLoading] = useState(false);
@@ -125,33 +125,49 @@ export default function BudgetAlertsBell() {
   const hasUnread   = unreadCount > 0;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={`relative ${isSidebar ? 'w-full' : ''}`}>
       {/* Bell button */}
       <button
         onClick={() => setOpen((p) => !p)}
-        className={`relative p-2 rounded-lg border transition-all duration-200 ${
-          open
-            ? 'text-amber-300 border-amber-400/50 bg-amber-400/10'
-            : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-amber-300 hover:border-amber-400/30 hover:bg-amber-400/10'
+        className={`relative flex items-center transition-all duration-200 ${
+          isSidebar
+            ? `w-full gap-3 rounded-xl px-3 py-2 text-sm font-medium ${
+                open
+                  ? 'bg-slate-700/60 text-amber-300'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+              }`
+            : `p-2 rounded-lg border ${
+                open
+                  ? 'text-amber-300 border-amber-400/50 bg-amber-400/10'
+                  : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-amber-300 hover:border-amber-400/30 hover:bg-amber-400/10'
+              }`
         }`}
         aria-label={`Budget alerts${hasUnread ? ` (${unreadCount} unread)` : ''}`}
       >
-        {hasUnread ? (
-          <motion.div
-            animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 4 }}
-          >
-            <BellRing className="w-5 h-5" />
-          </motion.div>
-        ) : (
-          <Bell className="w-5 h-5" />
-        )}
+        <div className="relative">
+          {hasUnread ? (
+            <motion.div
+              animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+              transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 4 }}
+            >
+              <BellRing className="w-5 h-5" />
+            </motion.div>
+          ) : (
+            <Bell className="w-5 h-5" />
+          )}
 
-        {/* Unread badge */}
-        {hasUnread && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black leading-none shadow-lg shadow-red-500/50">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
+          {/* Unread badge */}
+          {hasUnread && (
+            <span className={`absolute flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black leading-none shadow-lg shadow-red-500/50 ${
+              isSidebar ? '-top-1.5 -right-1.5 min-w-[16px] h-[16px]' : '-top-1 -right-1 min-w-[18px] h-[18px]'
+            }`}>
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </div>
+
+        {isSidebar && !collapsed && (
+          <span className="whitespace-nowrap">Budget Alerts</span>
         )}
       </button>
 
@@ -159,11 +175,15 @@ export default function BudgetAlertsBell() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0,  scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            initial={{ opacity: 0, x: isSidebar ? -10 : 0, y: isSidebar ? 0 : -8, scale: 0.97 }}
+            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+            exit={{ opacity: 0, x: isSidebar ? -10 : 0, y: isSidebar ? 0 : -8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-full bottom-0 ml-2 w-80 bg-gradient-to-br from-slate-100/98 dark:from-slate-800/98 to-white/98 dark:to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden z-50"
+            className={`absolute z-50 w-80 bg-gradient-to-br from-slate-100/98 dark:from-slate-800/98 to-white/98 dark:to-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-cyan-400/20 overflow-hidden ${
+              isSidebar
+                ? 'left-full bottom-0 ml-3'
+                : 'right-0 top-full mt-2'
+            }`}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-300/60 dark:border-slate-700/60">
