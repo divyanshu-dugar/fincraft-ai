@@ -186,7 +186,7 @@ const ExpenseList = () => {
       }
 
       const response = await fetch(
-        `${apiUrl}/expenses?${params.toString()}`,
+        `${apiUrl}/api/v1/expenses?${params.toString()}`,
         {
           headers: {
             Authorization: `${AUTH_SCHEME} ${token}`,
@@ -196,7 +196,7 @@ const ExpenseList = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch expenses (${response.status} ${response.statusText}) from ${apiUrl}/expenses`);
+        throw new Error(`Failed to fetch expenses (${response.status} ${response.statusText}) from ${apiUrl}/api/v1/expenses`);
       }
 
       const allExpenses = await response.json();
