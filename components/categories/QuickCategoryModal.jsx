@@ -7,11 +7,13 @@ import { getToken } from '@/lib/authenticate';
 export const QuickCategoryModal = ({
   isOpen,
   onClose,
-  endpoint,
+  endpoint: rawEndpoint,
   onCategoryCreated,
   existingCategories = [],
   defaultColor = '#3b82f6',
 }) => {
+  // Callers pass bare paths like '/expense-categories'. Ensure /api/v1 prefix.
+  const endpoint = rawEndpoint?.startsWith('/api/') ? rawEndpoint : `/api/v1${rawEndpoint}`;
   const [name, setName] = useState('');
   const [color, setColor] = useState(defaultColor);
   const [loading, setLoading] = useState(false);

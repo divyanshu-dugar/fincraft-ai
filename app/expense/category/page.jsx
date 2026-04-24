@@ -354,9 +354,10 @@ export default function ExpenseCategoryPage() {
   useEffect(() => { fetchTree(); }, [fetchTree]);
 
   // ── API helpers ─────────────────────────────────────────────────────────
-  const apiCall = async (method, path, body = null) => {
+  const apiCall = async (method, rawPath, body = null) => {
     const token = getToken();
     if (!token) throw new Error('Not authenticated');
+    const path = rawPath.startsWith('/api/') ? rawPath : `/api/v1${rawPath}`;
     const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `jwt ${token}` } };
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(`${API}${path}`, opts);
