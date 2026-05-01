@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import {
   BadgeCheck,
   BarChart2,
@@ -165,7 +166,7 @@ export default function BudgetList() {
         const d = await statsRes.json();
         setMonthStats(d.overallStats ?? null);
       }
-    } catch { /* silent */ }
+    } catch { toast.error("Failed to load budgets"); }
     finally { setLoading(false); }
   }, [currentMonth, currentYear]);
 
@@ -180,7 +181,7 @@ export default function BudgetList() {
         const data = await res.json();
         setBudgets(data.filter((b) => b.period === "yearly"));
       }
-    } catch { /* silent */ }
+    } catch { toast.error("Failed to load budgets"); }
     finally { setLoading(false); }
   }, []);
 
@@ -221,12 +222,18 @@ export default function BudgetList() {
         headers: { Authorization: `jwt ${token}` },
       });
       if (res.ok) {
+        toast.success(cascade ? "Budget series deleted" : "Budget deleted");
         setDeleteModal(null);
         fetchAlerts();
         if (view === "month") fetchMonthData();
         else fetchOtherData();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data?.message || "Failed to delete budget");
       }
-    } catch { /* silent */ }
+    } catch {
+      toast.error("Network error — could not delete budget");
+    }
   }
 
   async function markRead(alertId) {
