@@ -107,76 +107,79 @@ export default function Dashboard() {
       setLoading(true);
       const token = getToken();
 
-      // Calculate date range based on timeRange
+      // Calculate date range based on timeRange.
+      //
+      // All math is done in the user's LOCAL timezone (browser local time),
+      // not UTC. Otherwise an ET user at 9pm on Apr 30 would see UTC=May 1
+      // and the dashboard would query May (returning empty data).
+      //
+      // We send full ISO timestamps (not YYYY-MM-DD) so the backend can
+      // honor the user's local-day boundaries: e.g. "Apr 30" for an ET user
+      // means 2026-04-30T00:00:00-04:00 .. 2026-04-30T23:59:59.999-04:00,
+      // which spans 2026-04-30T04:00Z .. 2026-05-01T03:59:59.999Z. A
+      // YYYY-MM-DD string would be misread as UTC midnight and miss
+      // transactions logged in the evening ET.
       const getDateRange = () => {
-        // If custom dates are set, use them
+        // Helper: full ISO of local 00:00:00 for a Y/M/D
+        const localStartISO = (y, m, d) => new Date(y, m, d, 0, 0, 0, 0).toISOString();
+        // Helper: full ISO of local 23:59:59.999 for a Y/M/D
+        const localEndISO = (y, m, d) => new Date(y, m, d, 23, 59, 59, 999).toISOString();
+
+        // Custom dates come from <input type="date"> as YYYY-MM-DD; expand
+        // them to full local-day boundaries the same way.
         if (timeRange === "custom" && customStartDate && customEndDate) {
+          const [sy, sm, sd] = customStartDate.split('-').map(Number);
+          const [ey, em, ed] = customEndDate.split('-').map(Number);
           return {
-            startDate: customStartDate,
-            endDate: customEndDate,
+            startDate: localStartISO(sy, sm - 1, sd),
+            endDate: localEndISO(ey, em - 1, ed),
           };
         }
 
         const now = new Date();
-        const y = now.getUTCFullYear();
-        const m = now.getUTCMonth();
-        const d = now.getUTCDate();
-
-        // Helper: format a UTC date as YYYY-MM-DD
-        const fmt = (dt) => {
-          const yy = dt.getUTCFullYear();
-          const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
-          const dd = String(dt.getUTCDate()).padStart(2, '0');
-          return `${yy}-${mm}-${dd}`;
-        };
-
-        let start, end;
+        const y = now.getFullYear();
+        const m = now.getMonth();
+        const d = now.getDate();
 
         switch (timeRange) {
           case "weekly": {
-            // Current week: Monday → today
-            const day = now.getUTCDay(); // 0=Sun
-            const diff = day === 0 ? 6 : day - 1; // days since Monday
-            start = new Date(Date.UTC(y, m, d - diff));
-            end = new Date(Date.UTC(y, m, d));
-            break;
-          }
-          case "monthly": {
-            // Full current calendar month: 1st → last day
-            start = new Date(Date.UTC(y, m, 1));
-            end = new Date(Date.UTC(y, m + 1, 0)); // last day of month
-            break;
+            // Current week: Monday → today (local)
+            const day = now.getDay(); // 0=Sun
+            const diff = day === 0 ? 6 : day - 1;
+            return {
+              startDate: localStartISO(y, m, d - diff),
+              endDate: localEndISO(y, m, d),
+            };
           }
           case "yearly": {
-            // Current calendar year: Jan 1 → Dec 31
-            start = new Date(Date.UTC(y, 0, 1));
-            end = new Date(Date.UTC(y, 11, 31));
-            break;
+            return {
+              startDate: localStartISO(y, 0, 1),
+              endDate: localEndISO(y, 11, 31),
+            };
           }
+          case "monthly":
           default: {
-            start = new Date(Date.UTC(y, m, 1));
-            end = new Date(Date.UTC(y, m + 1, 0));
+            // Full current calendar month: 1st → last day (local)
+            // new Date(y, m+1, 0) = last day of month m
+            const lastDay = new Date(y, m + 1, 0).getDate();
+            return {
+              startDate: localStartISO(y, m, 1),
+              endDate: localEndISO(y, m, lastDay),
+            };
           }
         }
-
-        return {
-          startDate: fmt(start),
-          endDate: fmt(end),
-        };
       };
       const dateRange = getDateRange();
-      const queryParams = `?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
+      const queryParams = `?startDate=${encodeURIComponent(dateRange.startDate)}&endDate=${encodeURIComponent(dateRange.endDate)}`;
 
-      // Separate 12-month window for Monthly Breakdown, so it doesn't
-      // collapse to a single month when timeRange === "monthly"/"weekly".
+      // Separate 12-month rolling window for Monthly Breakdown — also local time.
       const nowForBreakdown = new Date();
-      const bY = nowForBreakdown.getUTCFullYear();
-      const bM = nowForBreakdown.getUTCMonth();
-      const fmtUTC = (dt) =>
-        `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
-      const breakdownStart = new Date(Date.UTC(bY, bM - 11, 1));
-      const breakdownEnd = new Date(Date.UTC(bY, bM + 1, 0));
-      const breakdownParams = `?startDate=${fmtUTC(breakdownStart)}&endDate=${fmtUTC(breakdownEnd)}`;
+      const bY = nowForBreakdown.getFullYear();
+      const bM = nowForBreakdown.getMonth();
+      const breakdownStart = new Date(bY, bM - 11, 1, 0, 0, 0, 0).toISOString();
+      const breakdownEndLastDay = new Date(bY, bM + 1, 0).getDate();
+      const breakdownEnd = new Date(bY, bM, breakdownEndLastDay, 23, 59, 59, 999).toISOString();
+      const breakdownParams = `?startDate=${encodeURIComponent(breakdownStart)}&endDate=${encodeURIComponent(breakdownEnd)}`;
 
       // Fetch all data with time range filter (+ 12-month window for breakdown)
       const [expensesRes, incomeRes, budgetRes, statsRes, breakdownExpensesRes, breakdownIncomeRes] = await Promise.all([
@@ -223,8 +226,9 @@ export default function Dashboard() {
       const savingsRate =
         totalIncome > 0 ? (netCashFlow / totalIncome) * 100 : 0;
 
-      // Calculate real period-over-period trends
-      // Split the date range in half: first half vs second half
+      // Calculate real period-over-period trends.
+      // dateRange.{startDate,endDate} are now full ISO timestamps (local-day
+      // boundaries serialized as UTC), so new Date() parses them correctly.
       const rangeStart = new Date(dateRange.startDate);
       const rangeEnd = new Date(dateRange.endDate);
       const midpoint = new Date((rangeStart.getTime() + rangeEnd.getTime()) / 2);

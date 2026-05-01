@@ -46,7 +46,7 @@ export function DashboardHeader({
                     className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                       timeRange === range
                         ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-200 dark:hover:text-white dark:hover:bg-slate-700"
                     }`}
                   >
                     {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -59,7 +59,7 @@ export function DashboardHeader({
                   className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1 whitespace-nowrap ${
                     timeRange === "custom"
                       ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-200 dark:hover:text-white dark:hover:bg-slate-700"
                   }`}
                 >
                   <CalendarIcon size={16} />

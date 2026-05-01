@@ -61,13 +61,11 @@ const ExpenseList = () => {
    */
   const searchParams = useSearchParams();
 
-  const todayUTC = new Date(
-    Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate()
-    )
-  );
+  // "today" in the user's local timezone — never UTC. Otherwise an ET user
+  // at 9pm on Apr 30 would see UTC=May 1 and the list would open to May.
+  const today = new Date();
+  const todayLocalMonth = today.getMonth();
+  const todayLocalYear = today.getFullYear();
 
   const urlStartDate = searchParams.get("startDate");
   const urlEndDate = searchParams.get("endDate");
@@ -77,12 +75,12 @@ const ExpenseList = () => {
     ? parseInt(searchParams.get("month"), 10)
     : urlStartDate
       ? parseInt(urlStartDate.split("-")[1], 10) - 1
-      : todayUTC.getUTCMonth();
+      : todayLocalMonth;
   const initYear = searchParams.get("year") !== null
     ? parseInt(searchParams.get("year"), 10)
     : urlStartDate
       ? parseInt(urlStartDate.split("-")[0], 10)
-      : todayUTC.getUTCFullYear();
+      : todayLocalYear;
 
   const [selectedCategory, setSelectedCategory] = useState(urlCategory || DEFAULT_CATEGORY);
   const [currentMonth, setCurrentMonth] = useState(initMonth);
@@ -545,13 +543,13 @@ const ExpenseList = () => {
                       <ChevronLeft size={18} strokeWidth={2.5} />
                     </button>
                     <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight min-w-[200px]">
-                      {new Date(Date.UTC(currentYear, currentMonth)).toLocaleString("default", { month: "long", year: "numeric", timeZone: "UTC" })}
+                      {new Date(currentYear, currentMonth).toLocaleString("default", { month: "long", year: "numeric" })}
                     </h2>
                     <button
                       onClick={() => changeMonth(1)}
                       disabled={
-                        currentYear === todayUTC.getUTCFullYear() &&
-                        currentMonth === todayUTC.getUTCMonth()
+                        currentYear === todayLocalYear &&
+                        currentMonth === todayLocalMonth
                       }
                       className="p-1.5 rounded-lg bg-white/10 border border-white/20 text-blue-100 hover:bg-white/25 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       aria-label="Next month"
@@ -617,13 +615,14 @@ const ExpenseList = () => {
             onCustomRangeReset={() => {
               setIsCustomRange(false);
               const t = new Date();
-              const m = t.getUTCMonth();
-              const y = t.getUTCFullYear();
+              const m = t.getMonth();
+              const y = t.getFullYear();
+              const lastDay = new Date(y, m + 1, 0).getDate();
               setCurrentMonth(m);
               setCurrentYear(y);
               setDateRange({
-                startDate: new Date(Date.UTC(y, m, 1)).toISOString().split("T")[0],
-                endDate: new Date(Date.UTC(y, m + 1, 0)).toISOString().split("T")[0],
+                startDate: new Date(y, m, 1, 0, 0, 0, 0).toISOString(),
+                endDate: new Date(y, m, lastDay, 23, 59, 59, 999).toISOString(),
               });
             }}
           />
