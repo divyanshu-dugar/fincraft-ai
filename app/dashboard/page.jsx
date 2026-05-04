@@ -113,27 +113,25 @@ export default function Dashboard() {
       // not UTC. Otherwise an ET user at 9pm on Apr 30 would see UTC=May 1
       // and the dashboard would query May (returning empty data).
       //
-      // We send full ISO timestamps (not YYYY-MM-DD) so the backend can
-      // honor the user's local-day boundaries: e.g. "Apr 30" for an ET user
-      // means 2026-04-30T00:00:00-04:00 .. 2026-04-30T23:59:59.999-04:00,
-      // which spans 2026-04-30T04:00Z .. 2026-05-01T03:59:59.999Z. A
-      // YYYY-MM-DD string would be misread as UTC midnight and miss
-      // transactions logged in the evening ET.
+      // Send YYYY-MM-DD date-only strings (not ISO timestamps). The backend's
+      // dateRangeFilter expands these to UTC-midnight bounds, which matches
+      // how expense.date is stored (toUTCDate of the entered YYYY-MM-DD).
+      //
+      // Why not local-day ISO bounds? An ET user picking "Apr 1" produced
+      // 2026-04-01T04:00:00Z, but the Apr 1 expense was stored at
+      // 2026-04-01T00:00:00Z — so the $gte filter excluded it, dropping
+      // every "1st of the month" entry for users west of UTC. Date-only
+      // strings keep the calendar-day intent the user actually selected.
+      //
+      // We base the *which calendar day* on the user's LOCAL clock so an ET
+      // user at 9pm Apr 30 still sees "April", not "May".
       const getDateRange = () => {
-        // Helper: full ISO of local 00:00:00 for a Y/M/D
-        const localStartISO = (y, m, d) => new Date(y, m, d, 0, 0, 0, 0).toISOString();
-        // Helper: full ISO of local 23:59:59.999 for a Y/M/D
-        const localEndISO = (y, m, d) => new Date(y, m, d, 23, 59, 59, 999).toISOString();
+        const dateOnly = (y, m, d) =>
+          `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
-        // Custom dates come from <input type="date"> as YYYY-MM-DD; expand
-        // them to full local-day boundaries the same way.
+        // Custom dates already arrive as YYYY-MM-DD from <input type="date">.
         if (timeRange === "custom" && customStartDate && customEndDate) {
-          const [sy, sm, sd] = customStartDate.split('-').map(Number);
-          const [ey, em, ed] = customEndDate.split('-').map(Number);
-          return {
-            startDate: localStartISO(sy, sm - 1, sd),
-            endDate: localEndISO(ey, em - 1, ed),
-          };
+          return { startDate: customStartDate, endDate: customEndDate };
         }
 
         const now = new Date();
@@ -143,28 +141,28 @@ export default function Dashboard() {
 
         switch (timeRange) {
           case "weekly": {
-            // Current week: Monday → today (local)
+            // Current week: Monday → today (user's local week)
             const day = now.getDay(); // 0=Sun
             const diff = day === 0 ? 6 : day - 1;
+            const weekStart = new Date(y, m, d - diff);
             return {
-              startDate: localStartISO(y, m, d - diff),
-              endDate: localEndISO(y, m, d),
+              startDate: dateOnly(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate()),
+              endDate: dateOnly(y, m, d),
             };
           }
           case "yearly": {
             return {
-              startDate: localStartISO(y, 0, 1),
-              endDate: localEndISO(y, 11, 31),
+              startDate: dateOnly(y, 0, 1),
+              endDate: dateOnly(y, 11, 31),
             };
           }
           case "monthly":
           default: {
-            // Full current calendar month: 1st → last day (local)
-            // new Date(y, m+1, 0) = last day of month m
+            // Full current calendar month: 1st → last day (user's local month)
             const lastDay = new Date(y, m + 1, 0).getDate();
             return {
-              startDate: localStartISO(y, m, 1),
-              endDate: localEndISO(y, m, lastDay),
+              startDate: dateOnly(y, m, 1),
+              endDate: dateOnly(y, m, lastDay),
             };
           }
         }
@@ -172,13 +170,16 @@ export default function Dashboard() {
       const dateRange = getDateRange();
       const queryParams = `?startDate=${encodeURIComponent(dateRange.startDate)}&endDate=${encodeURIComponent(dateRange.endDate)}`;
 
-      // Separate 12-month rolling window for Monthly Breakdown — also local time.
+      // 12-month rolling window for Monthly Breakdown — same date-only
+      // contract, so the May 2025 boundary at the far end isn't dropped.
       const nowForBreakdown = new Date();
       const bY = nowForBreakdown.getFullYear();
       const bM = nowForBreakdown.getMonth();
-      const breakdownStart = new Date(bY, bM - 11, 1, 0, 0, 0, 0).toISOString();
+      const breakdownStartDate = new Date(bY, bM - 11, 1);
       const breakdownEndLastDay = new Date(bY, bM + 1, 0).getDate();
-      const breakdownEnd = new Date(bY, bM, breakdownEndLastDay, 23, 59, 59, 999).toISOString();
+      const pad = (n) => String(n).padStart(2, '0');
+      const breakdownStart = `${breakdownStartDate.getFullYear()}-${pad(breakdownStartDate.getMonth() + 1)}-01`;
+      const breakdownEnd = `${bY}-${pad(bM + 1)}-${pad(breakdownEndLastDay)}`;
       const breakdownParams = `?startDate=${encodeURIComponent(breakdownStart)}&endDate=${encodeURIComponent(breakdownEnd)}`;
 
       // Fetch all data with time range filter (+ 12-month window for breakdown)

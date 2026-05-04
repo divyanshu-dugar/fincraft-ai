@@ -250,19 +250,31 @@ export default function BudgetAlertsBell({ isSidebar = false, collapsed = false 
                         </div>
                         <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">{alert.message}</p>
 
-                        {/* Progress bar */}
-                        <div className="mt-2 h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-700/60 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              alert.percentage > 100 ? 'bg-red-500' :
-                              alert.percentage >= 80  ? 'bg-amber-500' : 'bg-emerald-500'
-                            }`}
-                            style={{ width: `${Math.min(alert.percentage, 100)}%` }}
-                          />
-                        </div>
-                        <p className="text-[10px] text-slate-500 mt-0.5">
-                          {alert.percentage.toFixed(0)}% used · ${alert.currentSpent?.toFixed(2)} of ${alert.budgetAmount?.toFixed(2)}
-                        </p>
+                        {/* Progress bar — guard against null/NaN percentage from
+                            old documents or unusual edge cases (e.g. a budget
+                            with amount=0 that slipped past validation). */}
+                        {(() => {
+                          const pct = Number.isFinite(alert.percentage) ? alert.percentage : 0;
+                          const clamped = Math.max(0, Math.min(pct, 100));
+                          const spent = Number.isFinite(alert.currentSpent) ? alert.currentSpent : 0;
+                          const total = Number.isFinite(alert.budgetAmount) ? alert.budgetAmount : 0;
+                          return (
+                            <>
+                              <div className="mt-2 h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-700/60 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${
+                                    pct > 100 ? 'bg-red-500' :
+                                    pct >= 80  ? 'bg-amber-500' : 'bg-emerald-500'
+                                  }`}
+                                  style={{ width: `${clamped}%` }}
+                                />
+                              </div>
+                              <p className="text-[10px] text-slate-500 mt-0.5">
+                                {pct.toFixed(0)}% used · ${spent.toFixed(2)} of ${total.toFixed(2)}
+                              </p>
+                            </>
+                          );
+                        })()}
                       </div>
 
                       {/* Mark read */}

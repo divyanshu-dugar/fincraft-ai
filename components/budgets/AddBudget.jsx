@@ -296,7 +296,7 @@ export default function AddBudget() {
                 value={name}
                 onChange={(e) => { setName(e.target.value); clearErr('name'); }}
                 placeholder="e.g. Groceries, Entertainment, Travel…"
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all ${errors.name ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 placeholder-rose-400/50' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 placeholder-slate-500 hover:bg-slate-200 dark:bg-slate-700 focus:bg-slate-200 dark:bg-slate-700'}`}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all ${errors.name ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 placeholder-rose-400/50' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 placeholder-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 focus:bg-slate-200 dark:focus:bg-slate-700'}`}
               />
               {errors.name && <p className="text-xs text-rose-400 font-semibold mt-1.5">{errors.name}</p>}
             </div>
@@ -356,7 +356,7 @@ export default function AddBudget() {
                 type="date"
                 value={refDate}
                 onChange={(e) => { setRefDate(e.target.value); clearErr('refDate'); }}
-                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all [color-scheme:dark] ${errors.refDate ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:bg-slate-700 focus:bg-slate-200 dark:bg-slate-700'}`}
+                className={`w-full px-4 py-3 rounded-xl border text-sm font-medium outline-none transition-all [color-scheme:light] dark:[color-scheme:dark] ${errors.refDate ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 'border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 focus:bg-slate-200 dark:focus:bg-slate-700'}`}
               />
               {errors.refDate && <p className="text-xs text-rose-400 font-semibold mt-1.5">{errors.refDate}</p>}
 
@@ -500,7 +500,7 @@ export default function AddBudget() {
                   value={repeatUntil}
                   onChange={(e) => setRepeatUntil(e.target.value)}
                   min={dateRange.endDate || undefined}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 text-sm font-medium outline-none hover:bg-slate-200 dark:bg-slate-700 focus:bg-slate-200 dark:bg-slate-700 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-600 bg-slate-200/50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 text-sm font-medium outline-none hover:bg-slate-200 dark:hover:bg-slate-700 focus:bg-slate-200 dark:focus:bg-slate-700 [color-scheme:light] dark:[color-scheme:dark]"
                 />
                 <p className="text-xs text-indigo-400 font-medium mt-2">
                   This budget will auto-renew every {period} until {repeatUntil ? fmtDisplay(repeatUntil) : 'you stop it'}.

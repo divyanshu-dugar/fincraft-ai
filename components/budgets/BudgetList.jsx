@@ -138,18 +138,15 @@ export default function BudgetList() {
     setLoading(true);
     try {
       const token = getToken();
-      // Pre-create recurring budgets for future months before fetching
-      const nowDate = new Date();
-      const isFuture =
-        currentYear > nowDate.getFullYear() ||
-        (currentYear === nowDate.getFullYear() && currentMonth > nowDate.getMonth());
-      if (isFuture) {
-        await fetch(`${API}/api/v1/budgets/rollover-to`, {
-          method: "POST",
-          headers: { Authorization: `jwt ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ targetYear: currentYear, targetMonth: currentMonth }),
-        }).catch(() => {});
-      }
+      // Roll over recurring budgets up to the viewed month so future
+      // months show their expected recurring budget entries.
+      // The delete-cascade logic (repeatUntil tightening) ensures that
+      // deleted series are never re-created by this call.
+      await fetch(`${API}/api/v1/budgets/rollover-to`, {
+        method: "POST",
+        headers: { Authorization: `jwt ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ targetYear: currentYear, targetMonth: currentMonth }),
+      }).catch(() => {});
       const start = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-01`;
       const end   = new Date(Date.UTC(currentYear, currentMonth + 1, 0)).toISOString().split("T")[0];
       const qs    = new URLSearchParams({ startDate: start, endDate: end });
@@ -450,7 +447,11 @@ export default function BudgetList() {
                 {alerts.map((alert) => (
                   <div key={alert._id} className="flex items-center justify-between px-6 py-3 bg-amber-500/10">
                     <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${alert.type === "budget_exceeded" ? "bg-rose-400" : "bg-amber-400"}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        alert.type === "budget_exceeded"      ? "bg-rose-400"   :
+                        alert.type === "budget_limit_reached" ? "bg-orange-400" :
+                        "bg-amber-400"
+                      }`} />
                       <p className="text-sm text-slate-700 dark:text-slate-300">{alert.message}</p>
                     </div>
                     <button
