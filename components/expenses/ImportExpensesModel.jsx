@@ -19,16 +19,121 @@ import {
 } from "lucide-react";
 import { getToken } from "@/lib/authenticate";
 import { CategoryPicker } from "@/components/categories/CategoryPicker";
+import Papa from "papaparse";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 let _rid = 0;
 function uid() { return ++_rid; }
 
+/**
+ * Normalize an arbitrary date input into "YYYY-MM-DDT00:00:00".
+ * Accepts:
+ *  - ISO YYYY-MM-DD (with or without T-time)
+ *  - US "M/D/YYYY" or "MM/DD/YYYY"
+ *  - EU "D/M/YYYY" or "DD-MM-YYYY"  (DD > 12 disambiguates)
+ *  - Excel serial numbers (days since 1899-12-30)
+ *  - JS Date objects (xlsx returns these for cell types 'd')
+ * Returns "" if unparseable so the row gets cleanly filtered.
+ */
 function toApiLocalDateTime(v) {
-  if (!v) return "";
+  if (v === null || v === undefined || v === "") return "";
+
+  // Excel serials & numeric dates
+  if (typeof v === "number" && Number.isFinite(v)) {
+    // Excel epoch: 1899-12-30 UTC. Whole-number days only.
+    const ms = Math.round((v - 25569) * 86400 * 1000);
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return "";
+    return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}T00:00:00`;
+  }
+
+  // Native Date
+  if (v instanceof Date) {
+    if (isNaN(v.getTime())) return "";
+    return `${v.getFullYear()}-${pad2(v.getMonth() + 1)}-${pad2(v.getDate())}T00:00:00`;
+  }
+
   const s = String(v).trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? `${s}T00:00:00` : s;
+  if (!s) return "";
+
+  // YYYY-MM-DD or YYYY/MM/DD (already ISO-ish)
+  let m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (m) {
+    const [, y, mo, d] = m;
+    return `${y}-${pad2(mo)}-${pad2(d)}T00:00:00`;
+  }
+
+  // DD/MM/YYYY or MM/DD/YYYY (or with hyphens). Disambiguate by first number:
+  //   first > 12 → must be day-first
+  //   second > 12 → must be month-first
+  //   ambiguous → assume month-first (US-default), matches most CSV exports
+  m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
+  if (m) {
+    const a = Number(m[1]);
+    const b = Number(m[2]);
+    let y = Number(m[3]);
+    if (y < 100) y += 2000; // 2-digit year → 20YY
+    let day, mo;
+    if (a > 12) { day = a; mo = b; }
+    else if (b > 12) { mo = a; day = b; }
+    else { mo = a; day = b; } // ambiguous, default to MM/DD/YYYY
+    if (mo < 1 || mo > 12 || day < 1 || day > 31) return "";
+    return `${y}-${pad2(mo)}-${pad2(day)}T00:00:00`;
+  }
+
+  // Last-ditch: hand to Date parser (handles "Apr 15, 2025" etc.)
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T00:00:00`;
+  }
+  return "";
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+/**
+ * Parse a numeric-looking string into a finite number.
+ * Strips currency symbols ($, €, ₹, £, ¥), thousands separators (commas
+ * or dots used as group separators), and surrounding whitespace.
+ * Handles parentheses for negatives e.g. "(123.45)".
+ * Returns NaN if no usable number is present.
+ */
+function toApiAmount(v) {
+  if (v === null || v === undefined || v === "") return NaN;
+  if (typeof v === "number") return v;
+  let s = String(v).trim();
+  if (!s) return NaN;
+  // Parens → negative
+  let negative = false;
+  if (/^\(.*\)$/.test(s)) { negative = true; s = s.slice(1, -1); }
+  // Strip currency / spaces
+  s = s.replace(/[\s$€₹£¥]/g, "");
+  // Strip thousands separators while keeping the LAST '.' or ',' as decimal.
+  // Heuristic: if both '.' and ',' present, the right-most one is the decimal.
+  const lastDot = s.lastIndexOf(".");
+  const lastComma = s.lastIndexOf(",");
+  if (lastDot >= 0 && lastComma >= 0) {
+    const decimalIdx = Math.max(lastDot, lastComma);
+    const decimalChar = s[decimalIdx];
+    const groupChar = decimalChar === "." ? "," : ".";
+    s = s.split(groupChar).join("");
+    if (decimalChar === ",") s = s.replace(",", ".");
+  } else if (lastComma >= 0) {
+    // Only commas — treat as thousands if they look like groups (e.g. "1,234"),
+    // else as decimal (e.g. European "12,50").
+    const after = s.length - 1 - lastComma;
+    if (after === 3 && s.split(",").every((p, i) => i === 0 ? /^\d{1,3}$/.test(p) : /^\d{3}$/.test(p))) {
+      s = s.replace(/,/g, ""); // thousands
+    } else {
+      s = s.replace(",", "."); // decimal
+    }
+  }
+  const n = Number(s);
+  if (!Number.isFinite(n)) return NaN;
+  return negative ? -n : n;
 }
 
 // Common AI category name aliases → canonical sub-category names
@@ -424,30 +529,88 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
     setStep(3);
   }
 
-  // ── CSV parsing ────────────────────────────────────────────────────────────
-  const parseFile = (f) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        if (f.name.endsWith(".csv")) parseCSV(e.target.result);
-        else toast.error("Excel parsing is not supported yet. Please export as CSV.");
-      } catch { toast.error("Error parsing file. Please check the format."); }
-    };
-    if (f.name.endsWith(".csv")) reader.readAsText(f);
-    else reader.readAsArrayBuffer(f);
+  // ── File parsing ───────────────────────────────────────────────────────────
+  // Routes to the right parser by extension. Both produce the same shape:
+  // { rows: Array<Record<string,string>>, headers: string[] }.
+  const parseFile = async (f) => {
+    const lower = f.name.toLowerCase();
+    setLoading(true);
+    try {
+      if (lower.endsWith(".csv")) {
+        await parseCSV(f);
+      } else if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
+        await parseXLSX(f);
+      } else {
+        toast.error("Unsupported file type. Use .csv, .xlsx, or .xls.");
+      }
+    } catch (err) {
+      console.error("[Import] parse error", err);
+      toast.error(`Could not parse file: ${err.message || "unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const parseCSV = (content) => {
-    const lines = content.split("\n").filter((l) => l.trim());
-    const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
-    const rows = lines.slice(1)
-      .map((line) => {
-        const vals = line.split(",").map((v) => v.trim().replace(/"/g, ""));
-        const row = {};
-        headers.forEach((h, i) => { row[h] = vals[i] || ""; });
-        return row;
+  // CSV via PapaParse — handles quoted fields, escapes, BOM, \r\n vs \n,
+  // and trims headers. Naïve `split(",")` breaks on quoted commas and
+  // strips numeric values like "1,234.56" into "1" + "234.56".
+  const parseCSV = (file) => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: "greedy", // drop rows that are entirely blank
+        dynamicTyping: false, // keep strings — toApiAmount/toApiLocalDateTime handle conversion
+        transformHeader: (h) => String(h).trim(),
+        complete: (result) => {
+          const rows = (result.data || []).filter((r) =>
+            Object.values(r).some((v) => v !== "" && v !== null && v !== undefined)
+          );
+          if (rows.length === 0) {
+            reject(new Error("No data rows found in the file."));
+            return;
+          }
+          const headers = result.meta?.fields?.filter(Boolean) || Object.keys(rows[0]);
+          setImportData(rows);
+          autoDetectMapping(headers);
+          setStep(2);
+          resolve();
+        },
+        error: (err) => reject(err),
+      });
+    });
+  };
+
+  // XLSX via SheetJS (lazy-loaded so the ~600KB lib is only fetched when
+  // the user actually picks an Excel file).
+  const parseXLSX = async (file) => {
+    const XLSX = await import("xlsx");
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array", cellDates: true });
+    const firstSheetName = wb.SheetNames[0];
+    if (!firstSheetName) throw new Error("Excel workbook has no sheets.");
+    const sheet = wb.Sheets[firstSheetName];
+
+    // sheet_to_json with header:1 returns array-of-arrays; first row = headers.
+    // Using defval:"" guarantees consistent column count across rows.
+    const aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+    if (!aoa.length) throw new Error("Sheet is empty.");
+
+    const headers = (aoa[0] || []).map((h) => String(h ?? "").trim()).filter(Boolean);
+    if (!headers.length) throw new Error("First row must contain column headers.");
+
+    const rows = aoa.slice(1)
+      .map((arr) => {
+        const obj = {};
+        headers.forEach((h, i) => {
+          const cell = arr[i];
+          obj[h] = cell === null || cell === undefined ? "" : String(cell);
+        });
+        return obj;
       })
-      .filter((r) => Object.values(r).some(Boolean));
+      .filter((r) => Object.values(r).some((v) => v !== ""));
+
+    if (rows.length === 0) throw new Error("No data rows found in the sheet.");
+
     setImportData(rows);
     autoDetectMapping(headers);
     setStep(2);
@@ -504,24 +667,65 @@ export default function ImportExpensesModal({ isOpen, onClose, onImportSuccess }
           category: r.category
             ? (r.category.subcategoryId || r.category.parentId)
             : (r.aiCategory || "Miscellaneous"),
-          amount: Number(r.amount),
+          amount: toApiAmount(r.amount),
           note: r.note,
         }));
       } else {
-        // CSV: apply category name → id mapping to all rows
-        expenses = importData
-          .map((r) => {
-            const catName = (r[mapping.category] || "").trim();
-            const catVal  = csvCatMap[catName];
-            const catId   = catVal ? (catVal.subcategoryId || catVal.parentId) : null;
-            return {
-              date:     toApiLocalDateTime(r[mapping.date] || ""),
-              category: catId,
-              amount:   Number(r[mapping.amount] || 0),
-              note:     r[mapping.note] || "",
-            };
-          })
-          .filter((e) => e.date && e.category && e.amount > 0);
+        // CSV / XLSX: build the payload, but track WHY rows were dropped so we
+        // can tell the user instead of silently sending an empty list.
+        const rejected = { date: 0, amount: 0, category: 0 };
+        const built = importData.map((r) => {
+          const dateStr = toApiLocalDateTime(r[mapping.date]);
+          const amount = toApiAmount(r[mapping.amount]);
+          const catName = (r[mapping.category] || "").trim();
+          const catVal = csvCatMap[catName];
+          const catId = catVal ? (catVal.subcategoryId || catVal.parentId) : null;
+
+          let dropReason = null;
+          if (!dateStr) dropReason = "date";
+          else if (!Number.isFinite(amount) || amount <= 0) dropReason = "amount";
+          else if (!catId) dropReason = "category";
+
+          if (dropReason) rejected[dropReason]++;
+
+          return dropReason ? null : {
+            date: dateStr,
+            category: catId,
+            amount,
+            note: r[mapping.note] || "",
+          };
+        });
+        expenses = built.filter(Boolean);
+
+        if (expenses.length === 0) {
+          // Show all reasons so the user knows what to fix
+          const parts = [];
+          if (rejected.date) parts.push(`${rejected.date} with invalid/missing date`);
+          if (rejected.amount) parts.push(`${rejected.amount} with invalid amount`);
+          if (rejected.category) parts.push(`${rejected.category} with unmapped category`);
+          toast.error(
+            parts.length
+              ? `No rows could be imported: ${parts.join(", ")}.`
+              : "No rows could be imported. Check your column mapping."
+          );
+          setLoading(false);
+          return;
+        }
+
+        // Partial — warn but proceed
+        const totalRejected = rejected.date + rejected.amount + rejected.category;
+        if (totalRejected > 0) {
+          toast(
+            `${totalRejected} row${totalRejected > 1 ? "s" : ""} skipped (${
+              [
+                rejected.date && `${rejected.date} bad date`,
+                rejected.amount && `${rejected.amount} bad amount`,
+                rejected.category && `${rejected.category} no category`,
+              ].filter(Boolean).join(", ")
+            })`,
+            { icon: "⚠️" }
+          );
+        }
       }
 
       const token = getToken();
